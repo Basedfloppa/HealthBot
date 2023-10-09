@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "Lc1/eXfzZLpgaJA0qUYGVt+rJLvlZp7E+QmNAJAzbc3mgn0BCEbsNxPeOqP17rmWBghBaAnja+i9oIKfDupVow==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\user\\source\\repos\\HealthBot\\HealthBot\\HealthBot.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\user\\.nuget\\packages\\newtonsoft.json\\13.0.1\\newtonsoft.json.13.0.1.nupkg.sha512",
+    "C:\\Users\\user\\.nuget\\packages\\telegram.bot\\19.0.0\\telegram.bot.19.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}
