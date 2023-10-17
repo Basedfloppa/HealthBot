@@ -2309,11 +2309,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\user\\source\\repos\\HealthBot\\HealthBot_Tests\\HealthBot_Tests.csproj",
+      "projectUniqueName": "C:\\Users\\user\\Documents\\GitHub\\HealthBot\\HealthBot_Tests\\HealthBot_Tests.csproj",
       "projectName": "HealthBot_Tests",
-      "projectPath": "C:\\Users\\user\\source\\repos\\HealthBot\\HealthBot_Tests\\HealthBot_Tests.csproj",
+      "projectPath": "C:\\Users\\user\\Documents\\GitHub\\HealthBot\\HealthBot_Tests\\HealthBot_Tests.csproj",
       "packagesPath": "C:\\Users\\user\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\user\\source\\repos\\HealthBot\\HealthBot_Tests\\obj\\",
+      "outputPath": "C:\\Users\\user\\Documents\\GitHub\\HealthBot\\HealthBot_Tests\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
