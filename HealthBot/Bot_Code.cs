@@ -1,10 +1,8 @@
 ﻿using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot;
-using _Config;
+using Configuration;
 using Bot.scripts;
-using static System.Reflection.Metadata.BlobBuilder;
-using System.Net.NetworkInformation;
 
 namespace Bot.code
 {
@@ -22,7 +20,7 @@ namespace Bot.code
         bool bot_running = false;
 
         ITelegramBotClient bot = new TelegramBotClient(Config.token); // token
-        Dictionary<long, User_Instance> data = new Dictionary<long, User_Instance> { }; // enables work for multiple user
+        List<DataModel.User> data = new List<DataModel.User> { }; // enables work for multiple user
         static CancellationTokenSource cts = new CancellationTokenSource();
         CancellationToken cancellationToken = cts.Token;
         ReceiverOptions receiverOptions = new ReceiverOptions { AllowedUpdates = { } }; // receive all update types
@@ -40,31 +38,38 @@ namespace Bot.code
 
         public async Task HandleUpdateAsync(ITelegramBotClient botclient, Update update, CancellationToken cancellationToken)
         {
-            long cid;
-            string calldata;
-            int messageid;
+            long chat_id;
+            int message_id;
+
             Message message;
+
             if (update.Message != null)
             {
                 message = update.Message;
-                cid = update.Message.Chat.Id;
-                if (!data.ContainsKey(cid)) Command.User_load(update);
-                
-                if (update.Message.Text != null && update.Message.Text == $"/start")
+                chat_id = update.Message.Chat.Id;
+
+                if (data.Find(u => u.ChatId == chat_id) == null) Command.User_load(update);
+
+                if (message.Text != null && message.Text == $"/start")
                 {
-                    data[cid].state = State.Menu;
-                    await Command.Send(cid, $"Welcome!", Reply_Keyboards.Menu());
+                    data.Find(u => u.ChatId == chat_id).State = State.Menu.ToString();
+
+                    await Command.Send(chat_id, $"Welcome!", Reply_Keyboards.Menu());
                 }
                 return;
             }
             else if (update.CallbackQuery != null)
             {
-                cid = update.CallbackQuery.From.Id;
-                calldata = update.CallbackQuery.Data;
-                messageid = update.CallbackQuery.Message.MessageId;
+                string callback_data;
+
+                chat_id = update.CallbackQuery.From.Id;
+
+                if (data.Find(u => u.ChatId == chat_id) == null) Command.User_load(update);
+
+                callback_data = update.CallbackQuery.Data;
+                message_id = update.CallbackQuery.Message.MessageId;
             }
             else return;
-
         }
 
         public async Task HandleErrorAsync(ITelegramBotClient botclient, Exception exception, CancellationToken cancellationToken)

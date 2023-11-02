@@ -1,0 +1,5 @@
+C:\Users\user\Documents\GitHub\HealthBot\HealthBot\obj\Debug\net6.0\HealthBot.csproj.AssemblyReference.cache
+C:\Users\user\Documents\GitHub\HealthBot\HealthBot\obj\Debug\net6.0\HealthBot.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\user\Documents\GitHub\HealthBot\HealthBot\obj\Debug\net6.0\HealthBot.AssemblyInfoInputs.cache
+C:\Users\user\Documents\GitHub\HealthBot\HealthBot\obj\Debug\net6.0\HealthBot.AssemblyInfo.cs
+C:\Users\user\Documents\GitHub\HealthBot\HealthBot\obj\Debug\net6.0\HealthBot.csproj.CoreCompileInputs.cache
