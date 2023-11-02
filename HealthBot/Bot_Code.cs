@@ -3,6 +3,7 @@ using Telegram.Bot.Types;
 using Telegram.Bot;
 using Configuration;
 using Bot.scripts;
+using LinqToDB.Data;
 
 namespace Bot.code
 {
@@ -17,16 +18,16 @@ namespace Bot.code
 
     public class Bot_Code
     {
-        bool bot_running = false;
-
-        ITelegramBotClient bot = new TelegramBotClient(Config.token); // token
-        List<DataModel.User> data = new List<DataModel.User> { }; // enables work for multiple user
+        static ITelegramBotClient bot = new TelegramBotClient(Config.token); // token
+        static List<DataModel.User> data = new List<DataModel.User> { }; // enables work for multiple user
         static CancellationTokenSource cts = new CancellationTokenSource();
-        CancellationToken cancellationToken = cts.Token;
-        ReceiverOptions receiverOptions = new ReceiverOptions { AllowedUpdates = { } }; // receive all update types
+        static CancellationToken cancellationToken = cts.Token;
+        static ReceiverOptions receiverOptions = new ReceiverOptions { AllowedUpdates = { } }; // receive all update types
 
-        public void Main()
+        public static void Main()
         {
+            DataConnection.DefaultSettings = new MySettings();
+
             bot.StartReceiving
             (
                 HandleUpdateAsync,
@@ -34,9 +35,13 @@ namespace Bot.code
                 receiverOptions,
                 cancellationToken
             );
+
+            Command.Initialize(data, bot);
+
+            Console.Read();
         }
 
-        public async Task HandleUpdateAsync(ITelegramBotClient botclient, Update update, CancellationToken cancellationToken)
+        public static async Task HandleUpdateAsync(ITelegramBotClient botclient, Update update, CancellationToken cancellationToken)
         {
             long chat_id;
             int message_id;
@@ -72,7 +77,7 @@ namespace Bot.code
             else return;
         }
 
-        public async Task HandleErrorAsync(ITelegramBotClient botclient, Exception exception, CancellationToken cancellationToken)
+        public static async Task HandleErrorAsync(ITelegramBotClient botclient, Exception exception, CancellationToken cancellationToken)
         {
         }// exeption handling
     }

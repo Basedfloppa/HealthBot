@@ -24,13 +24,13 @@ namespace Bot.scripts
             if (upd.Message != null) chat_id = upd.Message.Chat.Id;
             if (upd.CallbackQuery != null) chat_id = upd.CallbackQuery.From.Id;
 
-            using (var db = new HealthBotDB())
+            using (var db = new HealthBotDB("HealthBot"))
             {
-                var user = db.Users.Single(u => u.ChatId == chat_id);
+                var query = db.Users.Where(u => u.ChatId == chat_id);
 
-                if (user != null)
+                if (query.Count() == 1)
                 {
-                    data.Add(user);
+                    data.Add(query.First());
                 }
                 else
                 {
@@ -44,7 +44,7 @@ namespace Bot.scripts
         } 
         public static async void Exit_seq() // safe exit, saves all current user data and notifies them about bot going down
         {
-            await using (var db = new HealthBotDB())
+            await using (var db = new HealthBotDB("HealthBotDB"))
             {
                 foreach (var user in data)
                 {
@@ -64,7 +64,7 @@ namespace Bot.scripts
         }
         public static async void Start_seq() // safe start command, loads all user data and notifies them that bot is up
         {
-            using (var db = new HealthBotDB())
+            using (var db = new HealthBotDB("HealthBotDB"))
             {
                 var users = from u
                             in db.Users

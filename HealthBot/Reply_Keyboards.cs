@@ -15,6 +15,12 @@ namespace Bot.scripts
         }
         public static InlineKeyboardMarkup Menu()
         {
+            InlineKeyboardMarkup result = new(new[]
+            {
+                InlineKeyboardButton.WithCallbackData(text: $"yes", callbackData: $"yes"),
+                InlineKeyboardButton.WithCallbackData(text: $"no", callbackData: $"no")
+            });
+            return result;
         }
     }
 }
