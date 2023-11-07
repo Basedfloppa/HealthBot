@@ -1,10 +1,7 @@
-﻿
-using DataModel;
+﻿using DataModel;
+using LinqToDB;
 using System.Data;
-using System.Net.NetworkInformation;
-using System.Runtime.Serialization.Json;
 using System.Text.Json;
-using Telegram.Bot.Types;
 
 namespace Sql_Queries
 {
@@ -63,26 +60,36 @@ namespace Sql_Queries
         {
             using (var db = new HealthBotDB())
             {
-                var entrys = from entry
-                             in db.DiaryEntrys
-                             where entry.Author == user.Uuid
-                             select entry;
-
                 var entry_ids = from entry
-                                in entrys
+                                in db.DiaryEntrys
+                                where entry.Author == user.Uuid
                                 select entry.Uuid;
 
-                var items_unnamed = from item
-                            in db.IntakeItems
-                            where entry_ids.Contains(item.DiaryEntry)
-                            select item;
+                return db.IntakeItems.Where(item => entry_ids.Contains(item.DiaryEntry) && item.Name.ToLower().Contains(name.ToLower())).ToList();
+            }
+        }
+        internal static List<IntakeItem> items_by_tag(string tag, DataModel.User user)
+        {
+            using (var db = new HealthBotDB())
+            {
+                var entry_ids = from entry
+                                in db.DiaryEntrys
+                                where entry.Author == user.Uuid
+                                select entry.Uuid;
 
-                var items = from item 
-                            in items_unnamed
-                            where item.Name.ToLower().Contains(name.ToLower())
-                            select item;
+                return db.IntakeItems.Where(item => entry_ids.Contains(item.DiaryEntry) && item.Tags.ToLower().Contains(tag.ToLower())).ToList();
+            }
+        }
+        internal static List<IntakeItem> items_argument(string argument, DataModel.User user)
+        {
+            using (var db = new HealthBotDB())
+            {
+                var entry_ids = from entry
+                                in db.DiaryEntrys
+                                where entry.Author == user.Uuid
+                                select entry.Uuid;
 
-                return items.ToList();
+                return db.IntakeItems.Where(item => entry_ids.Contains(item.DiaryEntry) && (item.Tags.ToLower().Contains(argument.ToLower()) || item.Name.ToLower().Contains(argument.ToLower()))).ToList();
             }
         }
         internal static string user_data_export(long chat_id)

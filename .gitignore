@@ -1,2 +1,4 @@
 *.tt
 Config.cs
+**/bin
+**/obj

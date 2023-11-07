@@ -9,25 +9,30 @@ namespace Bot.code
 {
     enum State
     {
-        Menu, // menu
-        Game0, // difficulty selection (input1d)
-        Game1, // basic game array (input2d)
-        Conclusion, // conclusion (inputbool)
-        Stats // statistics (input1d)
-    } // little simplification for menu navigation
+        Menu,
+        Account,
+        AccountChange,
+        AccountExport,
+        AccountSubscription,
+        LinkedAccounts,
+        AddAccount,
+        RemoveAccount,
+        Diary,
+        SearchDiary,
+        AddToDiary,
+        Stats
+    } 
 
     public class Bot_Code
     {
         static ITelegramBotClient bot = new TelegramBotClient(Config.token); // token
-        static List<DataModel.User> data = new List<DataModel.User> { }; // enables work for multiple user
+        static Dictionary<long, DataModel.User> data = new Dictionary<long, DataModel.User> { }; // enables work for multiple user
         static CancellationTokenSource cts = new CancellationTokenSource();
         static CancellationToken cancellationToken = cts.Token;
         static ReceiverOptions receiverOptions = new ReceiverOptions { AllowedUpdates = { } }; // receive all update types
 
         public static void Main()
         {
-            DataConnection.DefaultSettings = new MySettings();
-
             bot.StartReceiving
             (
                 HandleUpdateAsync,
@@ -51,15 +56,18 @@ namespace Bot.code
             if (update.Message != null)
             {
                 message = update.Message;
+                message_id = update.Message.MessageId;
+
                 chat_id = update.Message.Chat.Id;
 
-                if (data.Find(u => u.ChatId == chat_id) == null) Command.User_load(update);
+                if (!data.TryGetValue(chat_id, out var a )) Command.User_load(update);
 
-                if (message.Text != null && message.Text == $"/start")
+                if (message.Text != null && message.Text == "/start")
                 {
-                    data.Find(u => u.ChatId == chat_id).State = State.Menu.ToString();
+                    data[chat_id].State = State.Menu.ToString();
 
-                    await Command.Send(chat_id, $"Welcome!", Reply_Keyboards.Menu());
+                    Reply.Account(chat_id);
+                    await bot.DeleteMessageAsync(chat_id, message_id);
                 }
                 return;
             }
@@ -69,16 +77,18 @@ namespace Bot.code
 
                 chat_id = update.CallbackQuery.From.Id;
 
-                if (data.Find(u => u.ChatId == chat_id) == null) Command.User_load(update);
+                if (data[chat_id] == null) Command.User_load(update);
 
                 callback_data = update.CallbackQuery.Data;
-                message_id = update.CallbackQuery.Message.MessageId;
             }
             else return;
         }
 
         public static async Task HandleErrorAsync(ITelegramBotClient botclient, Exception exception, CancellationToken cancellationToken)
         {
+            Console.BackgroundColor = ConsoleColor.Red;
+            Console.Write("\n\n" + exception.ToString() + "\n\n");
+            Console.ResetColor();
         }// exeption handling
     }
 }
