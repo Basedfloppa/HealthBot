@@ -40,6 +40,17 @@ namespace Bot.code
             (
                 HandleUpdateAsync,
                 HandleErrorAsync,
+                HandleAccountState,
+                HandleLinkedAccountsState,
+                HandleAccountChangeState,
+                HandleAccountExportState,
+                HandleAddAccountState,
+                HandleRemoveAccountState,
+                HandleAccountSubscriptionState,
+                HandleStatsState,
+                HandleDiaryState,
+                HandleSearchDiaryState,
+                HandleAddToDiaryState
                 receiverOptions,
                 cancellationToken
             );
@@ -86,37 +97,37 @@ namespace Bot.code
                     }
                 case State.Account:
                     {
-                        await HandleGame0State(cid, calldata, messageid);
+                        await HandleAccountState(cid, calldata, messageid);
                         break;
                     }
                 case State.LinkedAccounts:
                     {
-                        await HandleGame1State(cid, calldata, messageid);
+                        await HandleLinkedAccountsState(cid, calldata, messageid);
                         break;
                     }
                 case State.AccountChange:
                     {
-                        await HandleConclusionState(cid, calldata, messageid);
+                        await HandleAccountChangeState(cid, calldata, messageid);
                         break;
                     }
                 case State.AccountExport:
                     {
-                        await HandleStatsState(cid, calldata, messageid);
+                        await HandleAccountExportState(cid, calldata, messageid);
                         break;
                     }
                 case State.AddAccount:
                     {
-                        await HandleStatsState(cid, calldata, messageid);
+                        await HandleAddAccountState(cid, calldata, messageid);
                         break;
                     }
                 case State.RemoveAccount:
                     {
-                        await HandleStatsState(cid, calldata, messageid);
+                        await HandleRemoveAccountState(cid, calldata, messageid);
                         break;
                     }
                 case State.AccountSubscription:
                     {
-                        await HandleStatsState(cid, calldata, messageid);
+                        await HandleAccountSubscriptionState(cid, calldata, messageid);
                         break;
                     }
                 case State.Stats:
@@ -126,17 +137,17 @@ namespace Bot.code
                     }
                 case State.Diary:
                     {
-                        await HandleStatsState(cid, calldata, messageid);
+                        await HandleDiaryState(cid, calldata, messageid);
                         break;
                     }
                 case State.SearchDiary:
                     {
-                        await HandleStatsState(cid, calldata, messageid);
+                        await HandleSearchDiaryState(cid, calldata, messageid);
                         break;
                     }
                 case State.AddToDiary:
                     {
-                        await HandleStatsState(cid, calldata, messageid);
+                        await HandleAddToDiaryState(cid, calldata, messageid);
                         break;
                     }
             }
