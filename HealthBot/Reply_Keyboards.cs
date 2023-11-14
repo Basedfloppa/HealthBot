@@ -1,14 +1,11 @@
-﻿using DataModel;
-using LinqToDB;
-using System;
-using Telegram.Bot.Types;
+﻿using LinqToDB;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Bot.scripts
 {
     static class Reply
     {
-        public static async Task Menu(long chat_id, string addition = "")
+        public static async Task Menu(long chat_id, int message_id, string addition = "")
         {
             var user = Command.data[chat_id];
             var name = user.Name != null && user.Name != "" ? user.Name : user.Alias;
@@ -24,7 +21,7 @@ namespace Bot.scripts
                 InlineKeyboardButton.WithCallbackData(text: "Accoun data", callbackData: "To_Account"),
             };
 
-            await Command.Send(chat_id, message, keyboard);
+            await Command.Send(chat_id, message, keyboard, message_id);
         }
         public static async Task Account(long chat_id, string addition = "")
         {
