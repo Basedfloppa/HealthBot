@@ -2,4 +2,6 @@
 Config.cs
 **/bin
 **/obj
-.vs
+**/FileContextIndex
+**/v17
+**/.vs
