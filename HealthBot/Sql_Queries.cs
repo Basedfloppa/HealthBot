@@ -95,7 +95,12 @@ namespace Sql_Queries
                         where diary_entry_ids.Contains(entry.DiaryEntry)
                         select entry;
 
-            return JsonSerializer.Serialize(user) + "\n\n" + JsonSerializer.Serialize(diary_entry_ids) + "\n\n" + JsonSerializer.Serialize(items);
+            var biometry = from entry
+                           in Command.db.Biometries
+                           where entry.Author == user.Uuid
+                           select entry;
+
+            return JsonSerializer.Serialize(user) + "\n\n" + JsonSerializer.Serialize(diary_entry_ids) + "\n\n" + JsonSerializer.Serialize(items) + "\n\n" + JsonSerializer.Serialize(biometry);
         }
     }
 }

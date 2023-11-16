@@ -24,8 +24,11 @@ namespace DataModel
 	/// </summary>
 	public partial class HealthBotDB : LinqToDB.Data.DataConnection
 	{
+		public ITable<Biometry>   Biometries  { get { return this.GetTable<Biometry>(); } }
 		public ITable<DiaryEntry> DiaryEntrys { get { return this.GetTable<DiaryEntry>(); } }
+		public ITable<ExportData> Exportdatas { get { return this.GetTable<ExportData>(); } }
 		public ITable<IntakeItem> IntakeItems { get { return this.GetTable<IntakeItem>(); } }
+		public ITable<Obresver>   Obresvers   { get { return this.GetTable<Obresver>(); } }
 		public ITable<User>       Users       { get { return this.GetTable<User>(); } }
 
 		partial void InitMappingSchema()
@@ -63,7 +66,29 @@ namespace DataModel
 		partial void InitMappingSchema();
 	}
 
-	[Table(Schema="public", Name="DiaryEntrys")]
+	[Table(Schema="public", Name="biometry")]
+	public partial class Biometry
+	{
+		[Column("uuid",       DbType="uuid",                         DataType=LinqToDB.DataType.Guid),                                  PrimaryKey,  NotNull] public Guid            Uuid      { get; set; } // uuid
+		[Column("author",     DbType="uuid",                         DataType=LinqToDB.DataType.Guid),                                               NotNull] public Guid            Author    { get; set; } // uuid
+		[Column("weight",     DbType="integer",                      DataType=LinqToDB.DataType.Int32,          Precision=32, Scale=0),    Nullable         ] public int?            Weight    { get; set; } // integer
+		[Column("height",     DbType="integer",                      DataType=LinqToDB.DataType.Int32,          Precision=32, Scale=0),    Nullable         ] public int?            Height    { get; set; } // integer
+		[Column("created_at", DbType="timestamp (6) with time zone", DataType=LinqToDB.DataType.DateTimeOffset, Precision=6),                        NotNull] public DateTimeOffset  CreatedAt { get; set; } // timestamp (6) with time zone
+		[Column("changed_at", DbType="timestamp (6) with time zone", DataType=LinqToDB.DataType.DateTimeOffset, Precision=6),              Nullable         ] public DateTimeOffset? ChangedAt { get; set; } // timestamp (6) with time zone
+		[Column("deleted_at", DbType="timestamp (6) with time zone", DataType=LinqToDB.DataType.DateTimeOffset, Precision=6),              Nullable         ] public DateTimeOffset? DeletedAt { get; set; } // timestamp (6) with time zone
+
+		#region Associations
+
+		/// <summary>
+		/// author (public.users)
+		/// </summary>
+		[Association(ThisKey="Author", OtherKey="Uuid", CanBeNull=false)]
+		public User FKAuthor { get; set; }
+
+		#endregion
+	}
+
+	[Table(Schema="public", Name="diaryentrys")]
 	public partial class DiaryEntry
 	{
 		[Column("uuid",             DbType="uuid",                         DataType=LinqToDB.DataType.Guid),                                  PrimaryKey,  NotNull] public Guid           Uuid            { get; set; } // uuid
@@ -85,7 +110,26 @@ namespace DataModel
 		public IEnumerable<IntakeItem> DiaryEntries { get; set; }
 
 		/// <summary>
-		/// Author (public.Users)
+		/// Author (public.users)
+		/// </summary>
+		[Association(ThisKey="Author", OtherKey="Uuid", CanBeNull=false)]
+		public User FKAuthor { get; set; }
+
+		#endregion
+	}
+
+	[Table(Schema="public", Name="exportdata")]
+	public partial class ExportData
+	{
+		[Column("uuid",          DbType="uuid",                         DataType=LinqToDB.DataType.Guid),                        PrimaryKey, NotNull] public Guid           Uuid         { get; set; } // uuid
+		[Column("author",        DbType="uuid",                         DataType=LinqToDB.DataType.Guid),                                    NotNull] public Guid           Author       { get; set; } // uuid
+		[Column("exported_data", DbType="text",                         DataType=LinqToDB.DataType.Text),                                    NotNull] public string         ExportedData { get; set; } // text
+		[Column("created_at",    DbType="timestamp (6) with time zone", DataType=LinqToDB.DataType.DateTimeOffset, Precision=6),             NotNull] public DateTimeOffset CreatedAt    { get; set; } // timestamp (6) with time zone
+
+		#region Associations
+
+		/// <summary>
+		/// author (public.users)
 		/// </summary>
 		[Association(ThisKey="Author", OtherKey="Uuid", CanBeNull=false)]
 		public User FKAuthor { get; set; }
@@ -110,15 +154,38 @@ namespace DataModel
 		#region Associations
 
 		/// <summary>
-		/// DiaryEntry (public.DiaryEntrys)
+		/// DiaryEntry (public.diaryentrys)
 		/// </summary>
 		[Association(ThisKey="DiaryEntry", OtherKey="Uuid", CanBeNull=false)]
-		public DiaryEntry FKDiaryEntry { get; set; }
+		public Diaryentry FKDiaryEntry { get; set; }
 
 		#endregion
 	}
 
-	[Table(Schema="public", Name="Users")]
+	[Table(Schema="public", Name="obresvers")]
+	public partial class Obresver
+	{
+		[Column("observer", DbType="uuid", DataType=LinqToDB.DataType.Guid), PrimaryKey(1), NotNull] public Guid Observer { get; set; } // uuid
+		[Column("observee", DbType="uuid", DataType=LinqToDB.DataType.Guid), PrimaryKey(2), NotNull] public Guid Observee { get; set; } // uuid
+
+		#region Associations
+
+		/// <summary>
+		/// fk_observee (public.users)
+		/// </summary>
+		[Association(ThisKey="Observee", OtherKey="Uuid", CanBeNull=false)]
+		public User Fkobservee { get; set; }
+
+		/// <summary>
+		/// fk_observer (public.users)
+		/// </summary>
+		[Association(ThisKey="Observer", OtherKey="Uuid", CanBeNull=false)]
+		public User Fkobserver { get; set; }
+
+		#endregion
+	}
+
+	[Table(Schema="public", Name="users")]
 	public partial class User
 	{
 		[Column("uuid",               DbType="uuid",                         DataType=LinqToDB.DataType.Guid),                                  PrimaryKey,  NotNull] public Guid            Uuid              { get; set; } // uuid
@@ -127,8 +194,6 @@ namespace DataModel
 		[Column("chat_id",            DbType="bigint",                       DataType=LinqToDB.DataType.Int64,          Precision=64, Scale=0),              NotNull] public long            ChatId            { get; set; } // bigint
 		[Column("age",                DbType="integer",                      DataType=LinqToDB.DataType.Int32,          Precision=32, Scale=0),    Nullable         ] public int?            Age               { get; set; } // integer
 		[Column("sex",                DbType="text",                         DataType=LinqToDB.DataType.Text),                                     Nullable         ] public string          Sex               { get; set; } // text
-		[Column("weight",             DbType="integer",                      DataType=LinqToDB.DataType.Int32,          Precision=32, Scale=0),    Nullable         ] public int?            Weight            { get; set; } // integer
-		[Column("doctor_Id",          DbType="uuid",                         DataType=LinqToDB.DataType.Guid),                                     Nullable         ] public Guid?           DoctorId          { get; set; } // uuid
 		[Column("subscription_end",   DbType="timestamp (6) with time zone", DataType=LinqToDB.DataType.DateTimeOffset, Precision=6),              Nullable         ] public DateTimeOffset? SubscriptionEnd   { get; set; } // timestamp (6) with time zone
 		[Column("subscription_start", DbType="timestamp (6) with time zone", DataType=LinqToDB.DataType.DateTimeOffset, Precision=6),              Nullable         ] public DateTimeOffset? SubscriptionStart { get; set; } // timestamp (6) with time zone
 		[Column("created_at",         DbType="time with time zone",          DataType=LinqToDB.DataType.Time,           Precision=6),                        NotNull] public DateTimeOffset  CreatedAt         { get; set; } // time with time zone
@@ -139,29 +204,53 @@ namespace DataModel
 		#region Associations
 
 		/// <summary>
-		/// Author_BackReference (public.DiaryEntrys)
+		/// author_BackReference (public.exportdata)
 		/// </summary>
 		[Association(ThisKey="Uuid", OtherKey="Author", CanBeNull=true)]
-		public IEnumerable<DiaryEntry> Authors { get; set; }
+		public IEnumerable<Exportdata> AuthorBackReferences { get; set; }
 
 		/// <summary>
-		/// DoctorIds (public.Users)
+		/// Author_BackReference (public.diaryentrys)
 		/// </summary>
-		[Association(ThisKey="DoctorId", OtherKey="Uuid", CanBeNull=true)]
-		public User Doctor { get; set; }
+		[Association(ThisKey="Uuid", OtherKey="Author", CanBeNull=true)]
+		public IEnumerable<Diaryentry> Authors { get; set; }
 
 		/// <summary>
-		/// DoctorIds_BackReference (public.Users)
+		/// author_BackReference (public.biometry)
 		/// </summary>
-		[Association(ThisKey="Uuid", OtherKey="DoctorId", CanBeNull=true)]
-		public IEnumerable<User> DoctorIds { get; set; }
+		[Association(ThisKey="Uuid", OtherKey="Author", CanBeNull=true)]
+		public IEnumerable<Biometry> FKAuthors { get; set; }
+
+		/// <summary>
+		/// fk_observee_BackReference (public.obresvers)
+		/// </summary>
+		[Association(ThisKey="Uuid", OtherKey="Observee", CanBeNull=true)]
+		public IEnumerable<Obresver> Fkobservees { get; set; }
+
+		/// <summary>
+		/// fk_observer_BackReference (public.obresvers)
+		/// </summary>
+		[Association(ThisKey="Uuid", OtherKey="Observer", CanBeNull=true)]
+		public IEnumerable<Obresver> Fkobservers { get; set; }
 
 		#endregion
 	}
 
 	public static partial class TableExtensions
 	{
+		public static Biometry Find(this ITable<Biometry> table, Guid Uuid)
+		{
+			return table.FirstOrDefault(t =>
+				t.Uuid == Uuid);
+		}
+
 		public static DiaryEntry Find(this ITable<DiaryEntry> table, Guid Uuid)
+		{
+			return table.FirstOrDefault(t =>
+				t.Uuid == Uuid);
+		}
+
+		public static ExportData Find(this ITable<ExportData> table, Guid Uuid)
 		{
 			return table.FirstOrDefault(t =>
 				t.Uuid == Uuid);
@@ -171,6 +260,13 @@ namespace DataModel
 		{
 			return table.FirstOrDefault(t =>
 				t.Uuid == Uuid);
+		}
+
+		public static Obresver Find(this ITable<Obresver> table, Guid Observer, Guid Observee)
+		{
+			return table.FirstOrDefault(t =>
+				t.Observer == Observer &&
+				t.Observee == Observee);
 		}
 
 		public static User Find(this ITable<User> table, Guid Uuid)
