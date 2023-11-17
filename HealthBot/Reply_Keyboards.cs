@@ -27,12 +27,17 @@ namespace Bot.scripts
         {
             var user = Command.data[chat_id];
 
+            var biometry = Command.db.Biometries.LastOrDefault(entry => entry.Author == user.Uuid);
+
+            var linked_accounts = Command.db.Obresvers.Count(entry => entry.Observee == user.Uuid);
+
             string message = $"Account of {user.Alias}\n" +
                              $"Age: {user.Age?.ToString() ?? "not set"}\n" +
-                             $"Weight: {user.Weight?.ToString() ?? "not set" }\n" +
+                             $"Weight: {biometry?.Weight?.ToString() ?? "not set" }\n" +
+                             $"Height: {biometry?.Height?.ToString() ?? "not set"}" +
                              $"Sex: {user.Sex?.ToString() ?? "not set"}\n" +
                              $"Subscription {(user.SubscriptionEnd == null ? Convert.ToDateTime(user.SubscriptionEnd - DateTime.Now).ToString("U") : "not started")}\n" +
-                             $"Linked accounts: {user.DoctorIds?.Count().ToString() ?? "no linked accounts yet" }" +
+                             $"Linked accounts: {(linked_accounts > 0 ? linked_accounts : "no linked accounts yet")}" +
                              $"{addition}";
 
             InlineKeyboardMarkup keyboard = new[]
@@ -54,13 +59,23 @@ namespace Bot.scripts
         }
         public static async Task LinkedAccounts(long chat_id, string addition = "")
         {
-            var users_linked = Command.data[chat_id].DoctorIds;
+            var user = Command.data[chat_id];
+
+            var observers_id = from entry
+                                in Command.db.Obresvers
+                                where entry.Observee == user.Uuid
+                                select entry.Observer;
+
+            var observers = from entry
+                            in Command.db.Users
+                            where observers_id.Contains(entry.Uuid)
+                            select entry.Alias;
 
             var message = $"Accounts that have access to your data:\n";
 
-            foreach(var uuid in users_linked)
+            foreach(var observer in observers)
             {
-                message += "@" + Command.db.Users.SingleOrDefault(u => u.Uuid.ToString() == uuid.ToString()).Alias.ToString() + "\n";
+                message += "@" + observer + "\n";
             }
 
             message += $"{addition}";
@@ -85,12 +100,17 @@ namespace Bot.scripts
         {
             var user = Command.data[chat_id];
 
-            string message = $"What info you want to change?" +
+            var biometry = Command.db.Biometries.LastOrDefault(entry => entry.Author == user.Uuid);
+
+            var linked_accounts = Command.db.Obresvers.Count(entry => entry.Observee == user.Uuid);
+
+            string message = $"Account of {user.Alias}\n" +
                              $"Age: {user.Age?.ToString() ?? "not set"}\n" +
-                             $"Weight: {user.Weight?.ToString() ?? "not set"}\n" +
+                             $"Weight: {biometry?.Weight?.ToString() ?? "not set"}\n" +
+                             $"Height: {biometry?.Height?.ToString() ?? "not set"}" +
                              $"Sex: {user.Sex?.ToString() ?? "not set"}\n" +
                              $"Subscription {(user.SubscriptionEnd == null ? Convert.ToDateTime(user.SubscriptionEnd - DateTime.Now).ToString("U") : "not started")}\n" +
-                             $"Linked accounts: {user.DoctorIds?.Count().ToString() ?? "no linked accounts yet"}" +
+                             $"Linked accounts: {(linked_accounts > 0 ? linked_accounts : "no linked accounts yet")}" +
                              $"{addition}";
 
             InlineKeyboardMarkup keyboard = new[]
