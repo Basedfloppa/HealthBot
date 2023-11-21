@@ -17,9 +17,7 @@ namespace Configuration
 
     public class MySettings : ILinqToDBSettings
     {
-        public IEnumerable<IDataProviderSettings> DataProviders
-            => Enumerable.Empty<IDataProviderSettings>();
-
+        public IEnumerable<IDataProviderSettings> DataProviders => Enumerable.Empty<IDataProviderSettings>();
         public string DefaultConfiguration => "PostgreSQL";
         public string DefaultDataProvider => "PostgreSQL";
 
