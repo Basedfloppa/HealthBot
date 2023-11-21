@@ -26,7 +26,7 @@ namespace DataModel
 	{
 		public ITable<Biometry>   Biometries  { get { return this.GetTable<Biometry>(); } }
 		public ITable<DiaryEntry> DiaryEntrys { get { return this.GetTable<DiaryEntry>(); } }
-		public ITable<ExportData> Exportdatas { get { return this.GetTable<ExportData>(); } }
+		public ITable<ExportData> ExportDatas { get { return this.GetTable<ExportData>(); } }
 		public ITable<IntakeItem> IntakeItems { get { return this.GetTable<IntakeItem>(); } }
 		public ITable<Obresver>   Obresvers   { get { return this.GetTable<Obresver>(); } }
 		public ITable<User>       Users       { get { return this.GetTable<User>(); } }
@@ -199,27 +199,28 @@ namespace DataModel
 		[Column("created_at",         DbType="time with time zone",          DataType=LinqToDB.DataType.Time,           Precision=6),                        NotNull] public DateTimeOffset  CreatedAt         { get; set; } // time with time zone
 		[Column("updated_at",         DbType="time with time zone",          DataType=LinqToDB.DataType.Time,           Precision=6),              Nullable         ] public DateTimeOffset? UpdatedAt         { get; set; } // time with time zone
 		[Column("deleted_at",         DbType="time with time zone",          DataType=LinqToDB.DataType.Time,           Precision=6),              Nullable         ] public DateTimeOffset? DeletedAt         { get; set; } // time with time zone
-		[Column("state",              DbType="\"State\"",                      DataType=LinqToDB.DataType.Enum),                                             NotNull] public string          State             { get; set; } // "State"
+		[Column("state",              DbType="text",                         DataType=LinqToDB.DataType.Text),                                               NotNull] public string          State             { get; set; } // text
+		[Column("last_action",        DbType="text",                         DataType=LinqToDB.DataType.Text),                                               NotNull] public string          LastAction        { get; set; } // text
 
 		#region Associations
-
-		/// <summary>
-		/// author_BackReference (public.exportdata)
-		/// </summary>
-		[Association(ThisKey="Uuid", OtherKey="Author", CanBeNull=true)]
-		public IEnumerable<Exportdata> AuthorBackReferences { get; set; }
-
-		/// <summary>
-		/// Author_BackReference (public.diaryentrys)
-		/// </summary>
-		[Association(ThisKey="Uuid", OtherKey="Author", CanBeNull=true)]
-		public IEnumerable<Diaryentry> Authors { get; set; }
 
 		/// <summary>
 		/// author_BackReference (public.biometry)
 		/// </summary>
 		[Association(ThisKey="Uuid", OtherKey="Author", CanBeNull=true)]
-		public IEnumerable<Biometry> FKAuthors { get; set; }
+		public IEnumerable<Biometry> AuthorBackReferences { get; set; }
+
+		/// <summary>
+		/// author_BackReference (public.exportdata)
+		/// </summary>
+		[Association(ThisKey="Uuid", OtherKey="Author", CanBeNull=true)]
+		public IEnumerable<Exportdata> Authors { get; set; }
+
+		/// <summary>
+		/// Author_BackReference (public.diaryentrys)
+		/// </summary>
+		[Association(ThisKey="Uuid", OtherKey="Author", CanBeNull=true)]
+		public IEnumerable<Diaryentry> FKAuthors { get; set; }
 
 		/// <summary>
 		/// fk_observee_BackReference (public.obresvers)

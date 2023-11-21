@@ -6,7 +6,7 @@ namespace Bot.scripts
 {
     static class Reply
     {
-        public static (string, InlineKeyboardMarkup) Menu(long chat_id, string addition = "")
+        public static (string, InlineKeyboardMarkup) Menu(long chat_id, string addition_text = "")
         {
             DataModel.User user = Command.data[chat_id];
             string name = user.Name != null && user.Name != "" ? user.Name : user.Alias;
@@ -14,7 +14,7 @@ namespace Bot.scripts
             StringBuilder message = new StringBuilder();
             message.Append($"Welcome {name}!\n");
             message.Append("What do we do next?");
-            message.Append($"{addition}");
+            message.Append($"{addition_text}");
 
             InlineKeyboardMarkup keyboard = new[] 
             {
@@ -25,7 +25,7 @@ namespace Bot.scripts
 
             return (message.ToString(), keyboard);
         }
-        public static (string, InlineKeyboardMarkup) Account(long chat_id, string addition = "")
+        public static (string, InlineKeyboardMarkup) Account(long chat_id, string addition_text = "")
         {
             DataModel.User user = Command.data[chat_id];
             DataModel.Biometry biometry = Command.db.Biometries.LastOrDefault(entry => entry.Author == user.Uuid);
@@ -39,7 +39,7 @@ namespace Bot.scripts
             message.Append($"Sex: {user.Sex?.ToString() ?? "not set"}\n");
             message.Append($"Subscription {(user.SubscriptionEnd == null ? Convert.ToDateTime(user.SubscriptionEnd - DateTime.Now).ToString("U") : "not started")}\n");
             message.Append($"Linked accounts: {(linked_accounts > 0 ? linked_accounts : "no linked accounts yet")}");
-            message.Append($"{addition}");
+            message.Append($"{addition_text}");
 
             InlineKeyboardMarkup keyboard = new[]
             {
@@ -58,7 +58,7 @@ namespace Bot.scripts
 
             return (message.ToString(), keyboard);
         }
-        public static (string, InlineKeyboardMarkup) LinkedAccounts(long chat_id, string addition = "")
+        public static (string, InlineKeyboardMarkup) LinkedAccounts(long chat_id, string addition_text = "")
         {
             DataModel.User user = Command.data[chat_id];
             var observers_id =  from entry
@@ -78,7 +78,7 @@ namespace Bot.scripts
                 message.Append($"@{observer}\n");
             }
 
-            message.Append($"{addition}");
+            message.Append($"{addition_text}");
 
             InlineKeyboardMarkup keyboard = new[]
             {
@@ -96,7 +96,7 @@ namespace Bot.scripts
 
             return (message.ToString(), keyboard);
         }
-        public static (string, InlineKeyboardMarkup) AccountChange(long chat_id, string addition = "")
+        public static (string, InlineKeyboardMarkup) AccountChange(long chat_id, string addition_text = "")
         {
             DataModel.User user = Command.data[chat_id];
             DataModel.Biometry biometry = Command.db.Biometries.LastOrDefault(entry => entry.Author == user.Uuid);
@@ -110,7 +110,7 @@ namespace Bot.scripts
             message.Append($"Sex: {user.Sex?.ToString() ?? "not set"}\n");
             message.Append($"Subscription {(user.SubscriptionEnd == null ? Convert.ToDateTime(user.SubscriptionEnd - DateTime.Now).ToString("U") : "not started")}\n");
             message.Append($"Linked accounts: {(linked_accounts > 0 ? linked_accounts : "no linked accounts yet")}");
-            message.Append($"{addition}");
+            message.Append($"{addition_text}");
 
             InlineKeyboardMarkup keyboard = new[]
             {
@@ -118,17 +118,17 @@ namespace Bot.scripts
                 {
                     InlineKeyboardButton.WithCallbackData(text: "Age"   , callbackData: "Account_Change_Age"),
                     InlineKeyboardButton.WithCallbackData(text: "Weight", callbackData: "Account_Change_Weight"),
-                    InlineKeyboardButton.WithCallbackData(text: "Sex"   , callbackData: "Account_Chainge_Sex")
+                    InlineKeyboardButton.WithCallbackData(text: "Sex"   , callbackData: "Account_Change_Sex")
                 }
             };
 
             return (message.ToString(), keyboard);
         }
-        public static (string, InlineKeyboardMarkup) AccountExport(string addition = "")
+        public static (string, InlineKeyboardMarkup) AccountExport(string addition_text = "")
         {
             StringBuilder message = new StringBuilder();
             message.Append("You want all your user data exported?\n");
-            message.Append($"{addition}");
+            message.Append($"{addition_text}");
 
             InlineKeyboardMarkup keyboard = new[]
             {
@@ -144,11 +144,11 @@ namespace Bot.scripts
 
             return (message.ToString(), keyboard);
         }
-        public static (string, InlineKeyboardMarkup) AddAccount(string addition = "")
+        public static (string, InlineKeyboardMarkup) AddAccount(string addition_text = "")
         {
             StringBuilder message = new StringBuilder();
             message.Append("Type username of account you want to add.\n");
-            message.Append($"{addition}");
+            message.Append($"{addition_text}");
 
             InlineKeyboardMarkup keyboard = new[]
             {
@@ -160,11 +160,11 @@ namespace Bot.scripts
 
             return (message.ToString(), keyboard);
         }
-        public static (string, InlineKeyboardMarkup) RemoveAccount(string addition = "")  
+        public static (string, InlineKeyboardMarkup) RemoveAccount(string addition_text = "")  
         {
             StringBuilder message = new StringBuilder();
             message.Append("Type username of account you want to remove.\n");
-            message.Append($"{addition}");
+            message.Append($"{addition_text}");
 
             InlineKeyboardMarkup keyboard = new[]
             {
@@ -176,13 +176,13 @@ namespace Bot.scripts
 
             return (message.ToString(), keyboard);
         }
-        public static (string, InlineKeyboardMarkup) AccountSubsctuption(long chat_id, string addition = "")
+        public static (string, InlineKeyboardMarkup) AccountSubsctuption(long chat_id, string addition_text = "")
         {
             DataModel.User user = Command.data[chat_id];
 
             StringBuilder message = new StringBuilder();
             message.Append($"For how long you desire to {(user.SubscriptionStart != null ? "prolong your" : "purchase")} subscription?");
-            message.Append($"{addition}");
+            message.Append($"{addition_text}");
 
             InlineKeyboardMarkup keyboard = new[]
             {
@@ -204,11 +204,11 @@ namespace Bot.scripts
 
             return (message.ToString(), keyboard);
         }
-        public static (string, InlineKeyboardMarkup) Stats(string addition = "")
+        public static (string, InlineKeyboardMarkup) Stats(string addition_text = "", string addition_tags = "")
         {
             StringBuilder message = new StringBuilder();
-            message.Append("What statistic info you want to see?");
-            message.Append($"{addition}");
+            message.AppendLine("What statistic info you want to see?");
+            message.AppendLine($"{addition_text}");
 
             InlineKeyboardMarkup keyboard = new[]
             {
@@ -217,18 +217,18 @@ namespace Bot.scripts
                 },
                 new[]
                 {
-                  InlineKeyboardButton.WithCallbackData(text: "Calories by date" , callbackData: "Stats_CaloriesByDate"),
-                  InlineKeyboardButton.WithCallbackData(text: "Liquid by date"   , callbackData: "Stats_LiquidByDate")
+                  InlineKeyboardButton.WithCallbackData(text: "Calories by date" , callbackData: $"Stats_CaloriesByDate{addition_tags}"),
+                  InlineKeyboardButton.WithCallbackData(text: "Liquid by date"   , callbackData: $"Stats_LiquidByDate{addition_tags}")
                 }
             };
 
             return (message.ToString(), keyboard);
         }
-        public static (string, InlineKeyboardMarkup) Diary(string addition = "")
+        public static (string, InlineKeyboardMarkup) Diary(string addition_text = "")
         {
             StringBuilder message = new StringBuilder();
             message.Append($"Welcome to your diary, what do you want to do?");
-            message.Append($"{addition}");
+            message.Append($"{addition_text}");
 
             InlineKeyboardMarkup keyboard = new[]
             {
@@ -239,11 +239,11 @@ namespace Bot.scripts
 
             return (message.ToString(), keyboard);
         }
-        public static (string, InlineKeyboardMarkup) SearchDiary(string addition = "")
+        public static (string, InlineKeyboardMarkup) SearchDiary(string addition_text = "")
         {
             StringBuilder message = new StringBuilder();
             message.Append("Welcome to your diary, what do you want to do?");
-            message.Append($"{addition}");
+            message.Append($"{addition_text}");
 
             InlineKeyboardMarkup keyboard = new[]
             {
@@ -255,11 +255,11 @@ namespace Bot.scripts
 
             return (message.ToString(), keyboard);
         }
-        public static (string, InlineKeyboardMarkup) AddToDiary(string addition = "")
+        public static (string, InlineKeyboardMarkup) AddToDiary(string addition_text = "")
         {
             StringBuilder message = new StringBuilder();
             message.Append("What type of entry you want to make?");
-            message.Append($"{addition}");
+            message.Append($"{addition_text}");
 
             InlineKeyboardMarkup keyboard = new[]
             {

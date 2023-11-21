@@ -5,6 +5,7 @@ using Configuration;
 using Bot.scripts;
 using HealthBot.handlers;
 using Telegram.Bot.Types.ReplyMarkups;
+using System.Security.AccessControl;
 
 namespace Bot.code
 {
@@ -21,20 +22,7 @@ namespace Bot.code
         Diary,
         SearchDiary,
         AddToDiary,
-        Stats,
-        Age,
-        Weight,
-        Sex,
-        Change,
-        CaloriesByDate,
-        LiquidByDate,
-        Type,
-        Name,
-        Tags,
-        New,
-        Search,
-        Intake,
-        Biometry
+        Stats
     }
     
     public class Bot_Code
@@ -63,7 +51,7 @@ namespace Bot.code
             long chat_id;
             int message_id;
             Message message;
-
+            
             if (update.Message != null)
             {
                 message = update.Message;
@@ -82,6 +70,15 @@ namespace Bot.code
 
                     await bot.DeleteMessageAsync(chat_id, message_id);
                 }
+
+                switch (Command.data[chat_id].LastAction)
+                {
+                    case "CaloriesByDate":
+                        break;
+                    case "LiquidByDate":
+                        break;
+                }
+
                 return;
             }
             else if (update.CallbackQuery != null)
@@ -98,16 +95,11 @@ namespace Bot.code
                         await State_Handlers.To_State_Handler(chat_id, callback_data, update.CallbackQuery.Message.MessageId);
                         break;
                     case "Account":
-                        State_Handlers.To_State_Handler(chat_id, callback_data, update.CallbackQuery.Message.MessageId);
-                        State_Handlers.Account_State_Handler(chat_id, callback_data, update.CallbackQuery.Message.MessageId);
+                        await State_Handlers.Account_State_Handler(chat_id, callback_data, update.CallbackQuery.Message.MessageId);
                         break;
                     case "Stats":
-                        State_Handlers.To_State_Handler(chat_id, callback_data, update.CallbackQuery.Message.MessageId);
                         break;
                     case "Diary":
-                        State_Handlers.To_State_Handler(chat_id, callback_data, update.CallbackQuery.Message.MessageId);
-                        State_Handlers.Search_State_Handler(chat_id, callback_data, update.CallbackQuery.Message.MessageId);
-                        State_Handlers.AddToDiary_State_Handler(chat_id, callback_data, update.CallbackQuery.Message.MessageId);
                         break;
                     default:
                         break;
