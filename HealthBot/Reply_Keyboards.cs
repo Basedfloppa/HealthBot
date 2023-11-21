@@ -1,18 +1,20 @@
 ﻿using LinqToDB;
+using System.Text;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Bot.scripts
 {
     static class Reply
     {
-        public static async Task Menu(long chat_id, int message_id, string addition = "")
+        public static (string, InlineKeyboardMarkup) Menu(long chat_id, string addition = "")
         {
-            var user = Command.data[chat_id];
-            var name = user.Name != null && user.Name != "" ? user.Name : user.Alias;
+            DataModel.User user = Command.data[chat_id];
+            string name = user.Name != null && user.Name != "" ? user.Name : user.Alias;
 
-            string message = $"Welcome {name}!\n" +
-                              "What do we do next?" +
-                             $"{addition}";
+            StringBuilder message = new StringBuilder();
+            message.Append($"Welcome {name}!\n");
+            message.Append("What do we do next?");
+            message.Append($"{addition}");
 
             InlineKeyboardMarkup keyboard = new[] 
             {
@@ -21,24 +23,23 @@ namespace Bot.scripts
                 InlineKeyboardButton.WithCallbackData(text: "Accoun data", callbackData: "To_Account"),
             };
 
-            await Command.Send(chat_id, message, keyboard, message_id);
+            return (message.ToString(), keyboard);
         }
-        public static async Task Account(long chat_id, string addition = "")
+        public static (string, InlineKeyboardMarkup) Account(long chat_id, string addition = "")
         {
-            var user = Command.data[chat_id];
+            DataModel.User user = Command.data[chat_id];
+            DataModel.Biometry biometry = Command.db.Biometries.LastOrDefault(entry => entry.Author == user.Uuid);
+            int linked_accounts = Command.db.Obresvers.Count(entry => entry.Observee == user.Uuid);
 
-            var biometry = Command.db.Biometries.LastOrDefault(entry => entry.Author == user.Uuid);
-
-            var linked_accounts = Command.db.Obresvers.Count(entry => entry.Observee == user.Uuid);
-
-            string message = $"Account of {user.Alias}\n" +
-                             $"Age: {user.Age?.ToString() ?? "not set"}\n" +
-                             $"Weight: {biometry?.Weight?.ToString() ?? "not set" }\n" +
-                             $"Height: {biometry?.Height?.ToString() ?? "not set"}" +
-                             $"Sex: {user.Sex?.ToString() ?? "not set"}\n" +
-                             $"Subscription {(user.SubscriptionEnd == null ? Convert.ToDateTime(user.SubscriptionEnd - DateTime.Now).ToString("U") : "not started")}\n" +
-                             $"Linked accounts: {(linked_accounts > 0 ? linked_accounts : "no linked accounts yet")}" +
-                             $"{addition}";
+            StringBuilder message = new StringBuilder();
+            message.Append($"Account of {user.Alias}\n");
+            message.Append($"Age: {user.Age?.ToString() ?? "not set"}\n");
+            message.Append($"Weight: {biometry?.Weight?.ToString() ?? "not set"}\n");
+            message.Append($"Height: {biometry?.Height?.ToString() ?? "not set"}\n");
+            message.Append($"Sex: {user.Sex?.ToString() ?? "not set"}\n");
+            message.Append($"Subscription {(user.SubscriptionEnd == null ? Convert.ToDateTime(user.SubscriptionEnd - DateTime.Now).ToString("U") : "not started")}\n");
+            message.Append($"Linked accounts: {(linked_accounts > 0 ? linked_accounts : "no linked accounts yet")}");
+            message.Append($"{addition}");
 
             InlineKeyboardMarkup keyboard = new[]
             {
@@ -55,30 +56,29 @@ namespace Bot.scripts
                 }
             };
 
-            await Command.Send(chat_id, message, keyboard);
+            return (message.ToString(), keyboard);
         }
-        public static async Task LinkedAccounts(long chat_id, string addition = "")
+        public static (string, InlineKeyboardMarkup) LinkedAccounts(long chat_id, string addition = "")
         {
-            var user = Command.data[chat_id];
-
-            var observers_id = from entry
+            DataModel.User user = Command.data[chat_id];
+            var observers_id =  from entry
                                 in Command.db.Obresvers
                                 where entry.Observee == user.Uuid
                                 select entry.Observer;
-
             var observers = from entry
                             in Command.db.Users
                             where observers_id.Contains(entry.Uuid)
                             select entry.Alias;
 
-            var message = $"Accounts that have access to your data:\n";
+            StringBuilder message = new StringBuilder();
+            message.Append("Accounts that have access to your data:\n");
 
             foreach(var observer in observers)
             {
-                message += "@" + observer + "\n";
+                message.Append($"@{observer}\n");
             }
 
-            message += $"{addition}";
+            message.Append($"{addition}");
 
             InlineKeyboardMarkup keyboard = new[]
             {
@@ -94,41 +94,41 @@ namespace Bot.scripts
                 }
             };
 
-            await Command.Send(chat_id, message, keyboard);
+            return (message.ToString(), keyboard);
         }
-        public static async Task AccountChange(long chat_id, string addition = "")
+        public static (string, InlineKeyboardMarkup) AccountChange(long chat_id, string addition = "")
         {
-            var user = Command.data[chat_id];
+            DataModel.User user = Command.data[chat_id];
+            DataModel.Biometry biometry = Command.db.Biometries.LastOrDefault(entry => entry.Author == user.Uuid);
+            int linked_accounts = Command.db.Obresvers.Count(entry => entry.Observee == user.Uuid);
 
-            var biometry = Command.db.Biometries.LastOrDefault(entry => entry.Author == user.Uuid);
-
-            var linked_accounts = Command.db.Obresvers.Count(entry => entry.Observee == user.Uuid);
-
-            string message = $"Account of {user.Alias}\n" +
-                             $"Age: {user.Age?.ToString() ?? "not set"}\n" +
-                             $"Weight: {biometry?.Weight?.ToString() ?? "not set"}\n" +
-                             $"Height: {biometry?.Height?.ToString() ?? "not set"}" +
-                             $"Sex: {user.Sex?.ToString() ?? "not set"}\n" +
-                             $"Subscription {(user.SubscriptionEnd == null ? Convert.ToDateTime(user.SubscriptionEnd - DateTime.Now).ToString("U") : "not started")}\n" +
-                             $"Linked accounts: {(linked_accounts > 0 ? linked_accounts : "no linked accounts yet")}" +
-                             $"{addition}";
+            StringBuilder message = new StringBuilder();
+            message.Append($"Account of {user.Alias}\n");
+            message.Append($"Age: {user.Age?.ToString() ?? "not set"}\n");
+            message.Append($"Weight: {biometry?.Weight?.ToString() ?? "not set"}\n");
+            message.Append($"Height: {biometry?.Height?.ToString() ?? "not set"}\n");
+            message.Append($"Sex: {user.Sex?.ToString() ?? "not set"}\n");
+            message.Append($"Subscription {(user.SubscriptionEnd == null ? Convert.ToDateTime(user.SubscriptionEnd - DateTime.Now).ToString("U") : "not started")}\n");
+            message.Append($"Linked accounts: {(linked_accounts > 0 ? linked_accounts : "no linked accounts yet")}");
+            message.Append($"{addition}");
 
             InlineKeyboardMarkup keyboard = new[]
             {
                 new[]
                 {
                     InlineKeyboardButton.WithCallbackData(text: "Age"   , callbackData: "Account_Change_Age"),
-                    InlineKeyboardButton.WithCallbackData(text: "Weight", callbackData: "Account_Change_Weight"), // мляяяя
-                    InlineKeyboardButton.WithCallbackData(text: "Sex"   , callbackData: "Account_Change_Sex")
+                    InlineKeyboardButton.WithCallbackData(text: "Weight", callbackData: "Account_Change_Weight"),
+                    InlineKeyboardButton.WithCallbackData(text: "Sex"   , callbackData: "Account_Chainge_Sex")
                 }
             };
 
-            await Command.Send(chat_id, message, keyboard);
+            return (message.ToString(), keyboard);
         }
-        public static async Task AccountExport(long chat_id, string addition = "")
+        public static (string, InlineKeyboardMarkup) AccountExport(string addition = "")
         {
-            var message = $"You want all your user data exported?\n" +
-                          $"{addition}";
+            StringBuilder message = new StringBuilder();
+            message.Append("You want all your user data exported?\n");
+            message.Append($"{addition}");
 
             InlineKeyboardMarkup keyboard = new[]
             {
@@ -142,12 +142,13 @@ namespace Bot.scripts
                 }
             };
 
-            await Command.Send(chat_id, message, keyboard);
+            return (message.ToString(), keyboard);
         }
-        public static async Task AddAccount(long chat_id, string addition = "")
+        public static (string, InlineKeyboardMarkup) AddAccount(string addition = "")
         {
-            var message = "Type username of account you want to add.\n" +
-                         $"{addition}";
+            StringBuilder message = new StringBuilder();
+            message.Append("Type username of account you want to add.\n");
+            message.Append($"{addition}");
 
             InlineKeyboardMarkup keyboard = new[]
             {
@@ -157,12 +158,13 @@ namespace Bot.scripts
                 }
             };
 
-            await Command.Send(chat_id, message, keyboard);
+            return (message.ToString(), keyboard);
         }
-        public static async Task RemoveAccount(long chat_id, string addition = "")
+        public static (string, InlineKeyboardMarkup) RemoveAccount(string addition = "")  
         {
-            var message = "Type username of account you want to remove.\n" +
-                         $"{addition}";
+            StringBuilder message = new StringBuilder();
+            message.Append("Type username of account you want to remove.\n");
+            message.Append($"{addition}");
 
             InlineKeyboardMarkup keyboard = new[]
             {
@@ -172,14 +174,15 @@ namespace Bot.scripts
                 }
             };
 
-            await Command.Send(chat_id, message, keyboard);
+            return (message.ToString(), keyboard);
         }
-        public static async Task AccountSubsctuption(long chat_id, string addition = "")
+        public static (string, InlineKeyboardMarkup) AccountSubsctuption(long chat_id, string addition = "")
         {
-            var user = Command.data[chat_id];
+            DataModel.User user = Command.data[chat_id];
 
-            var message = $"For how long you desire to {(user.SubscriptionStart != null ? "prolong your" : "purchase")} subscription?" +
-                          $"{addition}";
+            StringBuilder message = new StringBuilder();
+            message.Append($"For how long you desire to {(user.SubscriptionStart != null ? "prolong your" : "purchase")} subscription?");
+            message.Append($"{addition}");
 
             InlineKeyboardMarkup keyboard = new[]
             {
@@ -199,12 +202,13 @@ namespace Bot.scripts
                 }
             };
 
-            await Command.Send(chat_id, message, keyboard);
+            return (message.ToString(), keyboard);
         }
-        public static async Task Stats(long chat_id, string addition = "")
+        public static (string, InlineKeyboardMarkup) Stats(string addition = "")
         {
-            string message = "What statistic info you want to see?" +
-                             $"{addition}";
+            StringBuilder message = new StringBuilder();
+            message.Append("What statistic info you want to see?");
+            message.Append($"{addition}");
 
             InlineKeyboardMarkup keyboard = new[]
             {
@@ -218,12 +222,13 @@ namespace Bot.scripts
                 }
             };
 
-            await Command.Send(chat_id, message, keyboard);
+            return (message.ToString(), keyboard);
         }
-        public static async Task Diary(long chat_id, string addition = "")
+        public static (string, InlineKeyboardMarkup) Diary(string addition = "")
         {
-            string message = $"Welcome to your diary, what do you want to do?" +
-                             $"{addition}";
+            StringBuilder message = new StringBuilder();
+            message.Append($"Welcome to your diary, what do you want to do?");
+            message.Append($"{addition}");
 
             InlineKeyboardMarkup keyboard = new[]
             {
@@ -232,27 +237,29 @@ namespace Bot.scripts
                 InlineKeyboardButton.WithCallbackData(text: "Search entrys", callbackData: "Diary_Search")
             };
 
-            await Command.Send(chat_id, message, keyboard);
+            return (message.ToString(), keyboard);
         }
-        public static async Task SearchDiary(long chat_id, string addition = "")
+        public static (string, InlineKeyboardMarkup) SearchDiary(string addition = "")
         {
-            string message = $"Welcome to your diary, what do you want to do?" +
-                 $"{addition}";
+            StringBuilder message = new StringBuilder();
+            message.Append("Welcome to your diary, what do you want to do?");
+            message.Append($"{addition}");
 
             InlineKeyboardMarkup keyboard = new[]
             {
                 InlineKeyboardButton.WithCallbackData(text: "Cancel"        , callbackData: "To_Diary"),
-                InlineKeyboardButton.WithCallbackData(text: "Search by type", callbackData: "Diary_Search_By_Type"), // мляяяя
-                InlineKeyboardButton.WithCallbackData(text: "Search by name", callbackData: "Diary_Search_By_Name"),
-                InlineKeyboardButton.WithCallbackData(text: "Search by tags", callbackData: "Diary_Search_By_Tags")
+                InlineKeyboardButton.WithCallbackData(text: "Search by type", callbackData: "Diary_Search_All_Type"),
+                InlineKeyboardButton.WithCallbackData(text: "Search by name", callbackData: "Diary_Search_All_Name"),
+                InlineKeyboardButton.WithCallbackData(text: "Search by tags", callbackData: "Diary_Search_All_Tags")
             };
 
-            await Command.Send(chat_id, message, keyboard);
+            return (message.ToString(), keyboard);
         }
-        public static async Task AddToDiary(long chat_id, string addition = "")
+        public static (string, InlineKeyboardMarkup) AddToDiary(string addition = "")
         {
-            string message = $"What type of entry you want to make?" +
-                             $"{addition}";
+            StringBuilder message = new StringBuilder();
+            message.Append("What type of entry you want to make?");
+            message.Append($"{addition}");
 
             InlineKeyboardMarkup keyboard = new[]
             {
@@ -268,7 +275,7 @@ namespace Bot.scripts
                 }
             };
 
-            await Command.Send(chat_id, message, keyboard);
+            return (message.ToString(), keyboard);
         }
     }
 }

@@ -74,27 +74,20 @@ namespace Bot.scripts
                 }
             } 
         }
-        public static async Task Send(long chat_id, string message, InlineKeyboardMarkup keyboard)
+        public static async Task Send(long chat_id, (string, InlineKeyboardMarkup) tuple)
         {
             await bot_client.SendTextMessageAsync(
                 chatId: chat_id,
-                text: message,
-                replyMarkup: keyboard);
+                text: tuple.Item1,
+                replyMarkup: tuple.Item2);
         }
-        public static async Task Send(long chat_id, string message, InlineKeyboardMarkup keyboard, int message_id)
+        public static async Task Send(long chat_id, (string, InlineKeyboardMarkup) tuple, int message_id)
         {
             await bot_client.EditMessageTextAsync(
                 chatId: chat_id,
                 messageId: message_id,
-                text: message,
-                replyMarkup: keyboard);
-        }
-        public static async Task Send(long chat_id, InlineKeyboardMarkup keyboard, int message_id)
-        {
-            await bot_client.EditMessageReplyMarkupAsync(
-                chatId: chat_id,
-                messageId: message_id,
-                replyMarkup: keyboard);
+                text: tuple.Item1,
+                replyMarkup: tuple.Item2);
         }
         public static async Task Destroy(long chat_id, int message_id)
         {

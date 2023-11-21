@@ -4,6 +4,7 @@ using Telegram.Bot;
 using Configuration;
 using Bot.scripts;
 using HealthBot.handlers;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Bot.code
 {
@@ -40,8 +41,7 @@ namespace Bot.code
     {
         static ITelegramBotClient bot = new TelegramBotClient(Config.token); // token
         static Dictionary<long, DataModel.User> data = new Dictionary<long, DataModel.User> { }; // enables work for multiple user
-        static CancellationTokenSource cts = new CancellationTokenSource();
-        static CancellationToken cancellationToken = cts.Token;
+        static CancellationToken cancellationToken = new CancellationTokenSource().Token;
         static ReceiverOptions receiverOptions = new ReceiverOptions { AllowedUpdates = { } }; // receive all update types
 
         public static void Main()
@@ -62,14 +62,12 @@ namespace Bot.code
         {
             long chat_id;
             int message_id;
-
             Message message;
 
             if (update.Message != null)
             {
                 message = update.Message;
                 message_id = update.Message.MessageId;
-
                 chat_id = update.Message.Chat.Id;
 
                 if (!data.TryGetValue(chat_id, out var a)) Command.User_load(update);
@@ -78,7 +76,10 @@ namespace Bot.code
                 {
                     data[chat_id].State = State.Menu.ToString();
 
-                    Reply.Account(chat_id);
+                    (string, InlineKeyboardMarkup) tuple = Reply.Menu(chat_id);
+
+                    await Command.Send(chat_id, tuple);
+
                     await bot.DeleteMessageAsync(chat_id, message_id);
                 }
                 return;
@@ -89,12 +90,12 @@ namespace Bot.code
 
                 if (data[chat_id] == null) Command.User_load(update);
 
-                string callback_data = update.CallbackQuery.Data;
+                string callback_data = update.CallbackQuery.Data ?? "";
 
                 switch (callback_data.Split('_')[0])
                 {
                     case "To":
-                        State_Handlers.To_State_Handler(chat_id, callback_data, update.CallbackQuery.Message.MessageId);
+                        await State_Handlers.To_State_Handler(chat_id, callback_data, update.CallbackQuery.Message.MessageId);
                         break;
                     case "Account":
                         State_Handlers.To_State_Handler(chat_id, callback_data, update.CallbackQuery.Message.MessageId);
@@ -119,7 +120,7 @@ namespace Bot.code
             Console.BackgroundColor = ConsoleColor.Red;
             Console.Write("\n\n" + exception.ToString() + "\n\n");
             Console.ResetColor();
-        }// exeption handling
+        } // exeption handling
 
     }
 }
