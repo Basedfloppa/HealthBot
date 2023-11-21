@@ -98,8 +98,8 @@ namespace Bot.scripts
                 new[]
                 {
                     InlineKeyboardButton.WithCallbackData(text: "Age"   , callbackData: "Account_Change_Age"),
-                    InlineKeyboardButton.WithCallbackData(text: "Weight", callbackData: "Account_Change_Weight"),
-                    InlineKeyboardButton.WithCallbackData(text: "Sex"   , callbackData: "Account_Chainge_Sex")
+                    InlineKeyboardButton.WithCallbackData(text: "Weight", callbackData: "Account_Change_Weight"), // мляяяя
+                    InlineKeyboardButton.WithCallbackData(text: "Sex"   , callbackData: "Account_Change_Sex")
                 }
             };
 
@@ -222,7 +222,7 @@ namespace Bot.scripts
             InlineKeyboardMarkup keyboard = new[]
             {
                 InlineKeyboardButton.WithCallbackData(text: "Cancel"        , callbackData: "To_Diary"),
-                InlineKeyboardButton.WithCallbackData(text: "Search by type", callbackData: "Diary_Search_By_Type"),
+                InlineKeyboardButton.WithCallbackData(text: "Search by type", callbackData: "Diary_Search_By_Type"), // мляяяя
                 InlineKeyboardButton.WithCallbackData(text: "Search by name", callbackData: "Diary_Search_By_Name"),
                 InlineKeyboardButton.WithCallbackData(text: "Search by tags", callbackData: "Diary_Search_By_Tags")
             };

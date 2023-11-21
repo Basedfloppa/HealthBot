@@ -20,8 +20,22 @@ namespace Bot.code
         Diary,
         SearchDiary,
         AddToDiary,
-        Stats
-    } 
+        Stats,
+        Age,
+        Weight,
+        Sex,
+        Change,
+        CaloriesByDate,
+        LiquidByDate,
+        Type,
+        Name,
+        Tags,
+        New,
+        Search,
+        Intake,
+        Biometry
+    }
+    
     public class Bot_Code
     {
         static ITelegramBotClient bot = new TelegramBotClient(Config.token); // token
@@ -83,10 +97,16 @@ namespace Bot.code
                         State_Handlers.To_State_Handler(chat_id, callback_data, update.CallbackQuery.Message.MessageId);
                         break;
                     case "Account":
+                        State_Handlers.To_State_Handler(chat_id, callback_data, update.CallbackQuery.Message.MessageId);
+                        State_Handlers.Account_State_Handler(chat_id, callback_data, update.CallbackQuery.Message.MessageId);
                         break;
                     case "Stats":
+                        State_Handlers.To_State_Handler(chat_id, callback_data, update.CallbackQuery.Message.MessageId);
                         break;
                     case "Diary":
+                        State_Handlers.To_State_Handler(chat_id, callback_data, update.CallbackQuery.Message.MessageId);
+                        State_Handlers.Search_State_Handler(chat_id, callback_data, update.CallbackQuery.Message.MessageId);
+                        State_Handlers.AddToDiary_State_Handler(chat_id, callback_data, update.CallbackQuery.Message.MessageId);
                         break;
                     default:
                         break;
