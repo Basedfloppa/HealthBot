@@ -12,9 +12,9 @@ namespace Bot.scripts
             string name = user.Name != null && user.Name != "" ? user.Name : user.Alias;
 
             StringBuilder message = new StringBuilder();
-            message.Append($"Welcome {name}!\n");
-            message.Append("What do we do next?");
-            message.Append($"{addition_text}");
+            message.AppendLine($"Welcome {name}!");
+            message.AppendLine("What do we do next?");
+            message.AppendLine($"{addition_text}");
 
             InlineKeyboardMarkup keyboard = new[] 
             {
@@ -32,14 +32,14 @@ namespace Bot.scripts
             int linked_accounts = Command.db.Obresvers.Count(entry => entry.Observee == user.Uuid);
 
             StringBuilder message = new StringBuilder();
-            message.Append($"Account of {user.Alias}\n");
-            message.Append($"Age: {user.Age?.ToString() ?? "not set"}\n");
-            message.Append($"Weight: {biometry?.Weight?.ToString() ?? "not set"}\n");
-            message.Append($"Height: {biometry?.Height?.ToString() ?? "not set"}\n");
-            message.Append($"Sex: {user.Sex?.ToString() ?? "not set"}\n");
-            message.Append($"Subscription {(user.SubscriptionEnd == null ? Convert.ToDateTime(user.SubscriptionEnd - DateTime.Now).ToString("U") : "not started")}\n");
-            message.Append($"Linked accounts: {(linked_accounts > 0 ? linked_accounts : "no linked accounts yet")}");
-            message.Append($"{addition_text}");
+            message.AppendLine($"Account of {user.Alias}");
+            message.AppendLine($"Age: {user.Age?.ToString() ?? "not set"}");
+            message.AppendLine($"Weight: {biometry?.Weight?.ToString() ?? "not set"}");
+            message.AppendLine($"Height: {biometry?.Height?.ToString() ?? "not set"}");
+            message.AppendLine($"Sex: {user.Sex?.ToString() ?? "not set"}");
+            message.AppendLine($"Subscription {(user.SubscriptionEnd == null ? Convert.ToDateTime(user.SubscriptionEnd - DateTime.Now).ToString("U") : "not started")}");
+            message.AppendLine($"Linked accounts: {(linked_accounts > 0 ? linked_accounts : "no linked accounts yet")}");
+            message.AppendLine($"{addition_text}");
 
             InlineKeyboardMarkup keyboard = new[]
             {
@@ -71,14 +71,14 @@ namespace Bot.scripts
                             select entry.Alias;
 
             StringBuilder message = new StringBuilder();
-            message.Append("Accounts that have access to your data:\n");
+            message.AppendLine("Accounts that have access to your data:\n");
 
             foreach(var observer in observers)
             {
-                message.Append($"@{observer}\n");
+                message.AppendLine($"@{observer}");
             }
 
-            message.Append($"{addition_text}");
+            message.AppendLine($"{addition_text}");
 
             InlineKeyboardMarkup keyboard = new[]
             {
@@ -103,14 +103,14 @@ namespace Bot.scripts
             int linked_accounts = Command.db.Obresvers.Count(entry => entry.Observee == user.Uuid);
 
             StringBuilder message = new StringBuilder();
-            message.Append($"Account of {user.Alias}\n");
-            message.Append($"Age: {user.Age?.ToString() ?? "not set"}\n");
-            message.Append($"Weight: {biometry?.Weight?.ToString() ?? "not set"}\n");
-            message.Append($"Height: {biometry?.Height?.ToString() ?? "not set"}\n");
-            message.Append($"Sex: {user.Sex?.ToString() ?? "not set"}\n");
-            message.Append($"Subscription {(user.SubscriptionEnd == null ? Convert.ToDateTime(user.SubscriptionEnd - DateTime.Now).ToString("U") : "not started")}\n");
-            message.Append($"Linked accounts: {(linked_accounts > 0 ? linked_accounts : "no linked accounts yet")}");
-            message.Append($"{addition_text}");
+            message.AppendLine($"Account of {user.Alias}");
+            message.AppendLine($"Age: {user.Age?.ToString() ?? "not set"}");
+            message.AppendLine($"Weight: {biometry?.Weight?.ToString() ?? "not set"}");
+            message.AppendLine($"Height: {biometry?.Height?.ToString() ?? "not set"}");
+            message.AppendLine($"Sex: {user.Sex?.ToString() ?? "not set"}");
+            message.AppendLine($"Subscription {(user.SubscriptionEnd == null ? Convert.ToDateTime(user.SubscriptionEnd - DateTime.Now).ToString("U") : "not started")}");
+            message.AppendLine($"Linked accounts: {(linked_accounts > 0 ? linked_accounts : "no linked accounts yet")}");
+            message.AppendLine($"{addition_text}");
 
             InlineKeyboardMarkup keyboard = new[]
             {
@@ -127,8 +127,8 @@ namespace Bot.scripts
         public static (string, InlineKeyboardMarkup) AccountExport(string addition_text = "")
         {
             StringBuilder message = new StringBuilder();
-            message.Append("You want all your user data exported?\n");
-            message.Append($"{addition_text}");
+            message.AppendLine("You want all your user data exported?");
+            message.AppendLine($"{addition_text}");
 
             InlineKeyboardMarkup keyboard = new[]
             {
@@ -147,8 +147,8 @@ namespace Bot.scripts
         public static (string, InlineKeyboardMarkup) AddAccount(string addition_text = "")
         {
             StringBuilder message = new StringBuilder();
-            message.Append("Type username of account you want to add.\n");
-            message.Append($"{addition_text}");
+            message.AppendLine("Type username of account you want to add.");
+            message.AppendLine($"{addition_text}");
 
             InlineKeyboardMarkup keyboard = new[]
             {
@@ -163,8 +163,8 @@ namespace Bot.scripts
         public static (string, InlineKeyboardMarkup) RemoveAccount(string addition_text = "")  
         {
             StringBuilder message = new StringBuilder();
-            message.Append("Type username of account you want to remove.\n");
-            message.Append($"{addition_text}");
+            message.AppendLine("Type username of account you want to remove.");
+            message.AppendLine($"{addition_text}");
 
             InlineKeyboardMarkup keyboard = new[]
             {
@@ -181,8 +181,8 @@ namespace Bot.scripts
             DataModel.User user = Command.data[chat_id];
 
             StringBuilder message = new StringBuilder();
-            message.Append($"For how long you desire to {(user.SubscriptionStart != null ? "prolong your" : "purchase")} subscription?");
-            message.Append($"{addition_text}");
+            message.AppendLine($"For how long you desire to {(user.SubscriptionStart != null ? "prolong your" : "purchase")} subscription?");
+            message.AppendLine($"{addition_text}");
 
             InlineKeyboardMarkup keyboard = new[]
             {
@@ -227,8 +227,8 @@ namespace Bot.scripts
         public static (string, InlineKeyboardMarkup) Diary(string addition_text = "")
         {
             StringBuilder message = new StringBuilder();
-            message.Append($"Welcome to your diary, what do you want to do?");
-            message.Append($"{addition_text}");
+            message.AppendLine($"Welcome to your diary, what do you want to do?");
+            message.AppendLine($"{addition_text}");
 
             InlineKeyboardMarkup keyboard = new[]
             {
@@ -242,8 +242,8 @@ namespace Bot.scripts
         public static (string, InlineKeyboardMarkup) SearchDiary(string addition_text = "")
         {
             StringBuilder message = new StringBuilder();
-            message.Append("Welcome to your diary, what do you want to do?");
-            message.Append($"{addition_text}");
+            message.AppendLine("Welcome to your diary, what do you want to do?");
+            message.AppendLine($"{addition_text}");
 
             InlineKeyboardMarkup keyboard = new[]
             {
@@ -258,8 +258,8 @@ namespace Bot.scripts
         public static (string, InlineKeyboardMarkup) AddToDiary(string addition_text = "")
         {
             StringBuilder message = new StringBuilder();
-            message.Append("What type of entry you want to make?");
-            message.Append($"{addition_text}");
+            message.AppendLine("What type of entry you want to make?");
+            message.AppendLine($"{addition_text}");
 
             InlineKeyboardMarkup keyboard = new[]
             {

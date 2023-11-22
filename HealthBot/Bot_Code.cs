@@ -5,7 +5,7 @@ using Configuration;
 using Bot.scripts;
 using HealthBot.handlers;
 using Telegram.Bot.Types.ReplyMarkups;
-using System.Security.AccessControl;
+using Sql_Queries;
 
 namespace Bot.code
 {
@@ -73,7 +73,11 @@ namespace Bot.code
 
                 switch (Command.data[chat_id].LastAction)
                 {
-                    case "CaloriesByDate":
+                    case "CaloriesByDate": // TODO: add check for which date is earlier + parsing if dates are wrong
+                        var date_1 = Convert.ToDateTime(message.Text.Replace(" ", "").Split("-")[0]);
+                        var date_2 = Convert.ToDateTime(message.Text.Replace(" ", "").Split("-")[1]);
+                        await Command.Destroy(chat_id, message_id);
+                        await Command.Send(chat_id, Reply.Stats($"In given time span you consumed average of {Query.average_calories_by_date(date_1, date_2, data[chat_id])}"), message_id);
                         break;
                     case "LiquidByDate":
                         break;
