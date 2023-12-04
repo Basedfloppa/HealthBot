@@ -157,7 +157,7 @@ namespace DataModel
 		/// DiaryEntry (public.diaryentrys)
 		/// </summary>
 		[Association(ThisKey="DiaryEntry", OtherKey="Uuid", CanBeNull=false)]
-		public Diaryentry FKDiaryEntry { get; set; }
+		public DiaryEntry FKDiaryEntry { get; set; }
 
 		#endregion
 	}
@@ -214,13 +214,13 @@ namespace DataModel
 		/// author_BackReference (public.exportdata)
 		/// </summary>
 		[Association(ThisKey="Uuid", OtherKey="Author", CanBeNull=true)]
-		public IEnumerable<Exportdata> Authors { get; set; }
+		public IEnumerable<ExportData> Authors { get; set; }
 
 		/// <summary>
 		/// Author_BackReference (public.diaryentrys)
 		/// </summary>
 		[Association(ThisKey="Uuid", OtherKey="Author", CanBeNull=true)]
-		public IEnumerable<Diaryentry> FKAuthors { get; set; }
+		public IEnumerable<DiaryEntry> FKAuthors { get; set; }
 
 		/// <summary>
 		/// fk_observee_BackReference (public.obresvers)

@@ -41,7 +41,7 @@ namespace HealthBot.handlers
                     await Command.Send(chat_id, tuple, message_id);
                     break;
                 case "AccountSubscription":
-                    Command.data[chat_id].State = State.AccountSubscription.ToString(); // TODO: Reply keyboard with payment
+                    Command.data[chat_id].State = State.AccountSubscription.ToString(); // TODO: Chainge to reply keyboard with payment
                     break;
                 case "LinkedAccounts":
                     tuple = Reply.LinkedAccounts(chat_id);
@@ -120,16 +120,25 @@ namespace HealthBot.handlers
             switch (callback_data.Split('_')[2])
             {
                 case "Age":
-                    tuple = Reply.AccountChange(chat_id);
+                    tuple = Reply.AccountChange(chat_id, "Input your current age.");
 
+                    Command.data[chat_id].LastAction = "AccountChangeAge";
 
-
+                    await Command.Send(chat_id, tuple, message_id);
                     break;
                 case "Weight":
-                    Reply.AccountChange(chat_id, message_id.ToString()); //?? string
+                    tuple = Reply.AccountChange(chat_id, "Input your current weight.");
+
+                    Command.data[chat_id].LastAction = "AccountChangeWeight";
+
+                    await Command.Send(chat_id, tuple, message_id);
                     break;
                 case "Sex":
-                    Reply.AccountChange(chat_id, message_id.ToString()); //?? string
+                    tuple = Reply.AccountChange(chat_id, "Input your sex.");
+
+                    Command.data[chat_id].LastAction = "AccountChangeSex";
+
+                    await Command.Send(chat_id, tuple, message_id);
                     break;
                 default:
                     break;
@@ -142,39 +151,22 @@ namespace HealthBot.handlers
             switch (callback_data.Split('_')[3])
             {
                 case "CaloriesByDate":
-                    tuple = Reply.Stats();
+                    tuple = Reply.Stats("Input two dates in format dd.mm.yy-dd.mm.yy where first date is less than second.");
 
                     Command.data[chat_id].LastAction = "CaloriesByDate";
 
-                    await Command.Send(chat_id, tuple);
+                    await Command.Send(chat_id, tuple, message_id);
                     break;
                 case "LiquidByDate":
-                    tuple = Reply.Stats();
+                    tuple = Reply.Stats("Input two dates in format dd.mm.yy-dd.mm.yy where first date is less than second.");
 
                     Command.data[chat_id].LastAction = "LiquidByDate";
 
-                    await Command.Send(chat_id, tuple);
+                    await Command.Send(chat_id, tuple, message_id);
                     break;
                 default:
                     break;
             }
-        }
-        public static Task AddToDiary_State_Handler(long chat_id, string callback_data, int message_id)
-        {
-            switch (callback_data.Split('_')[2])
-            {
-                case "Type":
-                    Command.data[chat_id].State = State.Type.ToString();
-                    Reply.Diary(chat_id, message_id.ToString());
-                    break;
-                case "Biometry":
-                    Command.data[chat_id].State = State.Biometry.ToString();
-                    Reply.Diary(chat_id, message_id.ToString()); //?? string
-                    break;
-                default:
-                    break;
-            }
-            return Task.CompletedTask; //я хз как после аккаует чейндж можно реализовать
         }
     }
 }

@@ -28,7 +28,10 @@ namespace Bot.scripts
         public static (string, InlineKeyboardMarkup) Account(long chat_id, string addition_text = "")
         {
             DataModel.User user = Command.data[chat_id];
-            DataModel.Biometry biometry = Command.db.Biometries.LastOrDefault(entry => entry.Author == user.Uuid);
+            DataModel.Biometry biometry = Command.db.Biometries
+                                                    .Where(entry => entry.Author == user.Uuid)
+                                                    .OrderByDescending(entry => entry.CreatedAt)
+                                                    .FirstOrDefault();
             int linked_accounts = Command.db.Obresvers.Count(entry => entry.Observee == user.Uuid);
 
             StringBuilder message = new StringBuilder();
