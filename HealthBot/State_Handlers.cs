@@ -148,7 +148,7 @@ namespace HealthBot.handlers
         {
             (string, InlineKeyboardMarkup) tuple;
 
-            switch (callback_data.Split('_')[3])
+            switch (callback_data.Split('_')[1])
             {
                 case "CaloriesByDate":
                     tuple = Reply.Stats("Input two dates in format dd.mm.yy-dd.mm.yy where first date is less than second.");

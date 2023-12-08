@@ -71,16 +71,24 @@ namespace Bot.code
                     await bot.DeleteMessageAsync(chat_id, message_id);
                 }
 
+                DateTime date_min;
+                DateTime date_max;
+
                 switch (Command.data[chat_id].LastAction)
                 {
                     case "CaloriesByDate": // TODO: add check for which date is earlier + parsing if dates are wrong
-                        DateTime date_1 = Convert.ToDateTime(message.Text.Replace(" ", "").Split("-")[0]);
-                        DateTime date_2 = Convert.ToDateTime(message.Text.Replace(" ", "").Split("-")[1]);
+                        date_min = Convert.ToDateTime(message.Text.Replace(" ", "").Split("-")[0]);
+                        date_max = Convert.ToDateTime(message.Text.Replace(" ", "").Split("-")[1]);
 
                         await Command.Destroy(chat_id, message_id);
-                        await Command.Send(chat_id, Reply.Stats($"In given time span you consumed average of {Query.average_calories_by_date(date_1, date_2, data[chat_id])}"), message_id);
+                        await Command.Send(chat_id, Reply.Stats($"In given time span you consumed average of {Query.average_calories_by_date(date_min, date_max, data[chat_id])} calories"), message_id);
                         break;
                     case "LiquidByDate":
+                        date_min = Convert.ToDateTime(message.Text.Replace(" ", "").Split("-")[0]);
+                        date_max = Convert.ToDateTime(message.Text.Replace(" ", "").Split("-")[1]);
+
+                        await Command.Destroy(chat_id, message_id);
+                        await Command.Send(chat_id, Reply.Stats($"In given time span you consumed average of {Query.average_calories_by_date(date_min, date_max, data[chat_id])} ml of liquid"), message_id);
                         break;
                 }
 
@@ -103,6 +111,7 @@ namespace Bot.code
                         await State_Handlers.Account_State_Handler(chat_id, callback_data, update.CallbackQuery.Message.MessageId);
                         break;
                     case "Stats":
+                        await State_Handlers.Stats_State_Handler(chat_id, callback_data, update.CallbackQuery.Message.MessageId);
                         break;
                     case "Diary":
                         break;

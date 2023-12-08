@@ -12,7 +12,7 @@ namespace Sql_Queries
         {
             var entrys = from a
                          in Command.db.DiaryEntrys
-                         where a.Author == user.Uuid && (DateTime.Compare(a.CreatedAt.DateTime, date_min) == 0 || DateTime.Compare(a.CreatedAt.DateTime, date_max) == 1)
+                         where a.Author == user.Uuid && ( a.CreatedAt.DateTime <= date_min || a.CreatedAt.DateTime >= date_max)
                          select a;
 
             var counter = 0.0;
