@@ -1,106 +1,101 @@
-﻿using DataModel;
-using LinqToDB;
-using System.Data;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 using Bot.scripts;
+using DataModel;
 
 namespace Sql_Queries
 {
     internal static class Sql_Queries
     {
-        internal static double average_calories_by_date(DateTime date_max, DateTime date_min, DataModel.User user)
+        internal static double AverageCaloriesByDate(DateTime dateMax, DateTime dateMin, User user)
         {
-            var entrys = from a
-                            in Command.db.DiaryEntrys
-                            where a.Author == user.Uuid && (DateTime.Compare(a.CreatedAt.DateTime, date_min) == 0 || DateTime.Compare(a.CreatedAt.DateTime, date_max) == 1)
-                            select a;
+            var entrys = Command.db.DiaryEntrys
+                .Where(a => a.Author == user.Uuid && (a.CreatedAt >= dateMin && a.CreatedAt <= dateMax));
 
             var counter = 0.0;
-            var calories_summ = 0.0;
-
-            foreach (var entry in entrys) 
-            {
-                var items = from a
-                            in Command.db.IntakeItems
-                            where a.DiaryEntry == entry.Uuid
-                            select a;
-
-                foreach (var item in items) calories_summ += item.CaloryAmount.GetValueOrDefault(0);
-                counter++;
-            }
-            return calories_summ / counter;
-        }
-        internal static double average_water_by_date(DateTime date_max, DateTime date_min, DataModel.User user)
-        {
-            var entrys = from a
-                            in Command.db.DiaryEntrys
-                            where a.Author == user.Uuid && (DateTime.Compare(a.CreatedAt.DateTime, date_min) == 0 || DateTime.Compare(a.CreatedAt.DateTime, date_max) == 1)
-                            select a;
-
-            var counter = 0.0;
-            var calories_summ = 0.0;
+            var caloriesSumm = 0.0;
 
             foreach (var entry in entrys)
             {
-                var items = from a
-                            in Command.db.IntakeItems
-                            where a.DiaryEntry == entry.Uuid && a.State == "liquid"
-                            select a;
+                var items = Command.db.IntakeItems
+                    .Where(a => a.DiaryEntry == entry.Uuid);
 
-                foreach (var item in items) calories_summ += item.CaloryAmount.GetValueOrDefault(0);
+                foreach (var item in items) caloriesSumm += item.CaloryAmount.GetValueOrDefault(0);
                 counter++;
             }
-            return calories_summ / counter;
+            return caloriesSumm / counter;
         }
-        internal static List<IntakeItem> items_by_name(string name, DataModel.User user)
-        {
-            var entry_ids = from entry
-                            in Command.db.DiaryEntrys
-                            where entry.Author == user.Uuid
-                            select entry.Uuid;
 
-            return Command.db.IntakeItems.Where(item => entry_ids.Contains(item.DiaryEntry) && item.Name.ToLower().Contains(name.ToLower())).ToList();
+        internal static double AverageWaterByDate(DateTime dateMax, DateTime dateMin, User user)
+        {
+            var entrys = Command.db.DiaryEntrys
+                .Where(a => a.Author == user.Uuid && (a.CreatedAt >= dateMin && a.CreatedAt <= dateMax));
+
+            var counter = 0.0;
+            var caloriesSumm = 0.0;
+
+            foreach (var entry in entrys)
+            {
+                var items = Command.db.IntakeItems
+                    .Where(a => a.DiaryEntry == entry.Uuid && a.State == "liquid");
+
+                foreach (var item in items) caloriesSumm += item.CaloryAmount.GetValueOrDefault(0);
+                counter++;
+            }
+            return caloriesSumm / counter;
         }
-        internal static List<IntakeItem> items_by_tag(string tag, DataModel.User user)
-        {
-            var entry_ids = from entry
-                            in Command.db.DiaryEntrys
-                            where entry.Author == user.Uuid
-                            select entry.Uuid;
 
-            return Command.db.IntakeItems.Where(item => entry_ids.Contains(item.DiaryEntry) && item.Tags.ToLower().Contains(tag.ToLower())).ToList();
+        internal static List<IntakeItem> ItemsByName(string name, User user)
+        {
+            var entryIds = Command.db.DiaryEntrys
+                .Where(entry => entry.Author == user.Uuid)
+                .Select(entry => entry.Uuid);
+
+            return Command.db.IntakeItems
+                .Where(item => entryIds.Contains(item.DiaryEntry) && item.Name.ToLower().Contains(name.ToLower()))
+                .ToList();
         }
-        internal static List<IntakeItem> items_argument(string argument, DataModel.User user)
-        {
-            var entry_ids = from entry
-                            in Command.db.DiaryEntrys
-                            where entry.Author == user.Uuid
-                            select entry.Uuid;
 
-            return Command.db.IntakeItems.Where(item => entry_ids.Contains(item.DiaryEntry) && (item.Tags.ToLower().Contains(argument.ToLower()) || item.Name.ToLower().Contains(argument.ToLower()))).ToList();
+        internal static List<IntakeItem> ItemsByTag(string tag, User user)
+        {
+            var entryIds = Command.db.DiaryEntrys
+                .Where(entry => entry.Author == user.Uuid)
+                .Select(entry => entry.Uuid);
+
+            return Command.db.IntakeItems
+                .Where(item => entryIds.Contains(item.DiaryEntry) && item.Tags.ToLower().Contains(tag.ToLower()))
+                .ToList();
         }
-        internal static string user_data_export(long chat_id)
+
+        internal static List<IntakeItem> ItemsByArgument(string argument, User user)
         {
-            var user = Command.db.Users.SingleOrDefault(u => u.ChatId == chat_id);
+            var entryIds = Command.db.DiaryEntrys
+                .Where(entry => entry.Author == user.Uuid)
+                .Select(entry => entry.Uuid);
 
-            var diary_entrys = from entry 
-                                in Command.db.DiaryEntrys
-                                where entry.Author == user.Uuid
-                                select entry;
+            return Command.db.IntakeItems
+                .Where(item => entryIds.Contains(item.DiaryEntry) && (item.Tags.ToLower().Contains(argument.ToLower()) || item.Name.ToLower().Contains(argument.ToLower())))
+                .ToList();
+        }
 
-            var diary_entry_ids = diary_entrys.Select(e => e.Uuid);
+        internal static string UserDataExport(long chatId)
+        {
+            var user = Command.db.Users.SingleOrDefault(u => u.ChatId == chatId);
 
-            var items = from entry 
-                        in Command.db.IntakeItems
-                        where diary_entry_ids.Contains(entry.DiaryEntry)
-                        select entry;
+            var diaryEntrys = Command.db.DiaryEntrys
+                .Where(entry => entry.Author == user.Uuid);
 
-            var biometry = from entry
-                           in Command.db.Biometries
-                           where entry.Author == user.Uuid
-                           select entry;
+            var diaryEntryIds = diaryEntrys.Select(entry => entry.Uuid);
 
-            return JsonSerializer.Serialize(user) + "\n\n" + JsonSerializer.Serialize(diary_entry_ids) + "\n\n" + JsonSerializer.Serialize(items) + "\n\n" + JsonSerializer.Serialize(biometry);
+            var items = Command.db.IntakeItems
+                .Where(entry => diaryEntryIds.Contains(entry.DiaryEntry));
+
+            var biometry = Command.db.Biometries
+                .Where(entry => entry.Author == user.Uuid);
+
+            return JsonSerializer.Serialize(user) + "\n\n" + JsonSerializer.Serialize(diaryEntryIds) + "\n\n" + JsonSerializer.Serialize(items) + "\n\n" + JsonSerializer.Serialize(biometry);
         }
     }
 }
