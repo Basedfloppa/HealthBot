@@ -1,0 +1,18 @@
+version: '3.4'
+
+services:
+  healthbot:
+    image: healthbot
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+    tty: true
+  db:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+

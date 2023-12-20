@@ -2,24 +2,21 @@
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 using Bot.code;
-using DataModel;
-using LinqToDB;
-using Configuration;
-using LinqToDB.Data;
+using HealthBot;
+using User = HealthBot.User;
 
 namespace Bot.scripts
 {
     class Command
     {
-        public static Dictionary<long, DataModel.User> data = new Dictionary<long, DataModel.User> { };
+        public static Dictionary<long, User> data = new Dictionary<long, User> { };
         public static ITelegramBotClient bot_client;
-        public static HealthBotDB db;
-        public static void Initialize(Dictionary<long, DataModel.User> _data, ITelegramBotClient _bot_client)
+        public static HealthBotContext db;
+        public static void Initialize(Dictionary<long, User> _data, ITelegramBotClient _bot_client)
         {
             data = _data;
             bot_client = _bot_client;
-            DataConnection.DefaultSettings = new MySettings();
-            db = new HealthBotDB("HealthBot");
+            db = new HealthBotContext();
         }
         public static void User_load(Update upd) // loads user info from database
         {
@@ -36,7 +33,7 @@ namespace Bot.scripts
             }
             else
             {
-                var instance = new DataModel.User();
+                var instance = new User();
                 instance.State = State.Menu.ToString();
                 instance.Name = upd.Message.From.FirstName + " " + upd.Message.From.LastName;
                 instance.Alias = upd.Message.From.Username;
@@ -51,7 +48,7 @@ namespace Bot.scripts
             {
                 if (db.Users.Find(user.Value.Uuid) == null) 
                 {
-                    db.Insert(user);
+                    db.Add(user);
                 }
                 else if (user.Value != db.Users.Find(user.Value.Uuid)) 
                 {

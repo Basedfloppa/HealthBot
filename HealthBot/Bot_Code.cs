@@ -5,6 +5,9 @@ using Configuration;
 using Bot.scripts;
 using HealthBot.handlers;
 using Telegram.Bot.Types.ReplyMarkups;
+using User = HealthBot.User;
+using HealthBot;
+using System.Data.Common;
 
 namespace Bot.code
 {  
@@ -26,12 +29,17 @@ namespace Bot.code
     public class Bot_Code
     {
         static ITelegramBotClient bot = new TelegramBotClient(Config.token); // token
-        static Dictionary<long, DataModel.User> data = new Dictionary<long, DataModel.User> { }; // enables work for multiple user
+        static Dictionary<long, User> data = new Dictionary<long, User> { }; // enables work for multiple user
         static CancellationToken cancellationToken = new CancellationTokenSource().Token;
         static ReceiverOptions receiverOptions = new ReceiverOptions { AllowedUpdates = { } }; // receive all update types
 
         public static void Main()
         {
+            var db = new HealthBotContext();
+            db.Database.EnsureDeleted();
+            db.Database.EnsureCreated();
+            db.Dispose();
+
             bot.StartReceiving
             (
                 HandleUpdateAsync,
@@ -39,7 +47,7 @@ namespace Bot.code
                 receiverOptions,
                 cancellationToken
             );
-
+            
             Command.Initialize(data, bot);
 
             Console.Read();
