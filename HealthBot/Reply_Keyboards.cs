@@ -1,6 +1,7 @@
-﻿using LinqToDB;
-using System.Text;
+﻿using System.Text;
 using Telegram.Bot.Types.ReplyMarkups;
+using User = HealthBot.User;
+using HealthBot;
 
 namespace Bot.scripts
 {
@@ -8,7 +9,8 @@ namespace Bot.scripts
     {
         public static (string, InlineKeyboardMarkup) Menu(long chat_id, string addition_text = "")
         {
-            DataModel.User user = Command.data[chat_id];
+            
+            User user = Command.data[chat_id];
             string name = user.Name != null && user.Name != "" ? user.Name : user.Alias;
 
             StringBuilder message = new StringBuilder();
@@ -24,15 +26,17 @@ namespace Bot.scripts
             };
 
             return (message.ToString(), keyboard);
+            
         }
         public static (string, InlineKeyboardMarkup) Account(long chat_id, string addition_text = "")
         {
-            DataModel.User user = Command.data[chat_id];
-            DataModel.Biometry biometry = Command.db.Biometries
+            
+            User user = Command.data[chat_id];
+            Biometry biometry = Command.db.Biometries
                                                     .Where(entry => entry.Author == user.Uuid)
                                                     .OrderByDescending(entry => entry.CreatedAt)
                                                     .FirstOrDefault();
-            int linked_accounts = Command.db.Obresvers.Count(entry => entry.Observee == user.Uuid);
+            int linked_accounts = user.Observers.Count();
 
             StringBuilder message = new StringBuilder();
             message.AppendLine($"Account of {user.Alias}");
@@ -58,20 +62,13 @@ namespace Bot.scripts
                     InlineKeyboardButton.WithCallbackData(text: "Export data"            , callbackData: "To_AccountExport")
                 }
             };
-
+            
             return (message.ToString(), keyboard);
         }
         public static (string, InlineKeyboardMarkup) LinkedAccounts(long chat_id, string addition_text = "")
         {
-            DataModel.User user = Command.data[chat_id];
-            var observers_id =  from entry
-                                in Command.db.Obresvers
-                                where entry.Observee == user.Uuid
-                                select entry.Observer;
-            var observers = from entry
-                            in Command.db.Users
-                            where observers_id.Contains(entry.Uuid)
-                            select entry.Alias;
+            User user = Command.data[chat_id];
+            var observers = user.Observers;
 
             StringBuilder message = new StringBuilder();
             message.AppendLine("Accounts that have access to your data:\n");
@@ -101,9 +98,9 @@ namespace Bot.scripts
         }
         public static (string, InlineKeyboardMarkup) AccountChange(long chat_id, string addition_text = "")
         {
-            DataModel.User user = Command.data[chat_id];
-            DataModel.Biometry biometry = Command.db.Biometries.LastOrDefault(entry => entry.Author == user.Uuid);
-            int linked_accounts = Command.db.Obresvers.Count(entry => entry.Observee == user.Uuid);
+            User user = Command.data[chat_id];
+            Biometry biometry = Command.db.Biometries.LastOrDefault(entry => entry.Author == user.Uuid);
+            int linked_accounts = user.Observers.Count();
 
             StringBuilder message = new StringBuilder();
             message.AppendLine($"Account of {user.Alias}");
@@ -181,7 +178,7 @@ namespace Bot.scripts
         }
         public static (string, InlineKeyboardMarkup) AccountSubsctuption(long chat_id, string addition_text = "")
         {
-            DataModel.User user = Command.data[chat_id];
+            User user = Command.data[chat_id];
 
             StringBuilder message = new StringBuilder();
             message.AppendLine($"For how long you desire to {(user.SubscriptionStart != null ? "prolong your" : "purchase")} subscription?");

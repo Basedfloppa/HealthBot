@@ -1,18 +1,18 @@
-﻿using DataModel;
-using LinqToDB;
-using System.Data;
+﻿using System.Data;
 using System.Text.Json;
 using Bot.scripts;
+using HealthBot;
+using User = HealthBot.User;
 
 namespace Sql_Queries
 {
     public static class Query
     {
-        public static double average_calories_by_date(DateTime date_max, DateTime date_min, User user)
+        internal static double average_calories_by_date(DateTime date_max, DateTime date_min, User user)
         {
             var entrys = from a
-                         in Command.db.DiaryEntrys
-                         where a.Author == user.Uuid && ( a.CreatedAt.DateTime <= date_min || a.CreatedAt.DateTime >= date_max)
+                         in Command.db.Diaryentrys
+                         where a.Author == user.Uuid && ( a.CreatedAt <= date_min || a.CreatedAt >= date_max)
                          select a;
 
             var counter = 0.0;
@@ -30,11 +30,11 @@ namespace Sql_Queries
             }
             return calories_summ / counter;
         }
-        public static double average_water_by_date(DateTime date_max, DateTime date_min, User user)
+        internal static double average_water_by_date(DateTime date_max, DateTime date_min, User user)
         {
             var entrys = from a
-                            in Command.db.DiaryEntrys
-                            where a.Author == user.Uuid && (DateTime.Compare(a.CreatedAt.DateTime, date_min) == 0 || DateTime.Compare(a.CreatedAt.DateTime, date_max) == 1)
+                            in Command.db.Diaryentrys
+                            where a.Author == user.Uuid && (DateTime.Compare(a.CreatedAt, date_min) == 0 || DateTime.Compare(a.CreatedAt, date_max) == 1)
                             select a;
 
             var counter = 0.0;
@@ -52,28 +52,28 @@ namespace Sql_Queries
             }
             return calories_summ / counter;
         }
-        public static List<IntakeItem> items_by_name(string name, User user)
+        internal static List<IntakeItem> items_by_name(string name, User user)
         {
             var entry_ids = from entry
-                            in Command.db.DiaryEntrys
+                            in Command.db.Diaryentrys
                             where entry.Author == user.Uuid
                             select entry.Uuid;
 
             return Command.db.IntakeItems.Where(item => entry_ids.Contains(item.DiaryEntry) && item.Name.ToLower().Contains(name.ToLower())).ToList();
         }
-        public static List<IntakeItem> items_by_tag(string tag, User user)
+        internal static List<IntakeItem> items_by_tag(string tag, User user)
         {
             var entry_ids = from entry
-                            in Command.db.DiaryEntrys
+                            in Command.db.Diaryentrys
                             where entry.Author == user.Uuid
                             select entry.Uuid;
 
             return Command.db.IntakeItems.Where(item => entry_ids.Contains(item.DiaryEntry) && item.Tags.ToLower().Contains(tag.ToLower())).ToList();
         }
-        public static List<IntakeItem> items_argument(string argument, User user)
+        internal static List<IntakeItem> items_argument(string argument, User user)
         {
             var entry_ids = from entry
-                            in Command.db.DiaryEntrys
+                            in Command.db.Diaryentrys
                             where entry.Author == user.Uuid
                             select entry.Uuid;
 
@@ -84,7 +84,7 @@ namespace Sql_Queries
             var user = Command.db.Users.SingleOrDefault(u => u.ChatId == chat_id);
 
             var diary_entrys = from entry 
-                                in Command.db.DiaryEntrys
+                                in Command.db.Diaryentrys
                                 where entry.Author == user.Uuid
                                 select entry;
 
