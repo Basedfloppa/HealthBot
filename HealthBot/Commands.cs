@@ -73,22 +73,47 @@ namespace Bot.scripts
         }
         public static async Task Send(long chat_id, (string, InlineKeyboardMarkup) tuple)
         {
-            await bot_client.SendTextMessageAsync(
-                chatId: chat_id,
-                text: tuple.Item1,
-                replyMarkup: tuple.Item2);
+            try
+            {
+                await bot_client.SendTextMessageAsync(
+                    chatId: chat_id,
+                    text: tuple.Item1,
+                    replyMarkup: tuple.Item2);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка во время отправки: {ex.Message}");
+               
+                throw;
+            }
         }
         public static async Task Send(long chat_id, (string, InlineKeyboardMarkup) tuple, int message_id)
         {
-            await bot_client.EditMessageTextAsync(
-                chatId: chat_id,
-                messageId: message_id,
-                text: tuple.Item1,
-                replyMarkup: tuple.Item2);
+            try
+            {
+                await bot_client.EditMessageTextAsync(
+                    chatId: chat_id,
+                    messageId: message_id,
+                    text: tuple.Item1,
+                    replyMarkup: tuple.Item2);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка во время отправки измененного сообщения: {ex.Message}");
+                throw;
+            }
         }
         public static async Task Destroy(long chat_id, int message_id)
         {
-            await bot_client.DeleteMessageAsync(chat_id, message_id);
+            try
+            {
+                await bot_client.DeleteMessageAsync(chat_id, message_id);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error during Destroy operation: {ex.Message}");
+                throw;
+            }
         }
     }
 }
