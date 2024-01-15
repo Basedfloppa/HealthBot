@@ -98,16 +98,12 @@ namespace HealthBot.handlers
         }
         public static async Task Account_State_Handler(long chat_id, string callback_data, int message_id)
         {
-            (string, InlineKeyboardMarkup) tuple;
-
             switch (callback_data.Split('_')[1])
             {
                 case "Change":
-                    tuple = Reply.AccountChange(chat_id);
-
                     Command.data[chat_id].State = State.AccountChange.ToString();
 
-                    await Command.Send(chat_id, tuple, message_id);
+                    await Account_Change_State_Handler(chat_id, callback_data, message_id);
                     break;
                 default:
                     break;
@@ -120,7 +116,7 @@ namespace HealthBot.handlers
             switch (callback_data.Split('_')[2])
             {
                 case "Age":
-                    tuple = Reply.AccountChange(chat_id, "Input your current age.");
+                    tuple = Reply.AccountChange(chat_id, "Input your age.");
 
                     Command.data[chat_id].LastAction = "AccountChangeAge";
 

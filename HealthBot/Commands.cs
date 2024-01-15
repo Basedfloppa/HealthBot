@@ -39,7 +39,7 @@ namespace Bot.scripts
             if (query != null) { data.Add(chat_id, query); }
             else
             {
-                var instance = new DataModel.User
+                var instance = new User
                 {
                     State = State.Menu.ToString(),
                     Name = $"{user.FirstName} {user.LastName}",

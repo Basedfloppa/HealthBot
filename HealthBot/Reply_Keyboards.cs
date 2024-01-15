@@ -99,7 +99,10 @@ namespace Bot.scripts
         public static (string, InlineKeyboardMarkup) AccountChange(long chat_id, string addition_text = "")
         {
             User user = Command.data[chat_id];
-            Biometry biometry = Command.db.Biometries.LastOrDefault(entry => entry.Author == user.Uuid);
+            Biometry biometry = Command.db.Biometries
+                                .Where(entry => entry.Author == user.Uuid)
+                                .OrderBy(entry => entry.CreatedAt)
+                                .LastOrDefault();
             int linked_accounts = user.Observers.Count();
 
             StringBuilder message = new StringBuilder();
@@ -119,6 +122,10 @@ namespace Bot.scripts
                     InlineKeyboardButton.WithCallbackData(text: "Age"   , callbackData: "Account_Change_Age"),
                     InlineKeyboardButton.WithCallbackData(text: "Weight", callbackData: "Account_Change_Weight"),
                     InlineKeyboardButton.WithCallbackData(text: "Sex"   , callbackData: "Account_Change_Sex")
+                },
+                new[]
+                {
+                    InlineKeyboardButton.WithCallbackData(text: "Back"  , callbackData: "To_Account")
                 }
             };
 

@@ -9,6 +9,8 @@ using User = HealthBot.User;
 using HealthBot;
 using System.Data.Common;
 using Sql_Queries;
+using System.Security.Cryptography;
+using System.Data;
 
 namespace Bot.code
 {  
@@ -97,6 +99,12 @@ namespace Bot.code
 
                         await Command.Destroy(chat_id, message_id);
                         await Command.Send(chat_id, Reply.Stats($"In given time span you consumed average of {Query.average_calories_by_date(date_min, date_max, data[chat_id])} ml of liquid"), message_id);
+                        break;
+                    case "AccountChangeAge":
+                        data[chat_id].Age = Convert.ToInt32(message.Text);
+
+                        await Command.Destroy(chat_id, message_id);
+                        await Command.Send(chat_id, Reply.Account(chat_id), message_id);
                         break;
                 }
 
