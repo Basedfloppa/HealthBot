@@ -75,10 +75,10 @@ namespace Bot.code
                     data[chat_id].State = State.Menu.ToString();
 
                     (string, InlineKeyboardMarkup) tuple = Reply.Menu(chat_id);
+                    data[chat_id].messageid = message.MessageId;
 
+                    await Command.Destroy(chat_id, message_id);
                     await Command.Send(chat_id, tuple);
-
-                    await bot.DeleteMessageAsync(chat_id, message_id);
                 }
 
                 DateTime date_min;

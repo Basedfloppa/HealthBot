@@ -29,7 +29,7 @@ public partial class User
 
     public string State { get; set; } = null!;
 
-    public string LastAction { get; set; } = null!;
+    public string LastAction { get; set; } = "";
 
     public virtual ICollection<Biometry> Biometries { get; set; } = new List<Biometry>();
 
@@ -40,4 +40,6 @@ public partial class User
     public virtual ICollection<User> Observees { get; set; } = new List<User>();
 
     public virtual ICollection<User> Observers { get; set; } = new List<User>();
+
+    public long messageid {get; set;}
 }
