@@ -18,7 +18,7 @@ namespace Bot.scripts
             bot_client = _bot_client;
             db = new HealthBotContext();
         }
-        public static void User_load(Update upd) // loads user info from database
+        public static async void User_load(Update upd) // loads user info from database
         {
             long chat_id = 0;
             Telegram.Bot.Types.User user = new Telegram.Bot.Types.User();
@@ -47,7 +47,10 @@ namespace Bot.scripts
                     ChatId = chat_id,
                     CreatedAt = DateTime.Now
                 };
+
                 data.Add(chat_id, instance);
+                db.Users.Add(instance);
+                await db.SaveChangesAsync();
             }
         } 
         public static async void Exit_seq() // safe exit, saves all current user data and notifies them about bot going down

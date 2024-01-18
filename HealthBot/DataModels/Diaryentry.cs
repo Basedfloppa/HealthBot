@@ -17,9 +17,9 @@ public partial class Diaryentry
 
     public string? BloodPreassure { get; set; }
 
-    public DateTime CreatedAt { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.Now.ToUniversalTime();
 
-    public DateTime UpdatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; } = DateTime.Now.ToUniversalTime();
 
     public DateTime DeletedAt { get; set; }
 

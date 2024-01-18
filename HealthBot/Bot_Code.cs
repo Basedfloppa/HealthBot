@@ -11,6 +11,7 @@ using System.Data.Common;
 using Sql_Queries;
 using System.Security.Cryptography;
 using System.Data;
+using System.Net;
 
 namespace Bot.code
 {  
@@ -81,6 +82,8 @@ namespace Bot.code
                     await Command.Send(chat_id, tuple);
                 }
 
+                if (message.Text == null) return;  
+
                 DateTime date_min;
                 DateTime date_max;
 
@@ -91,20 +94,66 @@ namespace Bot.code
                         date_max = Convert.ToDateTime(message.Text.Replace(" ", "").Split("-")[1]);
 
                         await Command.Destroy(chat_id, message_id);
-                        await Command.Send(chat_id, Reply.Stats($"In given time span you consumed average of {Query.average_calories_by_date(date_min, date_max, data[chat_id])} calories"), message_id);
+                        await Command.Send(chat_id, Reply.Stats($"In given time span you consumed average of {Query.average_calories_by_date(date_min, date_max, data[chat_id])} calories"), data[chat_id].messageid);
                         break;
                     case "LiquidByDate":
                         date_min = Convert.ToDateTime(message.Text.Replace(" ", "").Split("-")[0]);
                         date_max = Convert.ToDateTime(message.Text.Replace(" ", "").Split("-")[1]);
 
                         await Command.Destroy(chat_id, message_id);
-                        await Command.Send(chat_id, Reply.Stats($"In given time span you consumed average of {Query.average_calories_by_date(date_min, date_max, data[chat_id])} ml of liquid"), message_id);
+                        await Command.Send(chat_id, Reply.Stats($"In given time span you consumed average of {Query.average_calories_by_date(date_min, date_max, data[chat_id])} ml of liquid"), data[chat_id].messageid);
                         break;
                     case "AccountChangeAge":
                         data[chat_id].Age = Convert.ToInt32(message.Text);
 
                         await Command.Destroy(chat_id, message_id);
-                        await Command.Send(chat_id, Reply.Account(chat_id), message_id);
+                        await Command.Send(chat_id, Reply.Account(chat_id), data[chat_id].messageid);
+
+                        data[chat_id].LastAction = "";
+                        break;
+                    case "AccountChangeWeight":
+                        var weight = Convert.ToInt32(message.Text); 
+                        
+                        if (data[chat_id].Biometries.Count > 0 && data[chat_id].Biometries.LastOrDefault().ChangedAt == DateTime.Today) 
+                        {
+                            data[chat_id].Biometries.LastOrDefault().Weight = weight;
+                        } 
+                        else
+                        {
+                            Command.db.Biometries.Add(new Biometry() { Author = data[chat_id].Uuid, Weight = weight});
+                        }
+
+                        await Command.Destroy(chat_id, message_id);
+                        await Command.Send(chat_id, Reply.Account(chat_id), data[chat_id].messageid);
+
+                        await Command.db.SaveChangesAsync();
+                        data[chat_id].LastAction = "";
+                        break;
+                    case "AccountChangeHeight":
+                        var height = Convert.ToInt32(message.Text); 
+                        
+                        if (data[chat_id].Biometries.Last().ChangedAt == DateTime.Today) 
+                        {
+                            data[chat_id].Biometries.Last().Weight = height;
+                        } 
+                        else
+                        {
+                            Command.db.Biometries.Add(new Biometry() { Author = data[chat_id].Uuid, Weight = height});
+                        }
+
+                        await Command.Destroy(chat_id, message_id);
+                        await Command.Send(chat_id, Reply.Account(chat_id), data[chat_id].messageid);
+
+                        await Command.db.SaveChangesAsync();
+                        data[chat_id].LastAction = "";
+                        break;
+                    case "AccountChangeSex":
+                        data[chat_id].Sex = Convert.ToString(message.Text);
+
+                        await Command.Destroy(chat_id, message_id);
+                        await Command.Send(chat_id, Reply.Account(chat_id), data[chat_id].messageid);
+
+                        data[chat_id].LastAction = "";
                         break;
                 }
 
@@ -115,6 +164,8 @@ namespace Bot.code
                 chat_id = update.CallbackQuery.From.Id;
 
                 if (!data.TryGetValue(chat_id, out var a)) Command.User_load(update);
+
+                data[chat_id].messageid = update.CallbackQuery.Message.MessageId;
 
                 string callback_data = update.CallbackQuery.Data ?? "";
 

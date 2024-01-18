@@ -13,7 +13,7 @@ namespace HealthBot.Migrations
             migrationBuilder.AddColumn<int>(
                 name: "messageid",
                 table: "users",
-                type: "bigint",
+                type: "integer",
                 nullable: false,
                 defaultValue: 0
             );

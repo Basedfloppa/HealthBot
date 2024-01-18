@@ -21,9 +21,9 @@ public partial class User
 
     public DateTime? SubscriptionStart { get; set; }
 
-    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset CreatedAt { get; set; } = DateTime.Now.ToUniversalTime();
 
-    public DateTimeOffset? UpdatedAt { get; set; }
+    public DateTimeOffset? UpdatedAt { get; set; } = DateTime.Now.ToUniversalTime();
 
     public DateTimeOffset? DeletedAt { get; set; }
 
@@ -41,5 +41,5 @@ public partial class User
 
     public virtual ICollection<User> Observers { get; set; } = new List<User>();
 
-    public long messageid {get; set;}
+    public int messageid {get; set;}
 }
