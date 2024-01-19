@@ -123,7 +123,8 @@ namespace Bot.scripts
                 {
                     InlineKeyboardButton.WithCallbackData(text: "Age"   , callbackData: "Account_Change_Age"),
                     InlineKeyboardButton.WithCallbackData(text: "Weight", callbackData: "Account_Change_Weight"),
-                    InlineKeyboardButton.WithCallbackData(text: "Sex"   , callbackData: "Account_Change_Sex")
+                    InlineKeyboardButton.WithCallbackData(text: "Sex"   , callbackData: "Account_Change_Sex"),
+                    InlineKeyboardButton.WithCallbackData(text: "Height"   , callbackData: "Account_Change_Height")
                 },
                 new[]
                 {

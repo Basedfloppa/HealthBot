@@ -136,6 +136,13 @@ namespace HealthBot.handlers
 
                     await Command.Send(chat_id, tuple, message_id);
                     break;
+                case "Height":
+                    tuple = Reply.AccountChange(chat_id, "input your height.");
+
+                    Command.data[chat_id].LastAction = "AccountChangeHeight";
+
+                    await Command.Send(chat_id, tuple, message_id);
+                    break;
                 default:
                     break;
             }

@@ -41,7 +41,8 @@ namespace Bot.code
         public static void Main()
         {
             var db = new HealthBotContext();
-            db.Database.EnsureCreated();
+            db.Database.EnsureDeleted();
+            db.Database.EnsureCreated();            
             db.Dispose();
 
             bot.StartReceiving
@@ -134,13 +135,16 @@ namespace Bot.code
                     case "AccountChangeHeight":
                         var height = Convert.ToInt32(message.Text); 
                         
-                        if (data[chat_id].Biometries.Last().ChangedAt == DateTime.Today.ToUniversalTime()) 
+                        Console.WriteLine(data[chat_id].Biometries.LastOrDefault().ChangedAt.ToUniversalTime());
+                        Console.WriteLine(DateTime.Today.ToUniversalTime());
+
+                        if (data[chat_id].Biometries.Count > 0 && data[chat_id].Biometries.LastOrDefault().ChangedAt == DateTime.Today.ToUniversalTime()) 
                         {
-                            data[chat_id].Biometries.Last().Weight = height;
+                            data[chat_id].Biometries.LastOrDefault().Height = height;
                         } 
                         else
                         {
-                            db.Biometries.Add(new Biometry() { Author = data[chat_id].Uuid, Weight = height});
+                            db.Biometries.Add(new Biometry() { Author = data[chat_id].Uuid, Height = height});
                         }
 
                         await Command.Destroy(chat_id, message_id);

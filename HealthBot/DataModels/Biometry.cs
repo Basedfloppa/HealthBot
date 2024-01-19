@@ -15,7 +15,7 @@ public partial class Biometry
 
     public DateTime CreatedAt { get; set; } = DateTime.Today.ToUniversalTime();
 
-    public DateTime? ChangedAt { get; set; } = DateTime.Today.ToUniversalTime();
+    public DateTime ChangedAt { get; set; } = DateTime.Today.ToUniversalTime();
 
     public DateTime? DeletedAt { get; set; }
 
