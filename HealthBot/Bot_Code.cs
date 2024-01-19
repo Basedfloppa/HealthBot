@@ -41,7 +41,6 @@ namespace Bot.code
         public static void Main()
         {
             var db = new HealthBotContext();
-            db.Database.EnsureDeleted();
             db.Database.EnsureCreated();
             db.Dispose();
 
@@ -86,6 +85,7 @@ namespace Bot.code
 
                 DateTime date_min;
                 DateTime date_max;
+                var db = new HealthBotContext();
 
                 switch (Command.data[chat_id].LastAction)
                 {
@@ -109,42 +109,44 @@ namespace Bot.code
                         await Command.Destroy(chat_id, message_id);
                         await Command.Send(chat_id, Reply.Account(chat_id), data[chat_id].messageid);
 
+                        db.Update(data[chat_id]);
+                        db.SaveChangesAsync();
                         data[chat_id].LastAction = "";
                         break;
                     case "AccountChangeWeight":
                         var weight = Convert.ToInt32(message.Text); 
                         
-                        if (data[chat_id].Biometries.Count > 0 && data[chat_id].Biometries.LastOrDefault().ChangedAt == DateTime.Today) 
+                        if (data[chat_id].Biometries.Count > 0 && data[chat_id].Biometries.LastOrDefault().ChangedAt == DateTime.Today.ToUniversalTime()) 
                         {
                             data[chat_id].Biometries.LastOrDefault().Weight = weight;
                         } 
                         else
                         {
-                            Command.db.Biometries.Add(new Biometry() { Author = data[chat_id].Uuid, Weight = weight});
+                            db.Biometries.Add(new Biometry() { Author = data[chat_id].Uuid, Weight = weight});
                         }
 
                         await Command.Destroy(chat_id, message_id);
                         await Command.Send(chat_id, Reply.Account(chat_id), data[chat_id].messageid);
 
-                        await Command.db.SaveChangesAsync();
+                        await db.SaveChangesAsync();
                         data[chat_id].LastAction = "";
                         break;
                     case "AccountChangeHeight":
                         var height = Convert.ToInt32(message.Text); 
                         
-                        if (data[chat_id].Biometries.Last().ChangedAt == DateTime.Today) 
+                        if (data[chat_id].Biometries.Last().ChangedAt == DateTime.Today.ToUniversalTime()) 
                         {
                             data[chat_id].Biometries.Last().Weight = height;
                         } 
                         else
                         {
-                            Command.db.Biometries.Add(new Biometry() { Author = data[chat_id].Uuid, Weight = height});
+                            db.Biometries.Add(new Biometry() { Author = data[chat_id].Uuid, Weight = height});
                         }
 
                         await Command.Destroy(chat_id, message_id);
                         await Command.Send(chat_id, Reply.Account(chat_id), data[chat_id].messageid);
 
-                        await Command.db.SaveChangesAsync();
+                        await db.SaveChangesAsync();
                         data[chat_id].LastAction = "";
                         break;
                     case "AccountChangeSex":
@@ -152,11 +154,12 @@ namespace Bot.code
 
                         await Command.Destroy(chat_id, message_id);
                         await Command.Send(chat_id, Reply.Account(chat_id), data[chat_id].messageid);
-
+                        
+                        db.Update(data[chat_id]);
+                        db.SaveChangesAsync();
                         data[chat_id].LastAction = "";
                         break;
                 }
-
                 return;
             }
             else if (update.CallbackQuery != null)
@@ -185,6 +188,7 @@ namespace Bot.code
                     default:
                         break;
                 }
+                
             }
             else return;
         }

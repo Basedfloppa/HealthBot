@@ -11,12 +11,10 @@ namespace Bot.scripts
     {
         public static Dictionary<long, User> data = new Dictionary<long, User> { };
         public static ITelegramBotClient bot_client;
-        public static HealthBotContext db;
         public static void Initialize(Dictionary<long, User> _data, ITelegramBotClient _bot_client)
         {
             data = _data;
             bot_client = _bot_client;
-            db = new HealthBotContext();
         }
         public static async void User_load(Update upd) // loads user info from database
         {
@@ -34,6 +32,7 @@ namespace Bot.scripts
                 user = upd.CallbackQuery.From;
             }
 
+            var db = new HealthBotContext();
             var query = db.Users.SingleOrDefault(u => u.ChatId == chat_id);
 
             if (query != null) { data.Add(chat_id, query); }
@@ -51,10 +50,13 @@ namespace Bot.scripts
                 data.Add(chat_id, instance);
                 db.Users.Add(instance);
                 await db.SaveChangesAsync();
+                db.Dispose();
             }
         } 
         public static async void Exit_seq() // safe exit, saves all current user data and notifies them about bot going down
         {
+            var db = new HealthBotContext();
+
             foreach (var user in data)
             {
                 if (db.Users.Find(user.Value.Uuid) == null) 
@@ -69,9 +71,12 @@ namespace Bot.scripts
                     
                 await bot_client.SendTextMessageAsync(user.Value.ChatId, $"For now bot is going offline, sorry for the inconvenience.");
             }
+
+            db.Dispose();
         }
         public static void Start_seq() // safe start command, loads all user data and notifies them that bot is up
         {
+            var db = new HealthBotContext();
             var users = db.Users.ToList();
 
             if (users != null)
@@ -81,6 +86,8 @@ namespace Bot.scripts
                     data.Add(user.ChatId, user);
                 }
             } 
+
+            db.Dispose();
         }
         public static async Task Send(long chat_id, (string, InlineKeyboardMarkup) tuple)
         {

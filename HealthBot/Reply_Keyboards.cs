@@ -30,13 +30,14 @@ namespace Bot.scripts
         }
         public static (string, InlineKeyboardMarkup) Account(long chat_id, string addition_text = "")
         {
-            
+            var db = new HealthBotContext();
             User user = Command.data[chat_id];
-            Biometry biometry = Command.db.Biometries
+            Biometry biometry = db.Biometries
                                                     .Where(entry => entry.Author == user.Uuid)
-                                                    .OrderByDescending(entry => entry.CreatedAt)
+                                                    .OrderBy(entry => entry.CreatedAt)
                                                     .FirstOrDefault();
             int linked_accounts = user.Observers.Count();
+            db.Dispose();
 
             StringBuilder message = new StringBuilder();
             message.AppendLine($"Account of {user.Alias}");
@@ -98,8 +99,9 @@ namespace Bot.scripts
         }
         public static (string, InlineKeyboardMarkup) AccountChange(long chat_id, string addition_text = "")
         {
+            var db = new HealthBotContext();
             User user = Command.data[chat_id];
-            Biometry biometry = Command.db.Biometries
+            Biometry biometry = db.Biometries
                                 .Where(entry => entry.Author == user.Uuid)
                                 .OrderBy(entry => entry.CreatedAt)
                                 .LastOrDefault();

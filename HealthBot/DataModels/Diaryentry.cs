@@ -5,7 +5,7 @@ namespace HealthBot;
 
 public partial class Diaryentry
 {
-    public Guid Uuid { get; set; }
+    public Guid Uuid { get; set; } = Guid.NewGuid();
 
     public Guid Author { get; set; }
 
@@ -17,9 +17,9 @@ public partial class Diaryentry
 
     public string? BloodPreassure { get; set; }
 
-    public DateTime CreatedAt { get; set; } = DateTime.Now.ToUniversalTime();
+    public DateTime CreatedAt { get; set; } = DateTime.Today.ToUniversalTime();
 
-    public DateTime UpdatedAt { get; set; } = DateTime.Now.ToUniversalTime();
+    public DateTime UpdatedAt { get; set; } = DateTime.Today.ToUniversalTime();
 
     public DateTime DeletedAt { get; set; }
 

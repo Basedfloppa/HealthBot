@@ -5,7 +5,7 @@ namespace HealthBot;
 
 public partial class Exportdatum
 {
-    public Guid Uuid { get; set; }
+    public Guid Uuid { get; set; } = Guid.NewGuid();
 
     public Guid Author { get; set; }
 

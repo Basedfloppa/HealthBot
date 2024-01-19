@@ -5,7 +5,7 @@ namespace HealthBot;
 
 public partial class User
 {
-    public Guid Uuid { get; set; }
+    public Guid Uuid { get; set; } = Guid.NewGuid();
 
     public string? Name { get; set; }
 
@@ -21,9 +21,9 @@ public partial class User
 
     public DateTime? SubscriptionStart { get; set; }
 
-    public DateTimeOffset CreatedAt { get; set; } = DateTime.Now.ToUniversalTime();
+    public DateTimeOffset CreatedAt { get; set; } = DateTime.Today.ToUniversalTime();
 
-    public DateTimeOffset? UpdatedAt { get; set; } = DateTime.Now.ToUniversalTime();
+    public DateTimeOffset? UpdatedAt { get; set; } = DateTime.Today.ToUniversalTime();
 
     public DateTimeOffset? DeletedAt { get; set; }
 
