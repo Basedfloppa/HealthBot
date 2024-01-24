@@ -188,7 +188,12 @@ namespace HealthBot.handlers
                     await Command.Update(user);
                     await Command.Send(user.ChatId, tuple, user.messageid);
                     break;
-                case "Intake":
+                case "IntakeItem":
+                    tuple = Reply.IntakeItem("Input your current heart rate in numeric format");
+                    user.LastAction = "HeartRate";
+
+                    await Command.Update(user);
+                    await Command.Send(user.ChatId, tuple, user.messageid);
                     break;
             }
         }

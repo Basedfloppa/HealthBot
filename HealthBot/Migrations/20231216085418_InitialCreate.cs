@@ -133,7 +133,7 @@ namespace HealthBot.Migrations
                     tags = table.Column<string>(type: "text", nullable: true),
                     state = table.Column<string>(type: "text", nullable: false, defaultValueSql: "'solid'::text"),
                     weight = table.Column<int>(type: "integer", nullable: true),
-                    diary_entry = table.Column<Guid>(type: "uuid", nullable: false),
+                    author = table.Column<Guid>(type: "uuid", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
@@ -142,9 +142,9 @@ namespace HealthBot.Migrations
                 {
                     table.PrimaryKey("IntakeItems_pkey", x => x.uuid);
                     table.ForeignKey(
-                        name: "DiaryEntry",
-                        column: x => x.diary_entry,
-                        principalTable: "diaryentrys",
+                        name: "Author",
+                        column: x => x.author,
+                        principalTable: "users",
                         principalColumn: "uuid",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -165,9 +165,9 @@ namespace HealthBot.Migrations
                 column: "author");
 
             migrationBuilder.CreateIndex(
-                name: "IX_IntakeItems_diary_entry",
+                name: "IX_IntakeItems_author",
                 table: "IntakeItems",
-                column: "diary_entry");
+                column: "author");
 
             migrationBuilder.CreateIndex(
                 name: "IX_obresvers_observee",

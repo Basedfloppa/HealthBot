@@ -17,7 +17,7 @@ public partial class IntakeItem
 
     public int? Weight { get; set; }
 
-    public Guid DiaryEntry { get; set; }
+    public Guid Author { get; set; }
 
     public DateTime CreatedAt { get; set; } = DateTime.Today.ToUniversalTime();
 
