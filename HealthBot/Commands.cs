@@ -59,6 +59,21 @@ namespace Bot.scripts
                 text: tuple.Item1,
                 replyMarkup: tuple.Item2);
         }
+        public static async Task Send(long chat_id, (string, InlineKeyboardMarkup) tuple, int message_id, string path)
+        {
+            await bot_client.EditMessageTextAsync(
+                chatId: chat_id,
+                messageId: message_id,
+                text: tuple.Item1,
+                replyMarkup: tuple.Item2);
+            
+            await using Stream stream = System.IO.File.OpenRead(path);
+
+            await bot_client.SendDocumentAsync(
+                chatId: chat_id,
+                document: InputFile.FromStream(stream: stream, fileName: path.Split("/").Last())
+            );
+        }
         public static async Task Destroy(long chat_id, int message_id)
         {
             await bot_client.DeleteMessageAsync(chat_id, message_id);

@@ -11,7 +11,7 @@ public partial class Exportdatum
 
     public string ExportedData { get; set; } = null!;
 
-    public DateTime CreatedAt { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.Now.ToUniversalTime();
 
     public virtual User AuthorNavigation { get; set; } = null!;
 }

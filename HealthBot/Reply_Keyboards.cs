@@ -63,13 +63,21 @@ namespace Bot.scripts
         }
         public static (string, InlineKeyboardMarkup) LinkedAccounts(User user, string addition_text = "")
         {
-            var observers = user.Observers;
+            var db = new HealthBotContext();
+            var observers = db.Users.Find(user.Uuid)?.Observers;
+            var observees = db.Users.Find(user.Uuid)?.Observees;
             StringBuilder message = new StringBuilder();
+
             message.AppendLine("Accounts that have access to your data:\n");
 
             foreach(var observer in observers)
             {
-                message.AppendLine($"@{observer}");
+                message.AppendLine($"@{observer} can see your data");
+            }
+
+            foreach(var observee in observees)
+            {
+                message.AppendLine($"@{observee} you can see their data");
             }
 
             message.AppendLine($"{addition_text}");
@@ -78,8 +86,8 @@ namespace Bot.scripts
             {
                 new[]
                 {
-                    InlineKeyboardButton.WithCallbackData(text: "Add account"   , callbackData: "To_AddAccount"),
-                    InlineKeyboardButton.WithCallbackData(text: "Remove account", callbackData: "To_RemoveAccount")
+                    InlineKeyboardButton.WithCallbackData(text: "Add account"   , callbackData: "Account_AddAccount"),
+                    InlineKeyboardButton.WithCallbackData(text: "Remove account", callbackData: "Account_RemoveAccount")
                 },
                 new[]
                 {
@@ -127,6 +135,7 @@ namespace Bot.scripts
         {
             StringBuilder message = new StringBuilder();
             message.AppendLine("You want all your user data exported?");
+            message.AppendLine("Type 'yes' to proceed");
             message.AppendLine($"{addition_text}");
 
             InlineKeyboardMarkup keyboard = new[]
@@ -134,42 +143,6 @@ namespace Bot.scripts
                 new[]
                 {
                     InlineKeyboardButton.WithCallbackData(text: "Cancel", callbackData: "To_Account"),
-                },
-                new[]
-                {
-                    InlineKeyboardButton.WithCallbackData(text: "Yes"   , callbackData: "Export_All"),
-                }
-            };
-
-            return (message.ToString(), keyboard);
-        }
-        public static (string, InlineKeyboardMarkup) AddAccount(string addition_text = "")
-        {
-            StringBuilder message = new StringBuilder();
-            message.AppendLine("Type username of account you want to add.");
-            message.AppendLine($"{addition_text}");
-
-            InlineKeyboardMarkup keyboard = new[]
-            {
-                new[]
-                {
-                    InlineKeyboardButton.WithCallbackData(text: "Cancel", callbackData: "To_LinkedAccounts")
-                }
-            };
-
-            return (message.ToString(), keyboard);
-        }
-        public static (string, InlineKeyboardMarkup) RemoveAccount(string addition_text = "")  
-        {
-            StringBuilder message = new StringBuilder();
-            message.AppendLine("Type username of account you want to remove.");
-            message.AppendLine($"{addition_text}");
-
-            InlineKeyboardMarkup keyboard = new[]
-            {
-                new[]
-                {
-                    InlineKeyboardButton.WithCallbackData(text: "Cancel", callbackData: "To_LinkedAccounts")
                 }
             };
 

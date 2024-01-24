@@ -39,8 +39,7 @@ namespace HealthBot.handlers
                 case "AccountExport":
                     tuple = Reply.AccountExport();
 
-                    user.State = State.AccountExport.ToString();
-
+                    user.LastAction = "AccountExport";
                     await Command.Update(user);
                     await Command.Send(user.ChatId, tuple, user.messageid);
                     break;
@@ -51,22 +50,6 @@ namespace HealthBot.handlers
                     tuple = Reply.LinkedAccounts(user);
 
                     user.State = State.LinkedAccounts.ToString();
-
-                    await Command.Update(user);
-                    await Command.Send(user.ChatId, tuple, user.messageid);
-                    break;
-                case "AddAccount":
-                    tuple = Reply.AddAccount();
-
-                    user.State = State.AddAccount.ToString();
-
-                    await Command.Update(user);
-                    await Command.Send(user.ChatId, tuple, user.messageid);
-                    break;
-                case "RemoveAccount":
-                    tuple = Reply.RemoveAccount();
-
-                    user.State = State.RemoveAccount.ToString();
 
                     await Command.Update(user);
                     await Command.Send(user.ChatId, tuple, user.messageid);
@@ -107,6 +90,8 @@ namespace HealthBot.handlers
         }
         public static async Task Account_State_Handler(User user, string callback_data)
         {
+            (string, InlineKeyboardMarkup) tuple;
+
             switch (callback_data.Split('_')[1])
             {
                 case "Change":
@@ -114,6 +99,20 @@ namespace HealthBot.handlers
 
                     await Command.Update(user);
                     await Account_Change_State_Handler(user, callback_data);
+                    break;
+                case "RemoveAccount":
+                    tuple = Reply.LinkedAccounts(user,"Input handle of user that you want to remove");
+                    user.LastAction = "RemoveAccount";
+
+                    await Command.Update(user);
+                    await Command.Send(user.ChatId, tuple, user.messageid);
+                    break;
+                case "AddAccount":
+                    tuple = Reply.LinkedAccounts(user,"Input handle of user that you want to add");
+                    user.LastAction = "AddAccount";
+
+                    await Command.Update(user);
+                    await Command.Send(user.ChatId, tuple, user.messageid);
                     break;
             }
         }

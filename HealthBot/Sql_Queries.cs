@@ -110,8 +110,7 @@ namespace Sql_Queries
                            where entry.Author == user.Uuid
                            select entry;
 
-            db.Dispose();
-
+            
             return JsonSerializer.Serialize(user) + "\n\n" + JsonSerializer.Serialize(diary_entry_ids) + "\n\n" + JsonSerializer.Serialize(items) + "\n\n" + JsonSerializer.Serialize(biometry);
         }
     }

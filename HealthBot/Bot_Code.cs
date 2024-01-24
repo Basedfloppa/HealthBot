@@ -8,6 +8,7 @@ using Telegram.Bot.Types.ReplyMarkups;
 using HealthBot;
 using Sql_Queries;
 using Microsoft.EntityFrameworkCore;
+using System.Net;
 
 namespace Bot.code
 {  
@@ -16,17 +17,13 @@ namespace Bot.code
         Menu,
         Account,
         AccountChange,
-        AccountExport,
         AccountSubscription,
         LinkedAccounts,
-        AddAccount,
-        RemoveAccount,
         Diary,
         SearchDiary,
         AddToDiary,
         Stats
     }
-    
     public class Bot_Code
     {
         static ITelegramBotClient bot = new TelegramBotClient(Config.token); // token
@@ -85,6 +82,7 @@ namespace Bot.code
                 DateTime date_min;
                 DateTime date_max;
                 Biometry biometry;
+                HealthBot.User observer;
 
                 switch (user.LastAction)
                 {
@@ -163,6 +161,74 @@ namespace Bot.code
                         
                         user.LastAction = "";
                         await Command.Update(user);
+                        break;
+                    case "AddAccount":
+                        observer = db.Users.Where(u => u.Alias == Convert.ToString(message.Text).Replace("@","")).FirstOrDefault();
+                        
+                        if(observer != null)
+                        {
+                            user.Observers.Add(observer);
+                            await Command.Send(chat_id, Reply.LinkedAccounts(user), user.messageid);
+                        }
+                        else
+                        {
+                            await Command.Send(chat_id, Reply.LinkedAccounts(user,"This account is not yes registered in the system."), user.messageid);
+                        }
+
+                        user.LastAction = "";
+                        await Command.Update(user);
+                        await Command.Destroy(chat_id, message_id);
+                        
+                        break;
+                    case "RemoveAccount":
+                        observer = db.Users.Where(u => u.Alias == Convert.ToString(message.Text).Replace("@","")).FirstOrDefault();
+                        
+                        if(observer != null)
+                        {
+                            user.Observers.Remove(observer);
+                            await Command.Send(chat_id, Reply.LinkedAccounts(user), user.messageid);
+                        }
+                        else
+                        {
+                            await Command.Send(chat_id, Reply.LinkedAccounts(user,"This user is not present in the system"), user.messageid);
+                        }
+
+                        user.LastAction = "";
+                        await Command.Update(user);
+                        await Command.Destroy(chat_id, message_id);
+                        
+                        break;
+                    case "AccountExport":
+                        if(message.Text.ToLower() != "yes")
+                        {
+                            await Command.Destroy(chat_id, message_id);
+                            break;
+                        }
+
+                        var last_export = db.Exportdata.Where(e => e.Author == user.Uuid)?.OrderBy(e => e.CreatedAt).FirstOrDefault();
+
+                        if(last_export != null && (last_export.CreatedAt - DateTime.Today).TotalDays < 14)
+                        {
+                            await Command.Send(user.ChatId, Reply.AccountExport("You are not elegible for account export at this time."), user.messageid);
+                        }
+                        else
+                        {
+                            var json = Sql_Queries.Query.user_data_export(user);
+                            var path = $"./{user.Alias}_{DateTime.Today.ToString("yyyy-MM-dd")}.json";
+                            System.IO.File.AppendAllText(path, json);
+
+                            db.Exportdata.Add( new Exportdatum
+                            {
+                                Author = user.Uuid,
+                                ExportedData = json
+                            });
+
+                            await Command.Destroy(chat_id, message_id);
+                            await db.SaveChangesAsync();
+                            db.Dispose();
+                            await Command.Send(user.ChatId, Reply.AccountExport("Done"), user.messageid, path);
+                        }
+
                         break;
                 }
                 return;
