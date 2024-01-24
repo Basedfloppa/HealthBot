@@ -1,6 +1,5 @@
 ﻿using System.Data;
 using System.Text.Json;
-using Bot.scripts;
 using HealthBot;
 using User = HealthBot.User;
 
@@ -90,11 +89,9 @@ namespace Sql_Queries
 
             return db.IntakeItems.Where(item => entry_ids.Contains(item.DiaryEntry) && (item.Tags.ToLower().Contains(argument.ToLower()) || item.Name.ToLower().Contains(argument.ToLower()))).ToList();
         }
-        public static string user_data_export(long chat_id)
+        public static string user_data_export(User user)
         {
             var db = new HealthBotContext();
-
-            var user = db.Users.SingleOrDefault(u => u.ChatId == chat_id);
 
             var diary_entrys = from entry 
                                 in db.Diaryentrys

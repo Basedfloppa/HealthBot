@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace HealthBot;
+﻿namespace HealthBot;
 
 public partial class Biometry
 {
@@ -13,9 +10,9 @@ public partial class Biometry
 
     public int? Height { get; set; }
 
-    public DateTime CreatedAt { get; set; } = DateTime.Today.ToUniversalTime();
+    public DateTime CreatedAt { get; set; } = DateTime.Now.ToUniversalTime();
 
-    public DateTime ChangedAt { get; set; } = DateTime.Today.ToUniversalTime();
+    public DateTime ChangedAt { get; set; } = DateTime.Now.ToUniversalTime();
 
     public DateTime? DeletedAt { get; set; }
 

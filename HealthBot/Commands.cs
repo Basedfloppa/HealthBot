@@ -9,86 +9,41 @@ namespace Bot.scripts
 {
     class Command
     {
-        public static Dictionary<long, User> data = new Dictionary<long, User> { };
         public static ITelegramBotClient bot_client;
-        public static void Initialize(Dictionary<long, User> _data, ITelegramBotClient _bot_client)
+        public static void Initialize(ITelegramBotClient _bot_client)
         {
-            data = _data;
             bot_client = _bot_client;
         }
-        public static async void User_load(Update upd) // loads user info from database
+        public static User User_create(Update upd, long chat_id) // creates user for database
         {
-            long chat_id = 0;
             Telegram.Bot.Types.User user = new Telegram.Bot.Types.User();
 
             if (upd.Message != null) 
             {
-                chat_id = upd.Message.Chat.Id;
-                user = upd.Message.From;
+                user = upd.Message.From; // cannot be null so no problem
             }
             if (upd.CallbackQuery != null) 
             {
-                chat_id = upd.CallbackQuery.From.Id;
                 user = upd.CallbackQuery.From;
             }
 
             var db = new HealthBotContext();
-            var query = db.Users.SingleOrDefault(u => u.ChatId == chat_id);
 
-            if (query != null) { data.Add(chat_id, query); }
-            else
+            User instance = new User
             {
-                var instance = new User
-                {
-                    State = State.Menu.ToString(),
-                    Name = $"{user.FirstName} {user.LastName}",
-                    Alias = user.Username,
-                    ChatId = chat_id,
-                    CreatedAt = DateTime.Now
-                };
+                State = State.Menu.ToString(),
+                Name = $"{user?.FirstName} {user?.LastName}",
+                Alias = user?.Username,
+                ChatId = chat_id,
+                CreatedAt = DateTime.Now
+            };
 
-                data.Add(chat_id, instance);
-                db.Users.Add(instance);
-                await db.SaveChangesAsync();
-                db.Dispose();
-            }
+            db.Users.Add(instance);
+            db.SaveChanges();
+            db.Dispose();
+
+            return instance;
         } 
-        public static async void Exit_seq() // safe exit, saves all current user data and notifies them about bot going down
-        {
-            var db = new HealthBotContext();
-
-            foreach (var user in data)
-            {
-                if (db.Users.Find(user.Value.Uuid) == null) 
-                {
-                    db.Add(user);
-                }
-                else if (user.Value != db.Users.Find(user.Value.Uuid)) 
-                {
-                    user.Value.UpdatedAt = DateTime.Now;
-                    db.Update(user);
-                }
-                    
-                await bot_client.SendTextMessageAsync(user.Value.ChatId, $"For now bot is going offline, sorry for the inconvenience.");
-            }
-
-            db.Dispose();
-        }
-        public static void Start_seq() // safe start command, loads all user data and notifies them that bot is up
-        {
-            var db = new HealthBotContext();
-            var users = db.Users.ToList();
-
-            if (users != null)
-            {
-                foreach (var user in users)
-                {
-                    data.Add(user.ChatId, user);
-                }
-            } 
-
-            db.Dispose();
-        }
         public static async Task Send(long chat_id, (string, InlineKeyboardMarkup) tuple)
         {
             await bot_client.SendTextMessageAsync(
@@ -107,6 +62,14 @@ namespace Bot.scripts
         public static async Task Destroy(long chat_id, int message_id)
         {
             await bot_client.DeleteMessageAsync(chat_id, message_id);
+        }
+        public static async Task Update<T>(T entry) where T: notnull
+        {
+            var db = new HealthBotContext();
+
+            db.Update(entry);
+            db.SaveChanges();
+            db.Dispose();
         }
     }
 }

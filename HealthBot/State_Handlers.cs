@@ -6,148 +6,158 @@ namespace HealthBot.handlers
 {
     internal class State_Handlers
     {
-        public static async Task To_State_Handler(long chat_id, string callback_data, int message_id)
+        public static async Task To_State_Handler(User user, string callback_data)
         {
             (string, InlineKeyboardMarkup) tuple;
 
             switch (callback_data.Split('_')[1])
             {
                 case "Menu":
-                    tuple = Reply.Menu(chat_id);
+                    tuple = Reply.Menu(user);
 
-                    Command.data[chat_id].State = State.Menu.ToString();
+                    user.State = State.Menu.ToString();
 
-                    await Command.Send(chat_id, tuple, message_id);
+                    await Command.Update(user);
+                    await Command.Send(user.ChatId, tuple, user.messageid);
                     break;
                 case "Account":
-                    tuple = Reply.Account(chat_id);
+                    tuple = Reply.Account(user);
 
-                    Command.data[chat_id].State = State.Account.ToString();
+                    user.State = State.Account.ToString();
 
-                    await Command.Send(chat_id, tuple, message_id);
+                    await Command.Update(user);
+                    await Command.Send(user.ChatId, tuple, user.messageid);
                     break;
                 case "AccountChange":
-                    tuple = Reply.AccountChange(chat_id);
+                    tuple = Reply.AccountChange(user);
 
-                    Command.data[chat_id].State = State.AccountChange.ToString();
+                    user.State = State.AccountChange.ToString();
 
-                    await Command.Send(chat_id, tuple, message_id);
+                    await Command.Update(user);
+                    await Command.Send(user.ChatId, tuple, user.messageid);
                     break;
                 case "AccountExport":
                     tuple = Reply.AccountExport();
 
-                    Command.data[chat_id].State = State.AccountExport.ToString();
+                    user.State = State.AccountExport.ToString();
 
-                    await Command.Send(chat_id, tuple, message_id);
+                    await Command.Update(user);
+                    await Command.Send(user.ChatId, tuple, user.messageid);
                     break;
                 case "AccountSubscription":
-                    Command.data[chat_id].State = State.AccountSubscription.ToString(); // TODO: Chainge to reply keyboard with payment
+                    user.State = State.AccountSubscription.ToString(); // TODO: Chainge to reply keyboard with payment
                     break;
                 case "LinkedAccounts":
-                    tuple = Reply.LinkedAccounts(chat_id);
+                    tuple = Reply.LinkedAccounts(user);
 
-                    Command.data[chat_id].State = State.LinkedAccounts.ToString();
+                    user.State = State.LinkedAccounts.ToString();
 
-                    await Command.Send(chat_id, tuple, message_id);
+                    await Command.Update(user);
+                    await Command.Send(user.ChatId, tuple, user.messageid);
                     break;
                 case "AddAccount":
                     tuple = Reply.AddAccount();
 
-                    Command.data[chat_id].State = State.AddAccount.ToString();
+                    user.State = State.AddAccount.ToString();
 
-                    await Command.Send(chat_id, tuple, message_id);
+                    await Command.Update(user);
+                    await Command.Send(user.ChatId, tuple, user.messageid);
                     break;
                 case "RemoveAccount":
                     tuple = Reply.RemoveAccount();
 
-                    Command.data[chat_id].State = State.RemoveAccount.ToString();
+                    user.State = State.RemoveAccount.ToString();
 
-                    await Command.Send(chat_id, tuple, message_id);
+                    await Command.Update(user);
+                    await Command.Send(user.ChatId, tuple, user.messageid);
                     break;
                 case "Diary":
                     tuple = Reply.Diary();
 
-                    Command.data[chat_id].State = State.Diary.ToString();
+                    user.State = State.Diary.ToString();
 
-                    await Command.Send(chat_id, tuple, message_id);
+                    await Command.Update(user);
+                    await Command.Send(user.ChatId, tuple, user.messageid);
                     break;
                 case "SearchDiary":
                     tuple = Reply.SearchDiary();
 
-                    Command.data[chat_id].State = State.SearchDiary.ToString();
+                    user.State = State.SearchDiary.ToString();
 
-                    await Command.Send(chat_id, tuple, message_id);
+                    await Command.Update(user);
+                    await Command.Send(user.ChatId, tuple, user.messageid);
                     break;
                 case "AddToDiary":
                     tuple = Reply.AddToDiary();
 
-                    Command.data[chat_id].State = State.AddToDiary.ToString();
+                    user.State = State.AddToDiary.ToString();
 
-                    await Command.Send(chat_id, tuple, message_id);
+                    await Command.Update(user);
+                    await Command.Send(user.ChatId, tuple, user.messageid);
                     break;
                 case "Stats":
                     tuple = Reply.Stats();
 
-                    Command.data[chat_id].State = State.Stats.ToString();
+                    user.State = State.Stats.ToString();
 
-                    await Command.Send(chat_id, tuple, message_id);
-                    break;
-                default:
+                    await Command.Update(user);
+                    await Command.Send(user.ChatId, tuple, user.messageid);
                     break;
             }
         }
-        public static async Task Account_State_Handler(long chat_id, string callback_data, int message_id)
+        public static async Task Account_State_Handler(User user, string callback_data)
         {
             switch (callback_data.Split('_')[1])
             {
                 case "Change":
-                    Command.data[chat_id].State = State.AccountChange.ToString();
+                    user.State = State.AccountChange.ToString();
 
-                    await Account_Change_State_Handler(chat_id, callback_data, message_id);
-                    break;
-                default:
+                    await Command.Update(user);
+                    await Account_Change_State_Handler(user, callback_data);
                     break;
             }
         }
-        public static async Task Account_Change_State_Handler(long chat_id, string callback_data, int message_id)
+        public static async Task Account_Change_State_Handler(User user, string callback_data)
         {
             (string, InlineKeyboardMarkup) tuple;
 
             switch (callback_data.Split('_')[2])
             {
                 case "Age":
-                    tuple = Reply.AccountChange(chat_id, "Input your age.");
+                    tuple = Reply.AccountChange(user, "Input your age.");
 
-                    Command.data[chat_id].LastAction = "AccountChangeAge";
+                    user.LastAction = "AccountChangeAge";
 
-                    await Command.Send(chat_id, tuple, message_id);
+                    await Command.Update(user);
+                    await Command.Send(user.ChatId, tuple, user.messageid);
                     break;
                 case "Weight":
-                    tuple = Reply.AccountChange(chat_id, "Input your current weight.");
+                    tuple = Reply.AccountChange(user, "Input your current weight.");
 
-                    Command.data[chat_id].LastAction = "AccountChangeWeight";
+                    user.LastAction = "AccountChangeWeight";
 
-                    await Command.Send(chat_id, tuple, message_id);
+                    await Command.Update(user);
+                    await Command.Send(user.ChatId, tuple, user.messageid);
                     break;
                 case "Sex":
-                    tuple = Reply.AccountChange(chat_id, "Input your sex.");
+                    tuple = Reply.AccountChange(user, "Input your sex.");
 
-                    Command.data[chat_id].LastAction = "AccountChangeSex";
+                    user.LastAction = "AccountChangeSex";
 
-                    await Command.Send(chat_id, tuple, message_id);
+                    await Command.Update(user);
+                    await Command.Send(user.ChatId, tuple, user.messageid);
                     break;
                 case "Height":
-                    tuple = Reply.AccountChange(chat_id, "input your height.");
+                    tuple = Reply.AccountChange(user, "input your height.");
 
-                    Command.data[chat_id].LastAction = "AccountChangeHeight";
+                    user.LastAction = "AccountChangeHeight";
 
-                    await Command.Send(chat_id, tuple, message_id);
-                    break;
-                default:
+                    await Command.Update(user);
+                    await Command.Send(user.ChatId, tuple, user.messageid);
                     break;
             }
         }
-        public static async Task Stats_State_Handler(long chat_id, string callback_data, int message_id)
+        public static async Task Stats_State_Handler(User user, string callback_data)
         {
             (string, InlineKeyboardMarkup) tuple;
 
@@ -156,18 +166,18 @@ namespace HealthBot.handlers
                 case "CaloriesByDate":
                     tuple = Reply.Stats("Input two dates in format dd.mm.yy-dd.mm.yy where first date is less than second.");
 
-                    Command.data[chat_id].LastAction = "CaloriesByDate";
+                    user.LastAction = "CaloriesByDate";
 
-                    await Command.Send(chat_id, tuple, message_id);
+                    await Command.Update(user);
+                    await Command.Send(user.ChatId, tuple, user.messageid);
                     break;
                 case "LiquidByDate":
                     tuple = Reply.Stats("Input two dates in format dd.mm.yy-dd.mm.yy where first date is less than second.");
 
-                    Command.data[chat_id].LastAction = "LiquidByDate";
+                    user.LastAction = "LiquidByDate";
 
-                    await Command.Send(chat_id, tuple, message_id);
-                    break;
-                default:
+                    await Command.Update(user);
+                    await Command.Send(user.ChatId, tuple, user.messageid);
                     break;
             }
         }

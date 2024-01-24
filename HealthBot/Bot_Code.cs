@@ -5,13 +5,9 @@ using Configuration;
 using Bot.scripts;
 using HealthBot.handlers;
 using Telegram.Bot.Types.ReplyMarkups;
-using User = HealthBot.User;
 using HealthBot;
-using System.Data.Common;
 using Sql_Queries;
-using System.Security.Cryptography;
-using System.Data;
-using System.Net;
+using Microsoft.EntityFrameworkCore;
 
 namespace Bot.code
 {  
@@ -34,7 +30,6 @@ namespace Bot.code
     public class Bot_Code
     {
         static ITelegramBotClient bot = new TelegramBotClient(Config.token); // token
-        static Dictionary<long, User> data = new Dictionary<long, User> { }; // enables work for multiple user
         static CancellationToken cancellationToken = new CancellationTokenSource().Token;
         static ReceiverOptions receiverOptions = new ReceiverOptions { AllowedUpdates = { } }; // receive all update types
 
@@ -53,115 +48,121 @@ namespace Bot.code
                 cancellationToken
             );
             
-            Command.Initialize(data, bot);
+            Command.Initialize(bot);
 
             Console.Read();
         }
         public static async Task HandleUpdateAsync(ITelegramBotClient botclient, Update update, CancellationToken cancellationToken)
         {
+            var db = new HealthBotContext();
+
             long chat_id;
             int message_id;
-            Message message;
             
             if (update.Message != null)
             {
-                message = update.Message;
-                message_id = update.Message.MessageId;
-                chat_id = update.Message.Chat.Id;
+                var message = update.Message;
+                
+                if (message.Text == null) return; 
 
-                if (!data.TryGetValue(chat_id, out var a)) Command.User_load(update);
+                chat_id = message.Chat.Id;
+                message_id = message.MessageId;
 
-                if (message.Text != null && message.Text == "/start")
+                var user = db.Users.FirstOrDefault(u => u.ChatId == chat_id) ?? Command.User_create(update, chat_id);
+
+                if (message.Text == "/start")
                 {
-                    data[chat_id].State = State.Menu.ToString();
+                    user.State = State.Menu.ToString();
 
-                    (string, InlineKeyboardMarkup) tuple = Reply.Menu(chat_id);
-                    data[chat_id].messageid = message.MessageId;
+                    (string, InlineKeyboardMarkup) tuple = Reply.Menu(user);
+                    user.messageid = message.MessageId;
 
+                    await Command.Update(user);
                     await Command.Destroy(chat_id, message_id);
                     await Command.Send(chat_id, tuple);
-                }
-
-                if (message.Text == null) return;  
+                } 
 
                 DateTime date_min;
                 DateTime date_max;
-                var db = new HealthBotContext();
+                Biometry biometry;
 
-                switch (Command.data[chat_id].LastAction)
+                switch (user.LastAction)
                 {
                     case "CaloriesByDate": // TODO: add check for which date is earlier + parsing if dates are wrong
                         date_min = Convert.ToDateTime(message.Text.Replace(" ", "").Split("-")[0]);
                         date_max = Convert.ToDateTime(message.Text.Replace(" ", "").Split("-")[1]);
 
                         await Command.Destroy(chat_id, message_id);
-                        await Command.Send(chat_id, Reply.Stats($"In given time span you consumed average of {Query.average_calories_by_date(date_min, date_max, data[chat_id])} calories"), data[chat_id].messageid);
+                        await Command.Send(chat_id, Reply.Stats($"In given time span you consumed average of {Query.average_calories_by_date(date_min, date_max, user)} calories"), user.messageid);
                         break;
                     case "LiquidByDate":
                         date_min = Convert.ToDateTime(message.Text.Replace(" ", "").Split("-")[0]);
                         date_max = Convert.ToDateTime(message.Text.Replace(" ", "").Split("-")[1]);
 
                         await Command.Destroy(chat_id, message_id);
-                        await Command.Send(chat_id, Reply.Stats($"In given time span you consumed average of {Query.average_calories_by_date(date_min, date_max, data[chat_id])} ml of liquid"), data[chat_id].messageid);
+                        await Command.Send(chat_id, Reply.Stats($"In given time span you consumed average of {Query.average_water_by_date(date_min, date_max, user)} ml of liquid"), user.messageid);
                         break;
                     case "AccountChangeAge":
-                        data[chat_id].Age = Convert.ToInt32(message.Text);
+                        user.Age = Convert.ToInt32(message.Text);
 
                         await Command.Destroy(chat_id, message_id);
-                        await Command.Send(chat_id, Reply.Account(chat_id), data[chat_id].messageid);
+                        await Command.Send(chat_id, Reply.Account(user), user.messageid);
 
-                        db.Update(data[chat_id]);
-                        db.SaveChangesAsync();
-                        data[chat_id].LastAction = "";
+                        user.LastAction = "";
+                        await Command.Update(user);
                         break;
                     case "AccountChangeWeight":
                         var weight = Convert.ToInt32(message.Text); 
+                        biometry = db.Biometries.Where(b => b.Author == user.Uuid).OrderBy(b => b.CreatedAt).FirstOrDefault();
                         
-                        if (data[chat_id].Biometries.Count > 0 && data[chat_id].Biometries.LastOrDefault().ChangedAt == DateTime.Today.ToUniversalTime()) 
+                        if (biometry is not null && biometry.ChangedAt.Date == DateTime.Today.Date) 
                         {
-                            data[chat_id].Biometries.LastOrDefault().Weight = weight;
+                            biometry.Weight = weight;
+                            await Command.Update(biometry);
                         } 
                         else
                         {
-                            db.Biometries.Add(new Biometry() { Author = data[chat_id].Uuid, Weight = weight});
+                            db.Biometries.Add(new Biometry() { Author = user.Uuid, Weight = weight});
+                            await db.SaveChangesAsync();
+                            db.Dispose();
                         }
 
+                        user.LastAction = "";
+                        
                         await Command.Destroy(chat_id, message_id);
-                        await Command.Send(chat_id, Reply.Account(chat_id), data[chat_id].messageid);
-
-                        await db.SaveChangesAsync();
-                        data[chat_id].LastAction = "";
+                        await Command.Send(chat_id, Reply.Account(user), user.messageid);
+                        await Command.Update(user);                       
                         break;
                     case "AccountChangeHeight":
                         var height = Convert.ToInt32(message.Text); 
-                        
-                        Console.WriteLine(data[chat_id].Biometries.LastOrDefault().ChangedAt.ToUniversalTime());
-                        Console.WriteLine(DateTime.Today.ToUniversalTime());
+                        biometry = db.Biometries.Where(b => b.Author == user.Uuid).OrderBy(b => b.CreatedAt).FirstOrDefault();
 
-                        if (data[chat_id].Biometries.Count > 0 && data[chat_id].Biometries.LastOrDefault().ChangedAt == DateTime.Today.ToUniversalTime()) 
+                        if (biometry is not null && biometry.ChangedAt.Date == DateTime.Today.Date) 
                         {
-                            data[chat_id].Biometries.LastOrDefault().Height = height;
+                            biometry.Height = height;
+                            await Command.Update(biometry);
                         } 
                         else
                         {
-                            db.Biometries.Add(new Biometry() { Author = data[chat_id].Uuid, Height = height});
+                            db.Biometries.Add(new Biometry() { Author = user.Uuid, Height = height});
+                            await db.SaveChangesAsync();
+                            db.Dispose();
                         }
 
+                        user.LastAction = "";
+                        
                         await Command.Destroy(chat_id, message_id);
-                        await Command.Send(chat_id, Reply.Account(chat_id), data[chat_id].messageid);
-
-                        await db.SaveChangesAsync();
-                        data[chat_id].LastAction = "";
+                        await Command.Send(chat_id, Reply.Account(user), user.messageid);
+                        await Command.Update(user);                       
                         break;
                     case "AccountChangeSex":
-                        data[chat_id].Sex = Convert.ToString(message.Text);
+                        user.Sex = Convert.ToString(message.Text);
 
                         await Command.Destroy(chat_id, message_id);
-                        await Command.Send(chat_id, Reply.Account(chat_id), data[chat_id].messageid);
+                        await Command.Send(chat_id, Reply.Account(user), user.messageid);
                         
-                        db.Update(data[chat_id]);
-                        db.SaveChangesAsync();
-                        data[chat_id].LastAction = "";
+                        user.LastAction = "";
+                        await Command.Update(user);
                         break;
                 }
                 return;
@@ -169,32 +170,29 @@ namespace Bot.code
             else if (update.CallbackQuery != null)
             {
                 chat_id = update.CallbackQuery.From.Id;
+                var user = db.Users.FirstOrDefault(u => u.ChatId == chat_id) ?? Command.User_create(update, chat_id);
 
-                if (!data.TryGetValue(chat_id, out var a)) Command.User_load(update);
-
-                data[chat_id].messageid = update.CallbackQuery.Message.MessageId;
+                user.messageid = update.CallbackQuery.Message.MessageId; 
+                await Command.Update(user);
 
                 string callback_data = update.CallbackQuery.Data ?? "";
 
                 switch (callback_data.Split('_')[0])
                 {
                     case "To":
-                        await State_Handlers.To_State_Handler(chat_id, callback_data, update.CallbackQuery.Message.MessageId);
+                        await State_Handlers.To_State_Handler(user, callback_data);
                         break;
                     case "Account":
-                        await State_Handlers.Account_State_Handler(chat_id, callback_data, update.CallbackQuery.Message.MessageId);
+                        await State_Handlers.Account_State_Handler(user, callback_data);
                         break;
                     case "Stats":
-                        await State_Handlers.Stats_State_Handler(chat_id, callback_data, update.CallbackQuery.Message.MessageId);
+                        await State_Handlers.Stats_State_Handler(user, callback_data);
                         break;
                     case "Diary":
                         break;
-                    default:
-                        break;
                 }
-                
             }
-            else return;
+            db.Dispose();
         }
         public static async Task HandleErrorAsync(ITelegramBotClient botclient, Exception exception, CancellationToken cancellationToken)
         {
