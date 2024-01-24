@@ -11,9 +11,6 @@ namespace HealthBot.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterDatabase()
-                .Annotation("Npgsql:Enum:State", "Menu");
-
             migrationBuilder.CreateTable(
                 name: "users",
                 columns: table => new
@@ -29,7 +26,6 @@ namespace HealthBot.Migrations
                     created_at = table.Column<DateTimeOffset>(type: "time with time zone", nullable: false),
                     updated_at = table.Column<DateTimeOffset>(type: "time with time zone", nullable: true),
                     deleted_at = table.Column<DateTimeOffset>(type: "time with time zone", nullable: true),
-                    state = table.Column<string>(type: "text", nullable: false),
                     last_action = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>

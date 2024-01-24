@@ -31,7 +31,6 @@ namespace Bot.scripts
 
             User instance = new User
             {
-                State = State.Menu.ToString(),
                 Name = $"{user?.FirstName} {user?.LastName}",
                 Alias = user?.Username,
                 ChatId = chat_id,

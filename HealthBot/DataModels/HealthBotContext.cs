@@ -139,7 +139,6 @@ public partial class HealthBotContext : DbContext
             entity.Property(e => e.LastAction).HasColumnName("last_action");
             entity.Property(e => e.Name).HasColumnName("name");
             entity.Property(e => e.Sex).HasColumnName("sex");
-            entity.Property(e => e.State).HasColumnName("state");
             entity.Property(e => e.SubscriptionEnd).HasColumnName("subscription_end");
             entity.Property(e => e.SubscriptionStart).HasColumnName("subscription_start");
             entity.Property(e => e.UpdatedAt)

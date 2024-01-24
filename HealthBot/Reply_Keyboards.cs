@@ -209,39 +209,24 @@ namespace Bot.scripts
 
             return (message.ToString(), keyboard);
         }
-        public static (string, InlineKeyboardMarkup) SearchDiary(string addition_text = "")
+        public static (string, InlineKeyboardMarkup) DiaryNew(string addition_text = "")
         {
             StringBuilder message = new StringBuilder();
-            message.AppendLine("Welcome to your diary, what do you want to do?");
+            message.AppendLine($"What type of entry you want to create?");
             message.AppendLine($"{addition_text}");
 
             InlineKeyboardMarkup keyboard = new[]
             {
-                InlineKeyboardButton.WithCallbackData(text: "Cancel"        , callbackData: "To_Diary"),
-                InlineKeyboardButton.WithCallbackData(text: "Search by type", callbackData: "Diary_Search_All_Type"),
-                InlineKeyboardButton.WithCallbackData(text: "Search by name", callbackData: "Diary_Search_All_Name"),
-                InlineKeyboardButton.WithCallbackData(text: "Search by tags", callbackData: "Diary_Search_All_Tags")
-            };
-
-            return (message.ToString(), keyboard);
-        }
-        public static (string, InlineKeyboardMarkup) AddToDiary(string addition_text = "")
-        {
-            StringBuilder message = new StringBuilder();
-            message.AppendLine("What type of entry you want to make?");
-            message.AppendLine($"{addition_text}");
-
-            InlineKeyboardMarkup keyboard = new[]
-            {
-                new[]
-                {
-                    InlineKeyboardButton.WithCallbackData(text: "Cancel"           , callbackData: "To_Diary")
+                new[]{
+                    InlineKeyboardButton.WithCallbackData(text: "Blood pressure"         , callbackData: "Diary_Add_BloodPressure"),
+                    InlineKeyboardButton.WithCallbackData(text: "Blood oxygen saturation", callbackData: "Diary_Add_BloodSaturation")
                 },
-                new[]
-                {
-                    InlineKeyboardButton.WithCallbackData(text: "Consumption entry", callbackData: "Diary_Add_Intake"),
-                    InlineKeyboardButton.WithCallbackData(text: "Biometry Entry"   , callbackData: "Diary_Add_Biometry"),
-
+                new[]{
+                    InlineKeyboardButton.WithCallbackData(text: "Heart rate"             , callbackData: "Diary_Add_HeartRate"),
+                    InlineKeyboardButton.WithCallbackData(text: "Intake item"            , callbackData: "Diary_Add_Intake")
+                },
+                new[]{
+                    InlineKeyboardButton.WithCallbackData(text: "Back"                   , callbackData: "To_Diary")
                 }
             };
 

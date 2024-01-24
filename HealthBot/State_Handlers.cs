@@ -1,6 +1,7 @@
 ﻿using Bot.scripts;
 using Bot.code;
 using Telegram.Bot.Types.ReplyMarkups;
+using System.Data.Common;
 
 namespace HealthBot.handlers
 {
@@ -15,25 +16,16 @@ namespace HealthBot.handlers
                 case "Menu":
                     tuple = Reply.Menu(user);
 
-                    user.State = State.Menu.ToString();
-
-                    await Command.Update(user);
                     await Command.Send(user.ChatId, tuple, user.messageid);
                     break;
                 case "Account":
                     tuple = Reply.Account(user);
 
-                    user.State = State.Account.ToString();
-
-                    await Command.Update(user);
                     await Command.Send(user.ChatId, tuple, user.messageid);
                     break;
                 case "AccountChange":
                     tuple = Reply.AccountChange(user);
 
-                    user.State = State.AccountChange.ToString();
-
-                    await Command.Update(user);
                     await Command.Send(user.ChatId, tuple, user.messageid);
                     break;
                 case "AccountExport":
@@ -44,46 +36,20 @@ namespace HealthBot.handlers
                     await Command.Send(user.ChatId, tuple, user.messageid);
                     break;
                 case "AccountSubscription":
-                    user.State = State.AccountSubscription.ToString(); // TODO: Chainge to reply keyboard with payment
                     break;
                 case "LinkedAccounts":
                     tuple = Reply.LinkedAccounts(user);
 
-                    user.State = State.LinkedAccounts.ToString();
-
-                    await Command.Update(user);
                     await Command.Send(user.ChatId, tuple, user.messageid);
                     break;
                 case "Diary":
                     tuple = Reply.Diary();
 
-                    user.State = State.Diary.ToString();
-
-                    await Command.Update(user);
-                    await Command.Send(user.ChatId, tuple, user.messageid);
-                    break;
-                case "SearchDiary":
-                    tuple = Reply.SearchDiary();
-
-                    user.State = State.SearchDiary.ToString();
-
-                    await Command.Update(user);
-                    await Command.Send(user.ChatId, tuple, user.messageid);
-                    break;
-                case "AddToDiary":
-                    tuple = Reply.AddToDiary();
-
-                    user.State = State.AddToDiary.ToString();
-
-                    await Command.Update(user);
                     await Command.Send(user.ChatId, tuple, user.messageid);
                     break;
                 case "Stats":
                     tuple = Reply.Stats();
 
-                    user.State = State.Stats.ToString();
-
-                    await Command.Update(user);
                     await Command.Send(user.ChatId, tuple, user.messageid);
                     break;
             }
@@ -95,9 +61,6 @@ namespace HealthBot.handlers
             switch (callback_data.Split('_')[1])
             {
                 case "Change":
-                    user.State = State.AccountChange.ToString();
-
-                    await Command.Update(user);
                     await Account_Change_State_Handler(user, callback_data);
                     break;
                 case "RemoveAccount":
@@ -177,6 +140,55 @@ namespace HealthBot.handlers
 
                     await Command.Update(user);
                     await Command.Send(user.ChatId, tuple, user.messageid);
+                    break;
+            }
+        }
+        public static async Task Diary_State_Handler(User user, string callback_data)
+        {
+            (string, InlineKeyboardMarkup) tuple;
+
+            switch(callback_data.Split('_')[1])
+            {
+                case "New":
+                    tuple = Reply.DiaryNew();
+
+                    await Command.Send(user.ChatId, tuple, user.messageid);
+                    break;
+                case "Search":
+                    break;
+                case "Add":
+                    await Diary_Add_State_Handler(user, callback_data);
+                    break;
+            }
+        }
+        public static async Task Diary_Add_State_Handler(User user, string callback_data)
+        {
+            (string, InlineKeyboardMarkup) tuple;
+
+            switch(callback_data.Split('_')[2])
+            {
+                case "BloodPressure":
+                    tuple = Reply.DiaryNew("Input your current blood pressure in format top_value/bottom_balue");
+                    user.LastAction = "BloodPressure";
+
+                    await Command.Update(user);
+                    await Command.Send(user.ChatId, tuple, user.messageid);
+                    break;
+                case "BloodSaturation":
+                    tuple = Reply.DiaryNew("Input your current blood oxygen saturation in numeric format");
+                    user.LastAction = "BloodSaturation";
+
+                    await Command.Update(user);
+                    await Command.Send(user.ChatId, tuple, user.messageid);
+                    break;
+                case "HeartRate":
+                    tuple = Reply.DiaryNew("Input your current heart rate in numeric format");
+                    user.LastAction = "HeartRate";
+
+                    await Command.Update(user);
+                    await Command.Send(user.ChatId, tuple, user.messageid);
+                    break;
+                case "Intake":
                     break;
             }
         }

@@ -27,8 +27,6 @@ public partial class User
 
     public DateTimeOffset? DeletedAt { get; set; }
 
-    public string State { get; set; } = null!;
-
     public string LastAction { get; set; } = "";
 
     public virtual ICollection<Biometry> Biometries { get; set; } = new List<Biometry>();
