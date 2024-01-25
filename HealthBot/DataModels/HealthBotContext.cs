@@ -91,7 +91,7 @@ public partial class HealthBotContext : DbContext
 
             entity.HasOne(d => d.AuthorNavigation).WithMany(p => p.Exportdata)
                 .HasForeignKey(d => d.Author)
-                .HasConstraintName("author");
+                .HasConstraintName("Author");
         });
 
         modelBuilder.Entity<IntakeItem>(entity =>
@@ -104,7 +104,7 @@ public partial class HealthBotContext : DbContext
             entity.Property(e => e.CaloryAmount).HasColumnName("calory_amount");
             entity.Property(e => e.CreatedAt).HasColumnName("created_at");
             entity.Property(e => e.DeletedAt).HasColumnName("deleted_at");
-            entity.Property(e => e.DiaryEntry).HasColumnName("diary_entry");
+            entity.Property(e => e.Author).HasColumnName("auhtor");
             entity.Property(e => e.Name).HasColumnName("name");
             entity.Property(e => e.State)
                 .HasDefaultValueSql("'solid'::text")
@@ -113,9 +113,9 @@ public partial class HealthBotContext : DbContext
             entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
             entity.Property(e => e.Weight).HasColumnName("weight");
 
-            entity.HasOne(d => d.DiaryEntryNavigation).WithMany(p => p.IntakeItems)
-                .HasForeignKey(d => d.DiaryEntry)
-                .HasConstraintName("DiaryEntry");
+            entity.HasOne(d => d.AuthorNavigation).WithMany(p => p.IntakeItems)
+                .HasForeignKey(d => d.Author)
+                .HasConstraintName("Author");
         });
 
         modelBuilder.Entity<User>(entity =>

@@ -25,5 +25,5 @@ public partial class IntakeItem
 
     public DateTime DeletedAt { get; set; }
 
-    public virtual Diaryentry DiaryEntryNavigation { get; set; } = null!;
+    public virtual User AuthorNavigation { get; set; } = null!;
 }
