@@ -21,6 +21,9 @@ namespace HealthBot.handlers
                 case "Account":
                     tuple = Reply.Account(user);
 
+                    user.LastAction = "";
+                    
+                    await Command.Update(user);
                     await Command.Send(user.ChatId, tuple, user.messageid);
                     break;
                 case "AccountChange":
@@ -155,6 +158,10 @@ namespace HealthBot.handlers
                     await Command.Send(user.ChatId, tuple, user.messageid);
                     break;
                 case "Search":
+                    if (callback_data.Split('_').Count() == 3) { tuple = Reply.DiarySearch(user.Uuid, page: Convert.ToInt32(callback_data.Split('_')[2])); }
+                    else { tuple = Reply.DiarySearch(user.Uuid); }
+
+                    await Command.Send(user.ChatId, tuple, user.messageid); 
                     break;
                 case "Add":
                     await Diary_Add_State_Handler(user, callback_data);
@@ -189,11 +196,11 @@ namespace HealthBot.handlers
                     await Command.Send(user.ChatId, tuple, user.messageid);
                     break;
                 case "IntakeItem":
-                    tuple = Reply.IntakeItem("Input your current heart rate in numeric format");
-                    user.LastAction = "HeartRate";
+                    // tuple = Reply.IntakeItem("Input your current heart rate in numeric format");
+                    // user.LastAction = "HeartRate";
 
-                    await Command.Update(user);
-                    await Command.Send(user.ChatId, tuple, user.messageid);
+                    // await Command.Update(user);
+                    // await Command.Send(user.ChatId, tuple, user.messageid);
                     break;
             }
         }

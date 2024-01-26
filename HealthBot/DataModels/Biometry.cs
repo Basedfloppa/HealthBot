@@ -1,20 +1,12 @@
 ﻿namespace HealthBot;
 
-public partial class Biometry
+public partial class Biometry: Generic
 {
-    public Guid Uuid { get; set; } = Guid.NewGuid();
-
     public Guid Author { get; set; }
 
     public int? Weight { get; set; }
 
     public int? Height { get; set; }
-
-    public DateTime CreatedAt { get; set; } = DateTime.Now.ToUniversalTime();
-
-    public DateTime ChangedAt { get; set; } = DateTime.Now.ToUniversalTime();
-
-    public DateTime? DeletedAt { get; set; }
 
     public virtual User AuthorNavigation { get; set; } = null!;
 }

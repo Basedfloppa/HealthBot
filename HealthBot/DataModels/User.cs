@@ -3,10 +3,8 @@ using System.Collections.Generic;
 
 namespace HealthBot;
 
-public partial class User
+public partial class User: Generic
 {
-    public Guid Uuid { get; set; } = Guid.NewGuid();
-
     public string? Name { get; set; }
 
     public string? Alias { get; set; }
@@ -20,12 +18,6 @@ public partial class User
     public DateTime? SubscriptionEnd { get; set; }
 
     public DateTime? SubscriptionStart { get; set; }
-
-    public DateTimeOffset CreatedAt { get; set; } = DateTime.Today.ToUniversalTime();
-
-    public DateTimeOffset? UpdatedAt { get; set; } = DateTime.Today.ToUniversalTime();
-
-    public DateTimeOffset? DeletedAt { get; set; }
 
     public string LastAction { get; set; } = "";
 

@@ -34,7 +34,7 @@ namespace Bot.scripts
                 Name = $"{user?.FirstName} {user?.LastName}",
                 Alias = user?.Username,
                 ChatId = chat_id,
-                CreatedAt = DateTime.Now
+                CreatedAt = DateTime.Now.ToUniversalTime()
             };
 
             db.Users.Add(instance);
@@ -77,9 +77,11 @@ namespace Bot.scripts
         {
             await bot_client.DeleteMessageAsync(chat_id, message_id);
         }
-        public static async Task Update<T>(T entry) where T: notnull
+        public static async Task Update<T>(T entry) where T: notnull, Generic
         {
             var db = new HealthBotContext();
+            
+            entry.UpdatedAt = DateTime.Now.ToUniversalTime();
 
             db.Update(entry);
             db.SaveChanges();

@@ -2,6 +2,7 @@
 using Telegram.Bot.Types.ReplyMarkups;
 using User = HealthBot.User;
 using HealthBot;
+using Telegram.Bot.Types;
 
 namespace Bot.scripts
 {
@@ -227,6 +228,62 @@ namespace Bot.scripts
                 },
                 new[]{
                     InlineKeyboardButton.WithCallbackData(text: "Back"                   , callbackData: "To_Diary")
+                }
+            };
+
+            return (message.ToString(), keyboard);
+        }
+        public static (string, InlineKeyboardMarkup) DiarySearch(Guid guid, string addition_text = "", int page = 0)
+        {
+            StringBuilder message = new StringBuilder();
+            message.AppendLine($"Entrys:");
+
+            var db = new HealthBotContext();
+            var entrys = db.Diaryentrys.Where(e => e.Author == guid).Skip(page*10).Take(10);
+            var pages = Math.Ceiling(db.Diaryentrys.Where(e => e.Author == guid).Count()/10.0);
+            
+            foreach (var entry in entrys) 
+            {
+                if (entry.Name == null) message.AppendLine($"Name: {entry.Name}");
+                if (entry.Tags == null) message.AppendLine($"Tags: {entry.Tags.Replace(" ", " ,")}");
+
+                switch (entry.Type)
+                {
+                    case "BloodPressure":
+                        message.AppendLine($"Blood pressure: {entry.BloodPreassure}");
+                        break;
+                    case "BloodSaturation":
+                        message.AppendLine($"Blood oxygen saturation: {entry.BloodSaturation}");
+                        break;
+                    case "HeartRate":
+                        message.AppendLine($"Heart rate: {entry.HeartRate}");
+                        break;
+                    case "Intake":
+                        if (entry.Type == "solid") message.AppendLine("Type: Solid");
+                        if (entry.Type == "liquid") message.AppendLine("Type: Liquid");
+
+                        if (entry.Weight != null) message.AppendLine($"Proguct weight: {entry.Weight} gramms");
+                        if (entry.CaloryAmount != null) message.AppendLine($"Product calory amount: {entry.CaloryAmount}");
+                        break;
+                }
+
+                message.AppendLine("");
+            }
+
+            message.AppendLine($"{addition_text}");
+
+            InlineKeyboardMarkup keyboard = new[]
+            {
+                new[]{
+                    InlineKeyboardButton.WithCallbackData(text: "first", callbackData: "Diary_Search_0"),
+                    InlineKeyboardButton.WithCallbackData(text: "<", callbackData: page > 0 ? $"Diary_Search_{page-1}" : $"Diary_Search_{page}"),
+                    InlineKeyboardButton.WithCallbackData(text: $"{page}", callbackData: $"Diary_Search_{page}"),
+                    InlineKeyboardButton.WithCallbackData(text: ">", callbackData: page < pages ? $"Diary_Search_{page+1}" : $"Diary_Search_{page}"),
+                    InlineKeyboardButton.WithCallbackData(text: "last", callbackData: $"Diary_Search_{pages}")
+                },
+                new[]
+                {
+                    InlineKeyboardButton.WithCallbackData(text: "back", callbackData: "To_Diary")
                 }
             };
 

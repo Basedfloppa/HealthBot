@@ -97,7 +97,7 @@ namespace Bot.code
                         var weight = Convert.ToInt32(message.Text); 
                         biometry = db.Biometries.Where(b => b.Author == user.Uuid).OrderBy(b => b.CreatedAt).FirstOrDefault();
                         
-                        if (biometry is not null && biometry.ChangedAt.Date == DateTime.Today.Date) 
+                        if (biometry is not null && biometry.UpdatedAt.Date == DateTime.Today.Date) 
                         {
                             biometry.Weight = weight;
                             await Command.Update(biometry);
@@ -119,7 +119,7 @@ namespace Bot.code
                         var height = Convert.ToInt32(message.Text); 
                         biometry = db.Biometries.Where(b => b.Author == user.Uuid).OrderBy(b => b.CreatedAt).FirstOrDefault();
 
-                        if (biometry is not null && biometry.ChangedAt.Date == DateTime.Today.Date) 
+                        if (biometry is not null && biometry.UpdatedAt.Date == DateTime.Today.Date) 
                         {
                             biometry.Height = height;
                             await Command.Update(biometry);
