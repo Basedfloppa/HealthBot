@@ -3,6 +3,7 @@ using Telegram.Bot.Types.ReplyMarkups;
 using User = HealthBot.User;
 using HealthBot;
 using Telegram.Bot.Types;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 namespace Bot.scripts
 {
@@ -233,6 +234,124 @@ namespace Bot.scripts
 
             return (message.ToString(), keyboard);
         }
+        public static (string, InlineKeyboardMarkup) DiaryNewFrom(string addition_text = "", Guid entry_uuid = new Guid())
+        {
+            StringBuilder message = new StringBuilder();
+            InlineKeyboardMarkup keyboard;
+
+            HealthBotContext db = new HealthBotContext();
+            Diaryentry entry = db.Diaryentrys.Find(entry_uuid);
+
+            if (entry.Name != null) message.AppendLine($"Name: {entry.Name}");
+            else message.AppendLine("Name: not set");
+            if (entry.Tags != null) message.AppendLine($"Tags: {entry.Tags.Replace(" ", " ,")}");
+            else message.AppendLine("Tags: not set");
+
+            switch (entry.Type)
+            {
+                case "BloodPressure":
+                    message.AppendLine($"Blood pressure: {entry.BloodPreassure}");
+
+                    keyboard = new InlineKeyboardMarkup(new[]
+                    {
+                        new[]{
+                            InlineKeyboardButton.WithCallbackData(text: "Entry name", callbackData: $"Diary_Form_Name_{entry_uuid}"),
+                            InlineKeyboardButton.WithCallbackData(text: "Entry tags", callbackData: $"Diary_Form_Tags_{entry_uuid}")
+                        },
+                        new[]{
+                            InlineKeyboardButton.WithCallbackData(text: "Blood pressure value", callbackData: $"Diary_Form_Pressure_{entry_uuid}"),
+                            InlineKeyboardButton.WithCallbackData(text: "Date", callbackData: $"Diary_Form_Date_{entry_uuid}")
+                        },
+                        new[]
+                        {
+                            InlineKeyboardButton.WithCallbackData(text: "Cancel", callbackData: $"Diary_Form_Cancel_{entry_uuid}"),
+                            InlineKeyboardButton.WithCallbackData(text: "Back", callbackData: $"Diary_New")
+                        }
+                    });
+                    break;
+                case "BloodSaturation":
+                    message.AppendLine($"Blood oxygen saturation: {entry.BloodSaturation}");
+
+                    keyboard = new InlineKeyboardMarkup(new[]
+                    {
+                        new[]{
+                            InlineKeyboardButton.WithCallbackData(text: "Entry name", callbackData: $"Diary_Form_Name_{entry_uuid}"),
+                            InlineKeyboardButton.WithCallbackData(text: "Entry tags", callbackData: $"Diary_Form_Tags_{entry_uuid}")
+                        },
+                        new[]{
+                            InlineKeyboardButton.WithCallbackData(text: "Blood oxygen saturation value", callbackData: $"Diary_Form_Saturation_{entry_uuid}"),
+                            InlineKeyboardButton.WithCallbackData(text: "Date", callbackData: $"Diary_Form_Date_{entry_uuid}")
+                        },
+                        new[]
+                        {
+                            InlineKeyboardButton.WithCallbackData(text: "Cancel", callbackData: $"Diary_Form_Cancel_{entry_uuid}"),
+                            InlineKeyboardButton.WithCallbackData(text: "Back", callbackData: $"Diary_New")
+                        }
+                    });
+                    break;
+                case "HeartRate":
+                    message.AppendLine($"Heart rate: {entry.HeartRate}");
+
+                    keyboard = new InlineKeyboardMarkup(new[]
+                    {
+                        new[]{
+                            InlineKeyboardButton.WithCallbackData(text: "Entry name", callbackData: $"Diary_Form_Name_{entry_uuid}"),
+                            InlineKeyboardButton.WithCallbackData(text: "Entry tags", callbackData: $"Diary_Form_Tags_{entry_uuid}")
+                        },
+                        new[]{
+                            InlineKeyboardButton.WithCallbackData(text: "Heart rate value", callbackData: $"Diary_Form_Rate_{entry_uuid}"),
+                            InlineKeyboardButton.WithCallbackData(text: "Date", callbackData: $"Diary_Form_Date_{entry_uuid}")
+                        },
+                        new[]
+                        {
+                            InlineKeyboardButton.WithCallbackData(text: "Cancel", callbackData: $"Diary_Form_Cancel_{entry_uuid}"),
+                            InlineKeyboardButton.WithCallbackData(text: "Back", callbackData: $"Diary_New")
+                        }
+                    });
+                    break;
+                case "Intake":
+                    if (entry.Type == "solid") message.AppendLine("Type: Solid");
+                    if (entry.Type == "liquid") message.AppendLine("Type: Liquid");
+
+                    if (entry.Weight != null) message.AppendLine($"Proguct weight: {entry.Weight} gramms");
+                    if (entry.CaloryAmount != null) message.AppendLine($"Product calory amount: {entry.CaloryAmount}");
+
+                    keyboard = new InlineKeyboardMarkup(new[]
+                    {
+                        new[]{
+                            InlineKeyboardButton.WithCallbackData(text: "Entry name", callbackData: $"Diary_Form_Name_{entry_uuid}"),
+                            InlineKeyboardButton.WithCallbackData(text: "Entry tags", callbackData: $"Diary_Form_Tags_{entry_uuid}")
+                        },
+                        new[]{
+                            InlineKeyboardButton.WithCallbackData(text: "Intake item state", callbackData: $"Diary_Form_Intake_State_{entry_uuid}"),
+                            InlineKeyboardButton.WithCallbackData(text: "Date", callbackData: $"Diary_Form_Date_{entry_uuid}")
+                        },
+                        new[]{
+                            InlineKeyboardButton.WithCallbackData(text: "Intake item weight", callbackData: $"Diary_Form_Intake_Weight_{entry_uuid}"),
+                            InlineKeyboardButton.WithCallbackData(text: "Intake item calory amount", callbackData: $"Diary_Form_Intake_Calory_{entry_uuid}")
+                        },
+                        new[]
+                        {
+                            InlineKeyboardButton.WithCallbackData(text: "Cancel", callbackData: $"Diary_Form_Cancel_{entry_uuid}"),
+                            InlineKeyboardButton.WithCallbackData(text: "Back", callbackData: $"Diary_New")
+                        }
+                    });
+                    break;
+                default:
+                keyboard = new InlineKeyboardMarkup(new[]
+                {
+                    new[]
+                    {
+                        InlineKeyboardButton.WithCallbackData(text: "Cancel", callbackData: $"Diary_Form_Cancel_{entry_uuid}")
+                    }
+                });
+                break;
+            }
+
+            message.AppendLine($"{addition_text}");   
+            
+            return (message.ToString(), keyboard);
+        }
         public static (string, InlineKeyboardMarkup) DiarySearch(Guid guid, string addition_text = "", int page = 0)
         {
             StringBuilder message = new StringBuilder();
@@ -245,7 +364,7 @@ namespace Bot.scripts
             foreach (var entry in entrys) 
             {
                 if (entry.Name == null) message.AppendLine($"Name: {entry.Name}");
-                if (entry.Tags == null) message.AppendLine($"Tags: {entry.Tags.Replace(" ", " ,")}");
+                if (entry.Tags == null) message.AppendLine($"Tags: {entry.Tags?.Replace(" ", " ,")}");
 
                 switch (entry.Type)
                 {

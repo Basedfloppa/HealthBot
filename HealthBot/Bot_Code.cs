@@ -213,59 +213,125 @@ namespace Bot.code
                             await Command.Send(user.ChatId, Reply.AccountExport("Done"), user.messageid, path);
                         }
                         break;
-                    case "BloodPressure":
-                        var pressure = Convert.ToString(message.Text); 
-                                            
-                        db.Diaryentrys.Add(new Diaryentry() 
-                        {
-                            Author = user.Uuid,
-                            Type = "BloodPressure",
-                            BloodPreassure = pressure
-                        });
-                        await db.SaveChangesAsync();
-                        db.Dispose();
+                    default:
+                        if (!user.LastAction.Contains("DiaryForm")) break;
 
-                        user.LastAction = "";
-                        
-                        await Command.Destroy(chat_id, message_id);
-                        await Command.Send(chat_id, Reply.Diary(), user.messageid);
-                        await Command.Update(user);                       
-                        break;
-                    case "BloodSaturation":
-                        var saturation = Convert.ToInt32(message.Text); 
-                                            
-                        db.Diaryentrys.Add(new Diaryentry() 
-                        {
-                            Author = user.Uuid,
-                            Type = "BloodSaturation",
-                            BloodSaturation = saturation
-                        });
-                        await db.SaveChangesAsync();
-                        db.Dispose();
+                        Diaryentry entry;
 
-                        user.LastAction = "";
-                        
-                        await Command.Destroy(chat_id, message_id);
-                        await Command.Send(chat_id, Reply.Diary(), user.messageid);
-                        await Command.Update(user);                       
-                        break;
-                    case "HeartRate":
-                        var rate = Convert.ToInt32(message.Text); 
-                                            
-                        db.Diaryentrys.Add(new Diaryentry() 
+                        switch(user.LastAction.Split('_')[0])
                         {
-                            Author = user.Uuid,
-                            Type = "HeartRate",
-                            HeartRate = rate
-                        });
-                        await db.SaveChangesAsync();
-                        db.Dispose();
+                            case "DiaryFormName":
+                                var name = Convert.ToString(message.Text); 
+                                entry = db.Diaryentrys.Find(Guid.Parse(user.LastAction.Split('_')[1]));
 
-                        user.LastAction = "";
-                        
-                        await Command.Destroy(chat_id, message_id);
-                        await Command.Send(chat_id, Reply.Diary(), user.messageid);
-                        await Command.Update(user);                       
+                                user.LastAction = "";
+                                entry.Name = name;
+                                await Command.Update(entry);
+                                await Command.Update(user);
+                                
+                                await Command.Destroy(chat_id, message_id);
+                                await Command.Send(chat_id, Reply.DiaryNewFrom(entry_uuid: entry.Uuid), user.messageid);                      
+                                break;
+                            case "DiaryFormTags":
+                                var tags = Convert.ToString(message.Text); 
+                                entry = db.Diaryentrys.Find(Guid.Parse(user.LastAction.Split('_')[1]));
+
+                                user.LastAction = "";
+                                entry.Tags = tags;
+                                await Command.Update(entry);
+                                await Command.Update(user);
+                                
+                                await Command.Destroy(chat_id, message_id);
+                                await Command.Send(chat_id, Reply.DiaryNewFrom(entry_uuid: entry.Uuid), user.messageid);                      
+                                break;
+                            case "DiaryFormDate":
+                                var date = Convert.ToDateTime(message.Text); 
+                                entry = db.Diaryentrys.Find(Guid.Parse(user.LastAction.Split('_')[1]));
+
+                                user.LastAction = "";
+                                entry.CreatedAt = date;
+                                await Command.Update(entry);
+                                await Command.Update(user);
+                                
+                                await Command.Destroy(chat_id, message_id);
+                                await Command.Send(chat_id, Reply.DiaryNewFrom(entry_uuid: entry.Uuid), user.messageid);                      
+                                break;
+                            case "DiaryFormPressure":
+                                var pressure = Convert.ToString(message.Text); 
+                                entry = db.Diaryentrys.Find(Guid.Parse(user.LastAction.Split('_')[1]));
+
+                                user.LastAction = "";
+                                entry.BloodPreassure = pressure;
+                                await Command.Update(entry);
+                                await Command.Update(user);
+                                
+                                await Command.Destroy(chat_id, message_id);
+                                await Command.Send(chat_id, Reply.DiaryNewFrom(entry_uuid: entry.Uuid), user.messageid);                      
+                                break;
+                            case "DiaryFormSaturation":
+                                var saturation = Convert.ToInt32(message.Text);
+                                entry = db.Diaryentrys.Find(Guid.Parse(user.LastAction.Split('_')[1]));
+
+                                user.LastAction = "";
+                                entry.BloodSaturation = saturation;
+                                await Command.Update(entry);
+                                await Command.Update(user);
+                                
+                                await Command.Destroy(chat_id, message_id);
+                                await Command.Send(chat_id, Reply.DiaryNewFrom(entry_uuid: entry.Uuid), user.messageid);                    
+                                break;
+                            case "DiaryFormRate":
+                                var rate = Convert.ToInt32(message.Text);          
+                                entry = db.Diaryentrys.Find(Guid.Parse(user.LastAction.Split('_')[1]));
+                                
+                                user.LastAction = "";
+                                entry.HeartRate = rate;
+                                await Command.Update(entry);
+                                await Command.Update(user);
+
+                                await Command.Destroy(chat_id, message_id);
+                                await Command.Send(chat_id, Reply.DiaryNewFrom(entry_uuid: entry.Uuid), user.messageid);                   
+                                break;
+                            case "DiaryFormIntakeState":
+                                var state = Convert.ToString(message.Text);          
+                                entry = db.Diaryentrys.Find(Guid.Parse(user.LastAction.Split('_')[1]));
+                                
+                                if (state == "solid" || state == "liquid")
+                                {
+                                    entry.State = state;
+                                    await Command.Update(entry);
+                                }
+                                
+                                user.LastAction = "";
+                                await Command.Update(user);
+                                await Command.Destroy(chat_id, message_id);
+                                await Command.Send(chat_id, Reply.DiaryNewFrom(entry_uuid: entry.Uuid), user.messageid);
+                                break;
+                            case "DiaryFormIntakeWeight":
+                                var intake_weight = Convert.ToInt32(message.Text);          
+                                entry = db.Diaryentrys.Find(Guid.Parse(user.LastAction.Split('_')[1]));
+                                
+                                user.LastAction = "";
+                                entry.Weight = intake_weight;
+                                await Command.Update(entry);
+                                await Command.Update(user);
+
+                                await Command.Destroy(chat_id, message_id);
+                                await Command.Send(chat_id, Reply.DiaryNewFrom(entry_uuid: entry.Uuid), user.messageid);                   
+                                break;
+                            case "DiaryFormIntakeCalory":
+                                var calory = Convert.ToInt32(message.Text);          
+                                entry = db.Diaryentrys.Find(Guid.Parse(user.LastAction.Split('_')[1]));
+                                
+                                user.LastAction = "";
+                                entry.CaloryAmount = calory;
+                                await Command.Update(entry);
+                                await Command.Update(user);
+
+                                await Command.Destroy(chat_id, message_id);
+                                await Command.Send(chat_id, Reply.DiaryNewFrom(entry_uuid: entry.Uuid), user.messageid);                   
+                                break;
+                        }
                         break;
                 }
                 return;

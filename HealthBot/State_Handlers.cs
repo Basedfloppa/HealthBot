@@ -166,41 +166,200 @@ namespace HealthBot.handlers
                 case "Add":
                     await Diary_Add_State_Handler(user, callback_data);
                     break;
+                case "Form":
+                    await Diary_Form_State_Handler(user, callback_data);
+                    break;
             }
         }
         public static async Task Diary_Add_State_Handler(User user, string callback_data)
+        {
+            HealthBotContext db = new HealthBotContext();
+            (string, InlineKeyboardMarkup) tuple;
+            Diaryentry entry;
+            string entry_uuid = "";
+
+            switch(callback_data.Split('_')[2])
+            {
+                case "BloodPressure":
+                    user.LastAction = "BloodPressure";
+                    
+                    if(callback_data.Split('_').Count() > 3)
+                    {
+                        entry_uuid = callback_data.Split('_')[3];
+                    }
+                    if (entry_uuid == "") 
+                    {
+                        entry = new Diaryentry() 
+                        {
+                            Author = user.Uuid,
+                            Type = "BloodPressure"
+                        };   
+                        db.Diaryentrys.Add(entry);
+                        db.SaveChanges();
+                        entry_uuid = entry.Uuid.ToString();
+                    }
+
+                    tuple = Reply.DiaryNewFrom(entry_uuid: Guid.Parse(entry_uuid));
+                    await Command.Update(user);                    
+                    await Command.Send(user.ChatId, tuple, user.messageid);
+                    break;
+                case "BloodSaturation":
+                    user.LastAction = "BloodSaturation";                    
+                    
+                    if(callback_data.Split('_').Count() > 3)
+                    {
+                        entry_uuid = callback_data.Split('_')[3];
+                    }
+                    if (entry_uuid == "") 
+                    {
+                        entry = new Diaryentry() 
+                        {
+                            Author = user.Uuid,
+                            Type = "BloodSaturation"
+                        };   
+                        db.Diaryentrys.Add(entry);
+                        db.SaveChanges();
+                        entry_uuid = entry.Uuid.ToString();
+                    }
+
+                    tuple = Reply.DiaryNewFrom(entry_uuid: Guid.Parse(entry_uuid));
+                    await Command.Update(user);                    
+                    await Command.Send(user.ChatId, tuple, user.messageid);
+                    break;
+                case "HeartRate":
+                    user.LastAction = "HeartRate";                    
+                    
+                    if(callback_data.Split('_').Count() > 3)
+                    {
+                        entry_uuid = callback_data.Split('_')[3];
+                    }
+                    if (entry_uuid == "") 
+                    {
+                        entry = new Diaryentry() 
+                        {
+                            Author = user.Uuid,
+                            Type = "HeartRate"
+                        };   
+                        db.Diaryentrys.Add(entry);
+                        db.SaveChanges();
+                        entry_uuid = entry.Uuid.ToString();
+                    }
+
+                    tuple = Reply.DiaryNewFrom(entry_uuid: Guid.Parse(entry_uuid));
+                    await Command.Update(user);                    
+                    await Command.Send(user.ChatId, tuple, user.messageid);
+                    break;
+                case "IntakeItem":
+                    user.LastAction = "IntakeItem";                    
+                    
+                    if(callback_data.Split('_').Count() > 3)
+                    {
+                        entry_uuid = callback_data.Split('_')[3];
+                    }
+                    if (entry_uuid == "") 
+                    {
+                        entry = new Diaryentry() 
+                        {
+                            Author = user.Uuid,
+                            Type = "IntakeItem"
+                        };   
+                        db.Diaryentrys.Add(entry);
+                        db.SaveChanges();
+                        entry_uuid = entry.Uuid.ToString();
+                    }
+
+                    tuple = Reply.DiaryNewFrom(entry_uuid: Guid.Parse(entry_uuid));
+                    await Command.Update(user);                    
+                    await Command.Send(user.ChatId, tuple, user.messageid);
+                    break;
+            }
+        }
+        public static async Task Diary_Form_State_Handler(User user, string callback_data)
         {
             (string, InlineKeyboardMarkup) tuple;
 
             switch(callback_data.Split('_')[2])
             {
-                case "BloodPressure":
-                    tuple = Reply.DiaryNew("Input your current blood pressure in format top_value/bottom_balue");
-                    user.LastAction = "BloodPressure";
+                case "Cancel":
+                    tuple = Reply.Diary();
+                    user.LastAction = "";
+
+                    var db = new HealthBotContext();
+                    var entry = db.Diaryentrys.Find(Guid.Parse(callback_data.Split('_')[3]));
+                    db.Remove(entry);
+                    db.SaveChanges();
+                    db.Dispose();
 
                     await Command.Update(user);
                     await Command.Send(user.ChatId, tuple, user.messageid);
                     break;
-                case "BloodSaturation":
-                    tuple = Reply.DiaryNew("Input your current blood oxygen saturation in numeric format");
-                    user.LastAction = "BloodSaturation";
+                case "Name":
+                    user.LastAction = $"DiaryFormName_{callback_data.Split('_')[3]}";
+                    tuple = Reply.DiaryNewFrom(addition_text: "Enter name of this entry", entry_uuid: Guid.Parse(callback_data.Split('_')[3]));
 
                     await Command.Update(user);
                     await Command.Send(user.ChatId, tuple, user.messageid);
                     break;
-                case "HeartRate":
-                    tuple = Reply.DiaryNew("Input your current heart rate in numeric format");
-                    user.LastAction = "HeartRate";
+                case "Tags":
+                    user.LastAction = $"DiaryFormTags_{callback_data.Split('_')[3]}";
+                    tuple = Reply.DiaryNewFrom(addition_text: "Enter tags of this entry in format of tag1,tag2,etc", entry_uuid: Guid.Parse(callback_data.Split('_')[3]));
 
                     await Command.Update(user);
                     await Command.Send(user.ChatId, tuple, user.messageid);
                     break;
-                case "IntakeItem":
-                    // tuple = Reply.IntakeItem("Input your current heart rate in numeric format");
-                    // user.LastAction = "HeartRate";
+                case "Date":
+                    user.LastAction = $"DiaryFormDate_{callback_data.Split('_')[3]}";
+                    tuple = Reply.DiaryNewFrom(addition_text: "Enter date of this entry in format dd.mm.yyyy", entry_uuid: Guid.Parse(callback_data.Split('_')[3]));
 
-                    // await Command.Update(user);
-                    // await Command.Send(user.ChatId, tuple, user.messageid);
+                    await Command.Update(user);
+                    await Command.Send(user.ChatId, tuple, user.messageid);
+                    break;
+                case "Pressure":
+                    user.LastAction = $"DiaryFormPressure_{callback_data.Split('_')[3]}";
+                    tuple = Reply.DiaryNewFrom(addition_text: "Enter blood pressure for this entry", entry_uuid: Guid.Parse(callback_data.Split('_')[3]));
+
+                    await Command.Update(user);
+                    await Command.Send(user.ChatId, tuple, user.messageid);
+                    break;
+                case "Saturation":
+                    user.LastAction = $"DiaryFormSarutation_{callback_data.Split('_')[3]}";
+                    tuple = Reply.DiaryNewFrom(addition_text: "Enter blood oxygen saturation for this entry", entry_uuid: Guid.Parse(callback_data.Split('_')[3]));
+
+                    await Command.Update(user);
+                    await Command.Send(user.ChatId, tuple, user.messageid);
+                    break;
+                case "Rate":
+                    user.LastAction = $"DiaryFormRate_{callback_data.Split('_')[3]}";
+                    tuple = Reply.DiaryNewFrom(addition_text: "Enter heart rate for this entry", entry_uuid: Guid.Parse(callback_data.Split('_')[3]));
+
+                    await Command.Update(user);
+                    await Command.Send(user.ChatId, tuple, user.messageid);
+                    break;
+                case "Intake":
+                    switch(callback_data.Split('_')[3])
+                    {
+                        case "State":
+                            user.LastAction = $"DiaryFormIntakeState_{callback_data.Split('_')[4]}";
+                            tuple = Reply.DiaryNewFrom(addition_text: "Enter state of matter for this entry, liquid or solid", entry_uuid: Guid.Parse(callback_data.Split('_')[4]));
+
+                            await Command.Update(user);
+                            await Command.Send(user.ChatId, tuple, user.messageid);
+                            break;
+                        case "Weight":
+                            user.LastAction = $"DiaryFormIntakeWeight_{callback_data.Split('_')[4]}";
+                            tuple = Reply.DiaryNewFrom(addition_text: "Enter weight of matter for this entry", entry_uuid: Guid.Parse(callback_data.Split('_')[4]));
+
+                            await Command.Update(user);
+                            await Command.Send(user.ChatId, tuple, user.messageid);
+                            break;
+                        case "Calory":
+                            user.LastAction = $"DiaryFormIntakeCalory_{callback_data.Split('_')[4]}";
+                            tuple = Reply.DiaryNewFrom(addition_text: "Enter amount of calories for this entry", entry_uuid: Guid.Parse(callback_data.Split('_')[4]));
+
+                            await Command.Update(user);
+                            await Command.Send(user.ChatId, tuple, user.messageid);
+                            break;
+                    }
                     break;
             }
         }
