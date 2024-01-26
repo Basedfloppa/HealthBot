@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace HealthBot;
 
-public partial class User: Generic
+public partial class User : Generic
 {
     public string? Name { get; set; }
 
@@ -31,5 +31,5 @@ public partial class User: Generic
 
     public virtual ICollection<User> Observers { get; set; } = new List<User>();
 
-    public int messageid {get; set;}
+    public int messageid { get; set; }
 }

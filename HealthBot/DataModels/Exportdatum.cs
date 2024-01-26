@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace HealthBot;
 
-public partial class Exportdatum: Generic
+public partial class Exportdatum : Generic
 {
     public Guid Author { get; set; }
 

@@ -1,6 +1,6 @@
 ﻿namespace HealthBot;
 
-public partial class Biometry: Generic
+public partial class Biometry : Generic
 {
     public Guid Author { get; set; }
 
