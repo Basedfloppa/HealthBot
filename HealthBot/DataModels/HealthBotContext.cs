@@ -96,7 +96,7 @@ public partial class HealthBotContext : DbContext
 
             entity.HasOne(d => d.AuthorNavigation).WithMany(p => p.Exportdata)
                 .HasForeignKey(d => d.Author)
-                .HasConstraintName("author");
+                .HasConstraintName("Author");
         });
 
         modelBuilder.Entity<User>(entity =>
