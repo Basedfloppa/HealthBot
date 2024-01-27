@@ -3,10 +3,8 @@ using System.Collections.Generic;
 
 namespace HealthBot;
 
-public partial class User
+public partial class User : Generic
 {
-    public Guid Uuid { get; set; }
-
     public string? Name { get; set; }
 
     public string? Alias { get; set; }
@@ -21,15 +19,7 @@ public partial class User
 
     public DateTime? SubscriptionStart { get; set; }
 
-    public DateTimeOffset CreatedAt { get; set; }
-
-    public DateTimeOffset? UpdatedAt { get; set; }
-
-    public DateTimeOffset? DeletedAt { get; set; }
-
-    public string State { get; set; } = null!;
-
-    public string LastAction { get; set; } = null!;
+    public string LastAction { get; set; } = "";
 
     public virtual ICollection<Biometry> Biometries { get; set; } = new List<Biometry>();
 
@@ -40,4 +30,6 @@ public partial class User
     public virtual ICollection<User> Observees { get; set; } = new List<User>();
 
     public virtual ICollection<User> Observers { get; set; } = new List<User>();
+
+    public int messageid { get; set; }
 }
