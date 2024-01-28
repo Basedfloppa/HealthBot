@@ -5,7 +5,9 @@ namespace HealthBot;
 
 public partial class Exportdatum : Generic
 {
-    public Guid Author { get; set; }
+    public Guid Uuid { get; set; }
+
+    public long Author { get; set; }
 
     public string ExportedData { get; set; } = null!;
 

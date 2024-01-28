@@ -11,6 +11,10 @@ public partial class User : Generic
 
     public long ChatId { get; set; }
 
+    public int MessageId { get; set; }
+
+    public string LastAction { get; set; } = "";
+
     public int? Age { get; set; }
 
     public string? Sex { get; set; }
@@ -19,17 +23,13 @@ public partial class User : Generic
 
     public DateTime? SubscriptionStart { get; set; }
 
-    public string LastAction { get; set; } = "";
-
     public virtual ICollection<Biometry> Biometries { get; set; } = new List<Biometry>();
 
-    public virtual ICollection<Diaryentry> Diaryentries { get; set; } = new List<Diaryentry>();
+    public virtual ICollection<Diaryentry> DiaryEntries { get; set; } = new List<Diaryentry>();
 
-    public virtual ICollection<Exportdatum> Exportdata { get; set; } = new List<Exportdatum>();
+    public virtual ICollection<Exportdatum> ExportData { get; set; } = new List<Exportdatum>();
 
     public virtual ICollection<User> Observees { get; set; } = new List<User>();
 
     public virtual ICollection<User> Observers { get; set; } = new List<User>();
-
-    public int messageid { get; set; }
 }

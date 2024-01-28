@@ -16,7 +16,7 @@ namespace HealthBot.handlers
                 case "Menu":
                     tuple = Reply.Menu(user);
 
-                    await Command.Send(user.ChatId, tuple, user.messageid);
+                    await Command.Send(user.ChatId, tuple, user.MessageId);
                     break;
                 case "Account":
                     tuple = Reply.Account(user);
@@ -24,36 +24,36 @@ namespace HealthBot.handlers
                     user.LastAction = "";
 
                     await Command.Update(user);
-                    await Command.Send(user.ChatId, tuple, user.messageid);
+                    await Command.Send(user.ChatId, tuple, user.MessageId);
                     break;
                 case "AccountChange":
                     tuple = Reply.AccountChange(user);
 
-                    await Command.Send(user.ChatId, tuple, user.messageid);
+                    await Command.Send(user.ChatId, tuple, user.MessageId);
                     break;
                 case "AccountExport":
                     tuple = Reply.AccountExport();
 
                     user.LastAction = "AccountExport";
                     await Command.Update(user);
-                    await Command.Send(user.ChatId, tuple, user.messageid);
+                    await Command.Send(user.ChatId, tuple, user.MessageId);
                     break;
                 case "AccountSubscription":
                     break;
                 case "LinkedAccounts":
                     tuple = Reply.LinkedAccounts(user);
 
-                    await Command.Send(user.ChatId, tuple, user.messageid);
+                    await Command.Send(user.ChatId, tuple, user.MessageId);
                     break;
                 case "Diary":
                     tuple = Reply.Diary();
 
-                    await Command.Send(user.ChatId, tuple, user.messageid);
+                    await Command.Send(user.ChatId, tuple, user.MessageId);
                     break;
                 case "Stats":
                     tuple = Reply.Stats();
 
-                    await Command.Send(user.ChatId, tuple, user.messageid);
+                    await Command.Send(user.ChatId, tuple, user.MessageId);
                     break;
             }
         }
@@ -75,14 +75,14 @@ namespace HealthBot.handlers
                     user.LastAction = "RemoveAccount";
 
                     await Command.Update(user);
-                    await Command.Send(user.ChatId, tuple, user.messageid);
+                    await Command.Send(user.ChatId, tuple, user.MessageId);
                     break;
                 case "AddAccount":
                     tuple = Reply.LinkedAccounts(user, "Input handle of user that you want to add");
                     user.LastAction = "AddAccount";
 
                     await Command.Update(user);
-                    await Command.Send(user.ChatId, tuple, user.messageid);
+                    await Command.Send(user.ChatId, tuple, user.MessageId);
                     break;
             }
         }
@@ -99,7 +99,7 @@ namespace HealthBot.handlers
                     user.LastAction = "AccountChangeAge";
 
                     await Command.Update(user);
-                    await Command.Send(user.ChatId, tuple, user.messageid);
+                    await Command.Send(user.ChatId, tuple, user.MessageId);
                     break;
                 case "Weight":
                     tuple = Reply.AccountChange(user, "Input your current weight.");
@@ -107,7 +107,7 @@ namespace HealthBot.handlers
                     user.LastAction = "AccountChangeWeight";
 
                     await Command.Update(user);
-                    await Command.Send(user.ChatId, tuple, user.messageid);
+                    await Command.Send(user.ChatId, tuple, user.MessageId);
                     break;
                 case "Sex":
                     tuple = Reply.AccountChange(user, "Input your sex.");
@@ -115,7 +115,7 @@ namespace HealthBot.handlers
                     user.LastAction = "AccountChangeSex";
 
                     await Command.Update(user);
-                    await Command.Send(user.ChatId, tuple, user.messageid);
+                    await Command.Send(user.ChatId, tuple, user.MessageId);
                     break;
                 case "Height":
                     tuple = Reply.AccountChange(user, "input your height.");
@@ -123,7 +123,7 @@ namespace HealthBot.handlers
                     user.LastAction = "AccountChangeHeight";
 
                     await Command.Update(user);
-                    await Command.Send(user.ChatId, tuple, user.messageid);
+                    await Command.Send(user.ChatId, tuple, user.MessageId);
                     break;
             }
         }
@@ -142,7 +142,7 @@ namespace HealthBot.handlers
                     user.LastAction = "CaloriesByDate";
 
                     await Command.Update(user);
-                    await Command.Send(user.ChatId, tuple, user.messageid);
+                    await Command.Send(user.ChatId, tuple, user.MessageId);
                     break;
                 case "LiquidByDate":
                     tuple = Reply.Stats(
@@ -152,7 +152,7 @@ namespace HealthBot.handlers
                     user.LastAction = "LiquidByDate";
 
                     await Command.Update(user);
-                    await Command.Send(user.ChatId, tuple, user.messageid);
+                    await Command.Send(user.ChatId, tuple, user.MessageId);
                     break;
             }
         }
@@ -166,22 +166,22 @@ namespace HealthBot.handlers
                 case "New":
                     tuple = Reply.DiaryNew();
 
-                    await Command.Send(user.ChatId, tuple, user.messageid);
+                    await Command.Send(user.ChatId, tuple, user.MessageId);
                     break;
                 case "Search":
                     if (callback_data.Split('_').Count() == 3)
                     {
                         tuple = Reply.DiarySearch(
-                            user.Uuid,
+                            user.ChatId,
                             page: Convert.ToInt32(callback_data.Split('_')[2])
                         );
                     }
                     else
                     {
-                        tuple = Reply.DiarySearch(user.Uuid);
+                        tuple = Reply.DiarySearch(user.ChatId);
                     }
 
-                    await Command.Send(user.ChatId, tuple, user.messageid);
+                    await Command.Send(user.ChatId, tuple, user.MessageId);
                     break;
                 case "Add":
                     await Diary_Add_State_Handler(user, callback_data);
@@ -210,15 +210,15 @@ namespace HealthBot.handlers
                     }
                     if (entry_uuid == "")
                     {
-                        entry = new Diaryentry() { Author = user.Uuid, Type = "BloodPressure" };
-                        db.Diaryentrys.Add(entry);
+                        entry = new Diaryentry() { Author = user.ChatId, Type = "BloodPressure" };
+                        db.DiaryEntrys.Add(entry);
                         db.SaveChanges();
                         entry_uuid = entry.Uuid.ToString();
                     }
 
                     tuple = Reply.DiaryNewFrom(entry_uuid: Guid.Parse(entry_uuid));
                     await Command.Update(user);
-                    await Command.Send(user.ChatId, tuple, user.messageid);
+                    await Command.Send(user.ChatId, tuple, user.MessageId);
                     break;
                 case "BloodSaturation":
                     user.LastAction = "BloodSaturation";
@@ -229,15 +229,15 @@ namespace HealthBot.handlers
                     }
                     if (entry_uuid == "")
                     {
-                        entry = new Diaryentry() { Author = user.Uuid, Type = "BloodSaturation" };
-                        db.Diaryentrys.Add(entry);
+                        entry = new Diaryentry() { Author = user.ChatId, Type = "BloodSaturation" };
+                        db.DiaryEntrys.Add(entry);
                         db.SaveChanges();
                         entry_uuid = entry.Uuid.ToString();
                     }
 
                     tuple = Reply.DiaryNewFrom(entry_uuid: Guid.Parse(entry_uuid));
                     await Command.Update(user);
-                    await Command.Send(user.ChatId, tuple, user.messageid);
+                    await Command.Send(user.ChatId, tuple, user.MessageId);
                     break;
                 case "HeartRate":
                     user.LastAction = "HeartRate";
@@ -248,15 +248,15 @@ namespace HealthBot.handlers
                     }
                     if (entry_uuid == "")
                     {
-                        entry = new Diaryentry() { Author = user.Uuid, Type = "HeartRate" };
-                        db.Diaryentrys.Add(entry);
+                        entry = new Diaryentry() { Author = user.ChatId, Type = "HeartRate" };
+                        db.DiaryEntrys.Add(entry);
                         db.SaveChanges();
                         entry_uuid = entry.Uuid.ToString();
                     }
 
                     tuple = Reply.DiaryNewFrom(entry_uuid: Guid.Parse(entry_uuid));
                     await Command.Update(user);
-                    await Command.Send(user.ChatId, tuple, user.messageid);
+                    await Command.Send(user.ChatId, tuple, user.MessageId);
                     break;
                 case "IntakeItem":
                     user.LastAction = "IntakeItem";
@@ -267,15 +267,15 @@ namespace HealthBot.handlers
                     }
                     if (entry_uuid == "")
                     {
-                        entry = new Diaryentry() { Author = user.Uuid, Type = "IntakeItem" };
-                        db.Diaryentrys.Add(entry);
+                        entry = new Diaryentry() { Author = user.ChatId, Type = "IntakeItem" };
+                        db.DiaryEntrys.Add(entry);
                         db.SaveChanges();
                         entry_uuid = entry.Uuid.ToString();
                     }
 
                     tuple = Reply.DiaryNewFrom(entry_uuid: Guid.Parse(entry_uuid));
                     await Command.Update(user);
-                    await Command.Send(user.ChatId, tuple, user.messageid);
+                    await Command.Send(user.ChatId, tuple, user.MessageId);
                     break;
             }
         }
@@ -291,13 +291,13 @@ namespace HealthBot.handlers
                     user.LastAction = "";
 
                     var db = new HealthBotContext();
-                    var entry = db.Diaryentrys.Find(Guid.Parse(callback_data.Split('_')[3]));
+                    var entry = db.DiaryEntrys.Find(Guid.Parse(callback_data.Split('_')[3]));
                     db.Remove(entry);
                     db.SaveChanges();
                     db.Dispose();
 
                     await Command.Update(user);
-                    await Command.Send(user.ChatId, tuple, user.messageid);
+                    await Command.Send(user.ChatId, tuple, user.MessageId);
                     break;
                 case "Name":
                     user.LastAction = $"DiaryFormName_{callback_data.Split('_')[3]}";
@@ -307,7 +307,7 @@ namespace HealthBot.handlers
                     );
 
                     await Command.Update(user);
-                    await Command.Send(user.ChatId, tuple, user.messageid);
+                    await Command.Send(user.ChatId, tuple, user.MessageId);
                     break;
                 case "Tags":
                     user.LastAction = $"DiaryFormTags_{callback_data.Split('_')[3]}";
@@ -317,7 +317,7 @@ namespace HealthBot.handlers
                     );
 
                     await Command.Update(user);
-                    await Command.Send(user.ChatId, tuple, user.messageid);
+                    await Command.Send(user.ChatId, tuple, user.MessageId);
                     break;
                 case "Date":
                     user.LastAction = $"DiaryFormDate_{callback_data.Split('_')[3]}";
@@ -327,7 +327,7 @@ namespace HealthBot.handlers
                     );
 
                     await Command.Update(user);
-                    await Command.Send(user.ChatId, tuple, user.messageid);
+                    await Command.Send(user.ChatId, tuple, user.MessageId);
                     break;
                 case "Pressure":
                     user.LastAction = $"DiaryFormPressure_{callback_data.Split('_')[3]}";
@@ -337,7 +337,7 @@ namespace HealthBot.handlers
                     );
 
                     await Command.Update(user);
-                    await Command.Send(user.ChatId, tuple, user.messageid);
+                    await Command.Send(user.ChatId, tuple, user.MessageId);
                     break;
                 case "Saturation":
                     user.LastAction = $"DiaryFormSarutation_{callback_data.Split('_')[3]}";
@@ -347,7 +347,7 @@ namespace HealthBot.handlers
                     );
 
                     await Command.Update(user);
-                    await Command.Send(user.ChatId, tuple, user.messageid);
+                    await Command.Send(user.ChatId, tuple, user.MessageId);
                     break;
                 case "Rate":
                     user.LastAction = $"DiaryFormRate_{callback_data.Split('_')[3]}";
@@ -357,7 +357,7 @@ namespace HealthBot.handlers
                     );
 
                     await Command.Update(user);
-                    await Command.Send(user.ChatId, tuple, user.messageid);
+                    await Command.Send(user.ChatId, tuple, user.MessageId);
                     break;
                 case "Intake":
                     switch (callback_data.Split('_')[3])
@@ -370,7 +370,7 @@ namespace HealthBot.handlers
                             );
 
                             await Command.Update(user);
-                            await Command.Send(user.ChatId, tuple, user.messageid);
+                            await Command.Send(user.ChatId, tuple, user.MessageId);
                             break;
                         case "Weight":
                             user.LastAction =
@@ -381,7 +381,7 @@ namespace HealthBot.handlers
                             );
 
                             await Command.Update(user);
-                            await Command.Send(user.ChatId, tuple, user.messageid);
+                            await Command.Send(user.ChatId, tuple, user.MessageId);
                             break;
                         case "Calory":
                             user.LastAction =
@@ -392,7 +392,7 @@ namespace HealthBot.handlers
                             );
 
                             await Command.Update(user);
-                            await Command.Send(user.ChatId, tuple, user.messageid);
+                            await Command.Send(user.ChatId, tuple, user.MessageId);
                             break;
                     }
                     break;

@@ -35,13 +35,13 @@ namespace Bot.scripts
         {
             var db = new HealthBotContext();
             var height = db
-                .Biometries.Where(b => b.Author == user.Uuid)
+                .Biometries.Where(b => b.Author == user.ChatId)
                 .Where(b => b.Height != null)
                 ?.OrderBy(b => b.CreatedAt)
                 .FirstOrDefault()
                 ?.Height;
             var weight = db
-                .Biometries.Where(b => b.Author == user.Uuid)
+                .Biometries.Where(b => b.Author == user.ChatId)
                 .Where(b => b.Weight != null)
                 ?.OrderBy(b => b.CreatedAt)
                 .FirstOrDefault()
@@ -99,8 +99,8 @@ namespace Bot.scripts
         )
         {
             var db = new HealthBotContext();
-            var observers = db.Users.Find(user.Uuid)?.Observers;
-            var observees = db.Users.Find(user.Uuid)?.Observees;
+            var observers = db.Users.Find(user.ChatId)?.Observers;
+            var observees = db.Users.Find(user.ChatId)?.Observees;
             StringBuilder message = new StringBuilder();
 
             message.AppendLine("Accounts that have access to your data:\n");
@@ -146,13 +146,13 @@ namespace Bot.scripts
         {
             var db = new HealthBotContext();
             var height = db
-                .Biometries.Where(b => b.Author == user.Uuid)
+                .Biometries.Where(b => b.Author == user.ChatId)
                 .Where(b => b.Height != null)
                 ?.OrderBy(b => b.CreatedAt)
                 .FirstOrDefault()
                 ?.Height;
             var weight = db
-                .Biometries.Where(b => b.Author == user.Uuid)
+                .Biometries.Where(b => b.Author == user.ChatId)
                 .Where(b => b.Weight != null)
                 ?.OrderBy(b => b.CreatedAt)
                 .FirstOrDefault()
@@ -357,7 +357,7 @@ namespace Bot.scripts
             InlineKeyboardMarkup keyboard;
 
             HealthBotContext db = new HealthBotContext();
-            Diaryentry entry = db.Diaryentrys.Find(entry_uuid);
+            Diaryentry entry = db.DiaryEntrys.Find(entry_uuid);
 
             if (entry.Name != null)
                 message.AppendLine($"Name: {entry.Name}");
@@ -579,7 +579,7 @@ namespace Bot.scripts
         }
 
         public static (string, InlineKeyboardMarkup) DiarySearch(
-            Guid guid,
+            long chat_id,
             string addition_text = "",
             int page = 0
         )
@@ -588,8 +588,8 @@ namespace Bot.scripts
             message.AppendLine($"Entrys:");
 
             var db = new HealthBotContext();
-            var entrys = db.Diaryentrys.Where(e => e.Author == guid).Skip(page * 10).Take(10);
-            var pages = Math.Ceiling(db.Diaryentrys.Where(e => e.Author == guid).Count() / 10.0);
+            var entrys = db.DiaryEntrys.Where(e => e.Author == chat_id).Skip(page * 10).Take(10);
+            var pages = Math.Ceiling(db.DiaryEntrys.Where(e => e.Author == chat_id).Count() / 10.0);
 
             foreach (var entry in entrys)
             {

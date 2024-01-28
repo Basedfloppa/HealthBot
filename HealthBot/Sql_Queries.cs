@@ -15,8 +15,8 @@ namespace Sql_Queries
         {
             var db = new HealthBotContext();
             var calories_summ = 0.0;
-            var entrys = db.Diaryentrys.Where(e =>
-                e.Author == user.Uuid
+            var entrys = db.DiaryEntrys.Where(e =>
+                e.Author == user.ChatId
                 && (
                     DateTime.Compare(e.UpdatedAt, date_min) == 0
                     || DateTime.Compare(e.UpdatedAt, date_max) == 1
@@ -38,8 +38,8 @@ namespace Sql_Queries
         {
             var db = new HealthBotContext();
             var calories_summ = 0.0;
-            var entrys = db.Diaryentrys.Where(e =>
-                e.Author == user.Uuid
+            var entrys = db.DiaryEntrys.Where(e =>
+                e.Author == user.ChatId
                 && (
                     DateTime.Compare(e.UpdatedAt, date_min) == 0
                     || DateTime.Compare(e.UpdatedAt, date_max) == 1
@@ -57,8 +57,8 @@ namespace Sql_Queries
         {
             var db = new HealthBotContext();
             var entrys = db
-                .Diaryentrys.Where(e =>
-                    e.Author == user.Uuid && e.Name.ToLower().Contains(name.ToLower())
+                .DiaryEntrys.Where(e =>
+                    e.Author == user.ChatId && e.Name.ToLower().Contains(name.ToLower())
                 )
                 .ToList();
 
@@ -69,8 +69,8 @@ namespace Sql_Queries
         {
             var db = new HealthBotContext();
             var entrys = db
-                .Diaryentrys.Where(e =>
-                    e.Author == user.Uuid && e.Tags.ToLower().Contains(tag.ToLower())
+                .DiaryEntrys.Where(e =>
+                    e.Author == user.ChatId && e.Tags.ToLower().Contains(tag.ToLower())
                 )
                 .ToList();
 
@@ -81,8 +81,8 @@ namespace Sql_Queries
         {
             var db = new HealthBotContext();
             var entrys = db
-                .Diaryentrys.Where(e =>
-                    e.Author == user.Uuid
+                .DiaryEntrys.Where(e =>
+                    e.Author == user.ChatId
                     && (
                         e.Tags.ToLower().Contains(argument.ToLower())
                         || e.Name.ToLower().Contains(argument.ToLower())
@@ -96,8 +96,8 @@ namespace Sql_Queries
         public static string user_data_export(User user)
         {
             var db = new HealthBotContext();
-            var diary_entrys = db.Diaryentrys.Where(e => e.Author == user.Uuid);
-            var biometry = db.Biometries.Where(b => b.Author == user.Uuid);
+            var diary_entrys = db.DiaryEntrys.Where(e => e.Author == user.ChatId);
+            var biometry = db.Biometries.Where(b => b.Author == user.ChatId);
 
             return JsonSerializer.Serialize(user)
                 + "\n\n"
