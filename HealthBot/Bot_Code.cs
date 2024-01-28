@@ -41,8 +41,7 @@ namespace Bot.code
             CancellationToken cancellationToken
         )
         {
-            var db = new HealthBotContext();
-
+            HealthBotContext db = new();
             long chat_id;
             int message_id;
 
@@ -50,13 +49,12 @@ namespace Bot.code
             {
                 var message = update.Message;
 
-                if (message.Text == null)
-                    return;
+                if (message.Text == null) return;
 
                 chat_id = message.Chat.Id;
                 message_id = message.MessageId;
 
-                var user =
+                HealthBot.User user =
                     db.Users.FirstOrDefault(u => u.ChatId == chat_id)
                     ?? Command.User_create(update, chat_id);
 
@@ -72,8 +70,8 @@ namespace Bot.code
 
                 DateTime date_min;
                 DateTime date_max;
-                Biometry biometry;
-                HealthBot.User observer;
+                Biometry? biometry;
+                HealthBot.User? observer;
 
                 switch (user.LastAction)
                 {
@@ -121,7 +119,7 @@ namespace Bot.code
                         await Command.Update(user);
                         break;
                     case "AccountChangeWeight":
-                        var weight = Convert.ToInt32(message.Text);
+                        int weight = Convert.ToInt32(message.Text);
                         biometry = db
                             .Biometries.Where(b => b.Author == user.ChatId)
                             .OrderBy(b => b.CreatedAt)
@@ -148,7 +146,7 @@ namespace Bot.code
                         await Command.Update(user);
                         break;
                     case "AccountChangeHeight":
-                        var height = Convert.ToInt32(message.Text);
+                        int height = Convert.ToInt32(message.Text);
                         biometry = db
                             .Biometries.Where(b => b.Author == user.ChatId)
                             .OrderBy(b => b.CreatedAt)
@@ -190,7 +188,7 @@ namespace Bot.code
                             )
                             .FirstOrDefault();
 
-                        if (observer != null)
+                        if (observer is not null)
                         {
                             user.Observers.Add(observer);
                             await Command.Send(chat_id, Reply.LinkedAccounts(user), user.MessageId);
@@ -210,7 +208,6 @@ namespace Bot.code
                         user.LastAction = "";
                         await Command.Update(user);
                         await Command.Destroy(chat_id, message_id);
-
                         break;
                     case "RemoveAccount":
                         observer = db
@@ -219,7 +216,7 @@ namespace Bot.code
                             )
                             .FirstOrDefault();
 
-                        if (observer != null)
+                        if (observer is not null)
                         {
                             user.Observers.Remove(observer);
                             await Command.Send(chat_id, Reply.LinkedAccounts(user), user.MessageId);
@@ -248,13 +245,13 @@ namespace Bot.code
                             break;
                         }
 
-                        var last_export = db
+                        Exportdatum? last_export = db
                             .ExportData.Where(e => e.Author == user.ChatId)
                             ?.OrderBy(e => e.CreatedAt)
                             .FirstOrDefault();
 
                         if (
-                            last_export != null
+                            last_export is not null
                             && (last_export.CreatedAt - DateTime.Today).TotalDays < 14
                         )
                         {
@@ -333,7 +330,7 @@ namespace Bot.code
                                 );
                                 break;
                             case "DiaryFormDate":
-                                var date = Convert.ToDateTime(message.Text);
+                                var date = Convert.ToDateTime(message.Text).ToUniversalTime();
                                 entry = db.DiaryEntrys.Find(
                                     Guid.Parse(user.LastAction.Split('_')[1])
                                 );

@@ -14,7 +14,7 @@ namespace HealthBot.Migrations
                 {
                     name = table.Column<string>(type: "text", nullable: true),
                     alias = table.Column<string>(type: "text", nullable: true),
-                    last_action = table.Column<string>(type: "text", nullable: true),
+                    last_action = table.Column<string>(type: "text", nullable: false),
                     chat_id = table.Column<long>(type: "bigint", nullable: false),
                     age = table.Column<int>(type: "integer", nullable: true),
                     sex = table.Column<string>(type: "text", nullable: true),

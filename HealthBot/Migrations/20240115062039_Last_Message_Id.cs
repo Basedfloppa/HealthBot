@@ -4,10 +4,8 @@
 
 namespace HealthBot.Migrations
 {
-    /// <inheritdoc />
     public partial class Last_Message_Id : Migration
     {
-        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<int>(
@@ -19,7 +17,6 @@ namespace HealthBot.Migrations
             );
         }
 
-        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(name: "message_id", table: "users");
