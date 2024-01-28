@@ -9,7 +9,7 @@ namespace Bot.scripts
 {
     class Command
     {
-        public static ITelegramBotClient bot_client;
+        public static ITelegramBotClient? bot_client;
 
         public static void Initialize(ITelegramBotClient _bot_client)
         {
@@ -56,11 +56,11 @@ namespace Bot.scripts
                     replyMarkup: tuple.Item2
             );
             }
-            catch (Exception ex)
+            catch(Exception e)
             {
-                Console.WriteLine($"Ошибка во время отправки: {ex.Message}");
-               
-                throw;
+                Console.BackgroundColor = ConsoleColor.Red;
+                Console.WriteLine($"EditMessageTextAsync method encountered {e.Message}");
+                Console.ResetColor();
             }
         }
 
@@ -70,12 +70,21 @@ namespace Bot.scripts
             int message_id
         )
         {
-            await bot_client.EditMessageTextAsync(
-                chatId: chat_id,
-                messageId: message_id,
-                text: tuple.Item1,
-                replyMarkup: tuple.Item2
-            );
+            try
+            {
+                await bot_client.EditMessageTextAsync(
+                    chatId: chat_id,
+                    messageId: message_id,
+                    text: tuple.Item1,
+                    replyMarkup: tuple.Item2
+                );
+            }
+            catch(Exception e)
+            {
+                Console.BackgroundColor = ConsoleColor.Red;
+                Console.WriteLine($"EditMessageTextAsync method encountered {e.Message}");
+                Console.ResetColor();
+            }
         }
 
         public static async Task Send(
@@ -93,24 +102,42 @@ namespace Bot.scripts
                     text: tuple.Item1,
                     replyMarkup: tuple.Item2
             );
+            }
+            catch(Exception e)
+            {
+                Console.BackgroundColor = ConsoleColor.Red;
+                Console.WriteLine($"EditMessageTextAsync method encountered {e.Message}");
+                Console.ResetColor();
+            }
 
             await using Stream stream = System.IO.File.OpenRead(path);
 
-            await bot_client.SendDocumentAsync(
+            try
+            {
+                await bot_client.SendDocumentAsync(
                 chatId: chat_id,
                 document: InputFile.FromStream(stream: stream, fileName: path.Split("/").Last())
-            );
+                );
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Ошибка во время отправки измененного сообщения: {ex.Message}");
+                Console.WriteLine($"SendDocumentAsync encountered: {ex.Message}");
                 throw;
             }
         }
 
         public static async Task Destroy(long chat_id, int message_id)
         {
-            await bot_client.DeleteMessageAsync(chat_id, message_id);
+            try
+            {
+                await bot_client.DeleteMessageAsync(chat_id, message_id);
+            }
+            catch(Exception e)
+            {
+                Console.BackgroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Destroy method encountered {e.Message}");
+                Console.ResetColor();
+            }
         }
 
         public static async Task Update<T>(T entry)
@@ -120,9 +147,21 @@ namespace Bot.scripts
 
             entry.UpdatedAt = DateTime.Now.ToUniversalTime();
 
-            db.Update(entry);
-            db.SaveChanges();
-            db.Dispose();
+            try
+            {
+                db.Update(entry);
+                await db.SaveChangesAsync();
+            }
+            catch(Exception e)
+            {
+                Console.BackgroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Update method encountered {e.Message} , entry: {entry}");
+                Console.ResetColor();
+            }
+            finally
+            {
+                await db.DisposeAsync();
+            }
         }
     }
 }

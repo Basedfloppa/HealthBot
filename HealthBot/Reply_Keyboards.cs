@@ -1,7 +1,5 @@
 ﻿using System.Text;
 using HealthBot;
-using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
-using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 using User = HealthBot.User;
 
