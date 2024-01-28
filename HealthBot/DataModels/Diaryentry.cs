@@ -11,7 +11,7 @@ public partial class Diaryentry : Generic
 
     public virtual User AuthorNavigation { get; set; } = null!;
 
-    public string Name { get; set; } = "";
+    public string? Name { get; set; }
 
     public string? Tags { get; set; }
 
@@ -19,7 +19,7 @@ public partial class Diaryentry : Generic
 
     public int? CaloryAmount { get; set; }
 
-    public string State { get; set; } = "";
+    public string? State { get; set; }
 
     public int? Weight { get; set; }
 

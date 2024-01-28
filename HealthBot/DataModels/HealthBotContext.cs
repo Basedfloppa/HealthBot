@@ -34,7 +34,6 @@ public partial class HealthBotContext : DbContext
             entity.Property(e => e.Alias).HasColumnName("alias");
             entity.Property(e => e.ChatId).HasColumnName("chat_id");
             entity.Property(e => e.CreatedAt).HasColumnName("created_at");
-            entity.Property(e => e.DeletedAt).HasColumnName("deleted_at");
             entity.Property(e => e.LastAction).HasColumnName("last_action");
             entity.Property(e => e.Name).HasColumnName("name");
             entity.Property(e => e.Sex).HasColumnName("sex");
@@ -105,7 +104,6 @@ public partial class HealthBotContext : DbContext
             entity.Property(e => e.Author).HasColumnName("author");
             entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
             entity.Property(e => e.CreatedAt).HasColumnName("created_at");
-            entity.Property(e => e.DeletedAt).HasColumnName("deleted_at");
             entity.Property(e => e.Height).HasColumnName("height");
             entity.Property(e => e.Weight).HasColumnName("weight");
 
@@ -134,7 +132,6 @@ public partial class HealthBotContext : DbContext
             entity.Property(e => e.BloodSaturation).HasColumnName("blood_saturation");
             entity.Property(e => e.BloodPreassure).HasColumnName("blood_preassure");
             entity.Property(e => e.CreatedAt).HasColumnName("created_at");
-            entity.Property(e => e.DeletedAt).HasColumnName("deleted_at");
             entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
 
             entity

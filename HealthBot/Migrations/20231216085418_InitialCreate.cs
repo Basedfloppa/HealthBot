@@ -14,6 +14,7 @@ namespace HealthBot.Migrations
                 {
                     name = table.Column<string>(type: "text", nullable: true),
                     alias = table.Column<string>(type: "text", nullable: true),
+                    last_action = table.Column<string>(type: "text", nullable: true),
                     chat_id = table.Column<long>(type: "bigint", nullable: false),
                     age = table.Column<int>(type: "integer", nullable: true),
                     sex = table.Column<string>(type: "text", nullable: true),
@@ -32,12 +33,7 @@ namespace HealthBot.Migrations
                     updated_at = table.Column<DateTime>(
                         type: "timestamp with time zone",
                         nullable: true
-                    ),
-                    deleted_at = table.Column<DateTime>(
-                        type: "timestamp with time zone",
-                        nullable: true
-                    ),
-                    last_action = table.Column<string>(type: "text", nullable: false)
+                    )
                 },
                 constraints: table =>
                 {
@@ -58,10 +54,6 @@ namespace HealthBot.Migrations
                         nullable: false
                     ),
                     changed_at = table.Column<DateTime>(
-                        type: "timestamp with time zone",
-                        nullable: true
-                    ),
-                    deleted_at = table.Column<DateTime>(
                         type: "timestamp with time zone",
                         nullable: true
                     )
@@ -85,15 +77,11 @@ namespace HealthBot.Migrations
                 {
                     uuid = table.Column<Guid>(type: "uuid", nullable: false),
                     author = table.Column<long>(type: "bigint", nullable: false),
-                    name = table.Column<string>(type: "text", nullable: false),
+                    name = table.Column<string>(type: "text", nullable: true),
                     tags = table.Column<string>(type: "text", nullable: true),
                     type = table.Column<string>(type: "text", nullable: false),
                     calory_amount = table.Column<int>(type: "integer", nullable: true),
-                    state = table.Column<string>(
-                        type: "text",
-                        nullable: false,
-                        defaultValueSql: "'solid'::text"
-                    ),
+                    state = table.Column<string>(type: "text", nullable: true),
                     weight = table.Column<int>(type: "integer", nullable: true),
                     heart_rate = table.Column<int>(type: "integer", nullable: true),
                     blood_saturation = table.Column<int>(type: "integer", nullable: true),
@@ -103,10 +91,6 @@ namespace HealthBot.Migrations
                         nullable: false
                     ),
                     updated_at = table.Column<DateTime>(
-                        type: "timestamp with time zone",
-                        nullable: false
-                    ),
-                    deleted_at = table.Column<DateTime>(
                         type: "timestamp with time zone",
                         nullable: false
                     )

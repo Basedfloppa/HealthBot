@@ -22,7 +22,7 @@ namespace HealthBot.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(name: "messageid", table: "users");
+            migrationBuilder.DropColumn(name: "message_id", table: "users");
         }
     }
 }

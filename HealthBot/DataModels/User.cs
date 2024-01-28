@@ -13,7 +13,7 @@ public partial class User : Generic
 
     public int MessageId { get; set; }
 
-    public string LastAction { get; set; } = "";
+    public string? LastAction { get; set; }
 
     public int? Age { get; set; }
 
