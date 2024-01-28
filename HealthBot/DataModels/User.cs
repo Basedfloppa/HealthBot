@@ -32,5 +32,4 @@ public partial class User : Generic
     public virtual ICollection<User> Observees { get; set; } = new List<User>();
 
     public virtual ICollection<User> Observers { get; set; } = new List<User>();
-
 }

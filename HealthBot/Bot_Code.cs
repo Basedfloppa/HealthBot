@@ -49,7 +49,8 @@ namespace Bot.code
             {
                 var message = update.Message;
 
-                if (message.Text == null) return;
+                if (message.Text == null)
+                    return;
 
                 chat_id = message.Chat.Id;
                 message_id = message.MessageId;
