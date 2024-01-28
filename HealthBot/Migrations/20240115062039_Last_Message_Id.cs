@@ -11,7 +11,7 @@ namespace HealthBot.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<int>(
-                name: "messageid",
+                name: "message_id",
                 table: "users",
                 type: "integer",
                 nullable: false,

@@ -63,7 +63,7 @@ namespace Bot.code
                 if (message.Text == "/start")
                 {
                     (string, InlineKeyboardMarkup) tuple = Reply.Menu(user);
-                    user.messageid = message.MessageId;
+                    user.MessageId = message.MessageId;
 
                     await Command.Update(user);
                     await Command.Destroy(chat_id, message_id);
@@ -91,7 +91,7 @@ namespace Bot.code
                             Reply.Stats(
                                 $"In given time span you consumed average of {Query.average_calories_by_date(date_min, date_max, user)} calories"
                             ),
-                            user.messageid
+                            user.MessageId
                         );
                         break;
                     case "LiquidByDate":
@@ -108,14 +108,14 @@ namespace Bot.code
                             Reply.Stats(
                                 $"In given time span you consumed average of {Query.average_water_by_date(date_min, date_max, user)} ml of liquid"
                             ),
-                            user.messageid
+                            user.MessageId
                         );
                         break;
                     case "AccountChangeAge":
                         user.Age = Convert.ToInt32(message.Text);
 
                         await Command.Destroy(chat_id, message_id);
-                        await Command.Send(chat_id, Reply.Account(user), user.messageid);
+                        await Command.Send(chat_id, Reply.Account(user), user.MessageId);
 
                         user.LastAction = "";
                         await Command.Update(user);
@@ -123,7 +123,7 @@ namespace Bot.code
                     case "AccountChangeWeight":
                         var weight = Convert.ToInt32(message.Text);
                         biometry = db
-                            .Biometries.Where(b => b.Author == user.Uuid)
+                            .Biometries.Where(b => b.Author == user.ChatId)
                             .OrderBy(b => b.CreatedAt)
                             .FirstOrDefault();
 
@@ -135,7 +135,7 @@ namespace Bot.code
                         else
                         {
                             db.Biometries.Add(
-                                new Biometry() { Author = user.Uuid, Weight = weight }
+                                new Biometry() { Author = user.ChatId, Weight = weight }
                             );
                             await db.SaveChangesAsync();
                             db.Dispose();
@@ -144,13 +144,13 @@ namespace Bot.code
                         user.LastAction = "";
 
                         await Command.Destroy(chat_id, message_id);
-                        await Command.Send(chat_id, Reply.Account(user), user.messageid);
+                        await Command.Send(chat_id, Reply.Account(user), user.MessageId);
                         await Command.Update(user);
                         break;
                     case "AccountChangeHeight":
                         var height = Convert.ToInt32(message.Text);
                         biometry = db
-                            .Biometries.Where(b => b.Author == user.Uuid)
+                            .Biometries.Where(b => b.Author == user.ChatId)
                             .OrderBy(b => b.CreatedAt)
                             .FirstOrDefault();
 
@@ -162,7 +162,7 @@ namespace Bot.code
                         else
                         {
                             db.Biometries.Add(
-                                new Biometry() { Author = user.Uuid, Height = height }
+                                new Biometry() { Author = user.ChatId, Height = height }
                             );
                             await db.SaveChangesAsync();
                             db.Dispose();
@@ -171,14 +171,14 @@ namespace Bot.code
                         user.LastAction = "";
 
                         await Command.Destroy(chat_id, message_id);
-                        await Command.Send(chat_id, Reply.Account(user), user.messageid);
+                        await Command.Send(chat_id, Reply.Account(user), user.MessageId);
                         await Command.Update(user);
                         break;
                     case "AccountChangeSex":
                         user.Sex = Convert.ToString(message.Text);
 
                         await Command.Destroy(chat_id, message_id);
-                        await Command.Send(chat_id, Reply.Account(user), user.messageid);
+                        await Command.Send(chat_id, Reply.Account(user), user.MessageId);
 
                         user.LastAction = "";
                         await Command.Update(user);
@@ -193,7 +193,7 @@ namespace Bot.code
                         if (observer != null)
                         {
                             user.Observers.Add(observer);
-                            await Command.Send(chat_id, Reply.LinkedAccounts(user), user.messageid);
+                            await Command.Send(chat_id, Reply.LinkedAccounts(user), user.MessageId);
                         }
                         else
                         {
@@ -203,7 +203,7 @@ namespace Bot.code
                                     user,
                                     "This account is not yes registered in the system."
                                 ),
-                                user.messageid
+                                user.MessageId
                             );
                         }
 
@@ -222,7 +222,7 @@ namespace Bot.code
                         if (observer != null)
                         {
                             user.Observers.Remove(observer);
-                            await Command.Send(chat_id, Reply.LinkedAccounts(user), user.messageid);
+                            await Command.Send(chat_id, Reply.LinkedAccounts(user), user.MessageId);
                         }
                         else
                         {
@@ -232,7 +232,7 @@ namespace Bot.code
                                     user,
                                     "This user is not present in the system"
                                 ),
-                                user.messageid
+                                user.MessageId
                             );
                         }
 
@@ -249,7 +249,7 @@ namespace Bot.code
                         }
 
                         var last_export = db
-                            .Exportdata.Where(e => e.Author == user.Uuid)
+                            .ExportData.Where(e => e.Author == user.ChatId)
                             ?.OrderBy(e => e.CreatedAt)
                             .FirstOrDefault();
 
@@ -263,7 +263,7 @@ namespace Bot.code
                                 Reply.AccountExport(
                                     "You are not elegible for account export at this time."
                                 ),
-                                user.messageid
+                                user.MessageId
                             );
                         }
                         else
@@ -273,8 +273,8 @@ namespace Bot.code
                                 $"./{user.Alias}_{DateTime.Today.ToString("yyyy-MM-dd")}.json";
                             System.IO.File.AppendAllText(path, json);
 
-                            db.Exportdata.Add(
-                                new Exportdatum { Author = user.Uuid, ExportedData = json }
+                            db.ExportData.Add(
+                                new Exportdatum { Author = user.ChatId, ExportedData = json }
                             );
 
                             await Command.Destroy(chat_id, message_id);
@@ -283,7 +283,7 @@ namespace Bot.code
                             await Command.Send(
                                 user.ChatId,
                                 Reply.AccountExport("Done"),
-                                user.messageid,
+                                user.MessageId,
                                 path
                             );
                         }
@@ -298,7 +298,7 @@ namespace Bot.code
                         {
                             case "DiaryFormName":
                                 var name = Convert.ToString(message.Text);
-                                entry = db.Diaryentrys.Find(
+                                entry = db.DiaryEntrys.Find(
                                     Guid.Parse(user.LastAction.Split('_')[1])
                                 );
 
@@ -311,12 +311,12 @@ namespace Bot.code
                                 await Command.Send(
                                     chat_id,
                                     Reply.DiaryNewFrom(entry_uuid: entry.Uuid),
-                                    user.messageid
+                                    user.MessageId
                                 );
                                 break;
                             case "DiaryFormTags":
                                 var tags = Convert.ToString(message.Text);
-                                entry = db.Diaryentrys.Find(
+                                entry = db.DiaryEntrys.Find(
                                     Guid.Parse(user.LastAction.Split('_')[1])
                                 );
 
@@ -329,12 +329,12 @@ namespace Bot.code
                                 await Command.Send(
                                     chat_id,
                                     Reply.DiaryNewFrom(entry_uuid: entry.Uuid),
-                                    user.messageid
+                                    user.MessageId
                                 );
                                 break;
                             case "DiaryFormDate":
                                 var date = Convert.ToDateTime(message.Text);
-                                entry = db.Diaryentrys.Find(
+                                entry = db.DiaryEntrys.Find(
                                     Guid.Parse(user.LastAction.Split('_')[1])
                                 );
 
@@ -347,12 +347,12 @@ namespace Bot.code
                                 await Command.Send(
                                     chat_id,
                                     Reply.DiaryNewFrom(entry_uuid: entry.Uuid),
-                                    user.messageid
+                                    user.MessageId
                                 );
                                 break;
                             case "DiaryFormPressure":
                                 var pressure = Convert.ToString(message.Text);
-                                entry = db.Diaryentrys.Find(
+                                entry = db.DiaryEntrys.Find(
                                     Guid.Parse(user.LastAction.Split('_')[1])
                                 );
 
@@ -365,12 +365,12 @@ namespace Bot.code
                                 await Command.Send(
                                     chat_id,
                                     Reply.DiaryNewFrom(entry_uuid: entry.Uuid),
-                                    user.messageid
+                                    user.MessageId
                                 );
                                 break;
                             case "DiaryFormSaturation":
                                 var saturation = Convert.ToInt32(message.Text);
-                                entry = db.Diaryentrys.Find(
+                                entry = db.DiaryEntrys.Find(
                                     Guid.Parse(user.LastAction.Split('_')[1])
                                 );
 
@@ -383,12 +383,12 @@ namespace Bot.code
                                 await Command.Send(
                                     chat_id,
                                     Reply.DiaryNewFrom(entry_uuid: entry.Uuid),
-                                    user.messageid
+                                    user.MessageId
                                 );
                                 break;
                             case "DiaryFormRate":
                                 var rate = Convert.ToInt32(message.Text);
-                                entry = db.Diaryentrys.Find(
+                                entry = db.DiaryEntrys.Find(
                                     Guid.Parse(user.LastAction.Split('_')[1])
                                 );
 
@@ -401,12 +401,12 @@ namespace Bot.code
                                 await Command.Send(
                                     chat_id,
                                     Reply.DiaryNewFrom(entry_uuid: entry.Uuid),
-                                    user.messageid
+                                    user.MessageId
                                 );
                                 break;
                             case "DiaryFormIntakeState":
                                 var state = Convert.ToString(message.Text);
-                                entry = db.Diaryentrys.Find(
+                                entry = db.DiaryEntrys.Find(
                                     Guid.Parse(user.LastAction.Split('_')[1])
                                 );
 
@@ -422,12 +422,12 @@ namespace Bot.code
                                 await Command.Send(
                                     chat_id,
                                     Reply.DiaryNewFrom(entry_uuid: entry.Uuid),
-                                    user.messageid
+                                    user.MessageId
                                 );
                                 break;
                             case "DiaryFormIntakeWeight":
                                 var intake_weight = Convert.ToInt32(message.Text);
-                                entry = db.Diaryentrys.Find(
+                                entry = db.DiaryEntrys.Find(
                                     Guid.Parse(user.LastAction.Split('_')[1])
                                 );
 
@@ -440,12 +440,12 @@ namespace Bot.code
                                 await Command.Send(
                                     chat_id,
                                     Reply.DiaryNewFrom(entry_uuid: entry.Uuid),
-                                    user.messageid
+                                    user.MessageId
                                 );
                                 break;
                             case "DiaryFormIntakeCalory":
                                 var calory = Convert.ToInt32(message.Text);
-                                entry = db.Diaryentrys.Find(
+                                entry = db.DiaryEntrys.Find(
                                     Guid.Parse(user.LastAction.Split('_')[1])
                                 );
 
@@ -458,7 +458,7 @@ namespace Bot.code
                                 await Command.Send(
                                     chat_id,
                                     Reply.DiaryNewFrom(entry_uuid: entry.Uuid),
-                                    user.messageid
+                                    user.MessageId
                                 );
                                 break;
                         }
@@ -473,7 +473,7 @@ namespace Bot.code
                     db.Users.FirstOrDefault(u => u.ChatId == chat_id)
                     ?? Command.User_create(update, chat_id);
 
-                user.messageid = update.CallbackQuery.Message.MessageId;
+                user.MessageId = update.CallbackQuery.Message.MessageId;
                 await Command.Update(user);
 
                 string callback_data = update.CallbackQuery.Data ?? "";

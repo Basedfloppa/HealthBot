@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -13,7 +12,6 @@ namespace HealthBot.Migrations
                 name: "users",
                 columns: table => new
                 {
-                    uuid = table.Column<Guid>(type: "uuid", nullable: false),
                     name = table.Column<string>(type: "text", nullable: true),
                     alias = table.Column<string>(type: "text", nullable: true),
                     chat_id = table.Column<long>(type: "bigint", nullable: false),
@@ -43,7 +41,7 @@ namespace HealthBot.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("Users_pkey", x => x.uuid);
+                    table.PrimaryKey("Users_pkey", x => x.chat_id);
                 }
             );
 
@@ -52,7 +50,7 @@ namespace HealthBot.Migrations
                 columns: table => new
                 {
                     uuid = table.Column<Guid>(type: "uuid", nullable: false),
-                    author = table.Column<Guid>(type: "uuid", nullable: false),
+                    author = table.Column<long>(type: "bigint", nullable: false),
                     weight = table.Column<int>(type: "integer", nullable: true),
                     height = table.Column<int>(type: "integer", nullable: true),
                     created_at = table.Column<DateTime>(
@@ -75,7 +73,7 @@ namespace HealthBot.Migrations
                         name: "author",
                         column: x => x.author,
                         principalTable: "users",
-                        principalColumn: "uuid",
+                        principalColumn: "chat_id",
                         onDelete: ReferentialAction.Cascade
                     );
                 }
@@ -86,7 +84,7 @@ namespace HealthBot.Migrations
                 columns: table => new
                 {
                     uuid = table.Column<Guid>(type: "uuid", nullable: false),
-                    author = table.Column<Guid>(type: "uuid", nullable: false),
+                    author = table.Column<long>(type: "bigint", nullable: false),
                     name = table.Column<string>(type: "text", nullable: false),
                     tags = table.Column<string>(type: "text", nullable: true),
                     type = table.Column<string>(type: "text", nullable: false),
@@ -120,7 +118,7 @@ namespace HealthBot.Migrations
                         name: "Author",
                         column: x => x.author,
                         principalTable: "users",
-                        principalColumn: "uuid",
+                        principalColumn: "chat_id",
                         onDelete: ReferentialAction.Cascade
                     );
                 }
@@ -131,7 +129,7 @@ namespace HealthBot.Migrations
                 columns: table => new
                 {
                     uuid = table.Column<Guid>(type: "uuid", nullable: false),
-                    author = table.Column<Guid>(type: "uuid", nullable: false),
+                    author = table.Column<long>(type: "bigint", nullable: false),
                     exported_data = table.Column<string>(type: "text", nullable: false),
                     created_at = table.Column<DateTime>(
                         type: "timestamp with time zone",
@@ -145,7 +143,7 @@ namespace HealthBot.Migrations
                         name: "author",
                         column: x => x.author,
                         principalTable: "users",
-                        principalColumn: "uuid",
+                        principalColumn: "chat_id",
                         onDelete: ReferentialAction.Cascade
                     );
                 }
@@ -155,8 +153,8 @@ namespace HealthBot.Migrations
                 name: "obresvers",
                 columns: table => new
                 {
-                    observer = table.Column<Guid>(type: "uuid", nullable: false),
-                    observee = table.Column<Guid>(type: "uuid", nullable: false)
+                    observer = table.Column<long>(type: "bigint", nullable: false),
+                    observee = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -165,13 +163,13 @@ namespace HealthBot.Migrations
                         name: "fk_observee",
                         column: x => x.observee,
                         principalTable: "users",
-                        principalColumn: "uuid"
+                        principalColumn: "chat_id"
                     );
                     table.ForeignKey(
                         name: "fk_observer",
                         column: x => x.observer,
                         principalTable: "users",
-                        principalColumn: "uuid"
+                        principalColumn: "chat_id"
                     );
                 }
             );

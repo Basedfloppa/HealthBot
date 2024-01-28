@@ -5,7 +5,9 @@ namespace HealthBot;
 
 public partial class Diaryentry : Generic
 {
-    public Guid Author { get; set; }
+    public Guid Uuid { get; set; }
+
+    public long Author { get; set; }
 
     public virtual User AuthorNavigation { get; set; } = null!;
 
