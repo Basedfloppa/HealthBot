@@ -1,5 +1,4 @@
-﻿
-namespace Configuration
+﻿namespace Configuration
 {
     class Config
     {
