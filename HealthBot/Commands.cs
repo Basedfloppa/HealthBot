@@ -20,11 +20,11 @@ namespace Bot.scripts
         {
             Telegram.Bot.Types.User user = new Telegram.Bot.Types.User();
 
-            if (upd.Message != null)
+            if (upd != null && upd.Message != null )
             {
-                user = upd.Message.From; // cannot be null so no problem
+                user = upd.Message.From;
             }
-            if (upd.CallbackQuery != null)
+            else if (upd.CallbackQuery != null)
             {
                 user = upd.CallbackQuery.From;
             }
@@ -59,16 +59,12 @@ namespace Bot.scripts
             catch(Exception e)
             {
                 Console.BackgroundColor = ConsoleColor.Red;
-                Console.WriteLine($"EditMessageTextAsync method encountered {e.Message}");
+                Console.WriteLine($"Command.Send method encountered {e.Message} , chat_id: {chat_id}");
                 Console.ResetColor();
             }
         }
 
-        public static async Task Send(
-            long chat_id,
-            (string, InlineKeyboardMarkup) tuple,
-            int message_id
-        )
+        public static async Task Send(long chat_id, (string, InlineKeyboardMarkup) tuple, int message_id )
         {
             try
             {
@@ -82,17 +78,12 @@ namespace Bot.scripts
             catch(Exception e)
             {
                 Console.BackgroundColor = ConsoleColor.Red;
-                Console.WriteLine($"EditMessageTextAsync method encountered {e.Message}");
+                Console.WriteLine($"Command.Send method encountered {e.Message} , chat_id: {chat_id} , message_id: {message_id}");
                 Console.ResetColor();
             }
         }
 
-        public static async Task Send(
-            long chat_id,
-            (string, InlineKeyboardMarkup) tuple,
-            int message_id,
-            string path
-        )
+        public static async Task Send(long chat_id, (string, InlineKeyboardMarkup) tuple, int message_id, string path)
         {
             try
             {
@@ -101,12 +92,12 @@ namespace Bot.scripts
                     messageId: message_id,
                     text: tuple.Item1,
                     replyMarkup: tuple.Item2
-            );
+                );
             }
             catch(Exception e)
             {
                 Console.BackgroundColor = ConsoleColor.Red;
-                Console.WriteLine($"EditMessageTextAsync method encountered {e.Message}");
+                Console.WriteLine($"Command.Send method encountered {e.Message} , chat_id: {chat_id} , message_id: {message_id}");
                 Console.ResetColor();
             }
 
@@ -121,8 +112,9 @@ namespace Bot.scripts
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"SendDocumentAsync encountered: {ex.Message}");
-                throw;
+                Console.BackgroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Command.Send encountered: {ex.Message} , path: {path}");
+                Console.ResetColor();
             }
         }
 
@@ -135,13 +127,12 @@ namespace Bot.scripts
             catch(Exception e)
             {
                 Console.BackgroundColor = ConsoleColor.Red;
-                Console.WriteLine($"Destroy method encountered {e.Message}");
+                Console.WriteLine($"Command.Destroy method encountered {e.Message} , chat_id: {chat_id} , message_id: {message_id}");
                 Console.ResetColor();
             }
         }
 
-        public static async Task Update<T>(T entry)
-            where T : notnull, Generic
+        public static async Task Update<T>(T entry) where T : notnull, Generic
         {
             var db = new HealthBotContext();
 
@@ -155,7 +146,7 @@ namespace Bot.scripts
             catch(Exception e)
             {
                 Console.BackgroundColor = ConsoleColor.Red;
-                Console.WriteLine($"Update method encountered {e.Message} , entry: {entry}");
+                Console.WriteLine($"Command.Update method encountered {e.Message} , entry: {entry}");
                 Console.ResetColor();
             }
             finally

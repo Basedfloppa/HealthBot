@@ -114,7 +114,7 @@ namespace Bot.code
                         user.Age = Convert.ToInt32(message.Text);
 
                         await Command.Destroy(chat_id, message_id);
-                        await Command.Send(chat_id, Reply.Account(user), user.MessageId);
+                        await Command.Send(chat_id, Reply.AccountChange(user), user.MessageId);
 
                         user.LastAction = "";
                         await Command.Update(user);
@@ -126,7 +126,7 @@ namespace Bot.code
                             .OrderBy(b => b.CreatedAt)
                             .FirstOrDefault();
 
-                        if (biometry is not null && biometry.UpdatedAt.Date == DateTime.Today.Date)
+                        if (biometry != null && biometry.UpdatedAt.Date == DateTime.Today.Date)
                         {
                             biometry.Weight = weight;
                             await Command.Update(biometry);
@@ -143,7 +143,7 @@ namespace Bot.code
                         user.LastAction = "";
 
                         await Command.Destroy(chat_id, message_id);
-                        await Command.Send(chat_id, Reply.Account(user), user.MessageId);
+                        await Command.Send(chat_id, Reply.AccountChange(user), user.MessageId);
                         await Command.Update(user);
                         break;
                     case "AccountChangeHeight":
@@ -153,7 +153,7 @@ namespace Bot.code
                             .OrderBy(b => b.CreatedAt)
                             .FirstOrDefault();
 
-                        if (biometry is not null && biometry.UpdatedAt.Date == DateTime.Today.Date)
+                        if (biometry != null && biometry.UpdatedAt.Date == DateTime.Today.Date)
                         {
                             biometry.Height = height;
                             await Command.Update(biometry);
@@ -170,14 +170,14 @@ namespace Bot.code
                         user.LastAction = "";
 
                         await Command.Destroy(chat_id, message_id);
-                        await Command.Send(chat_id, Reply.Account(user), user.MessageId);
+                        await Command.Send(chat_id, Reply.AccountChange(user), user.MessageId);
                         await Command.Update(user);
                         break;
                     case "AccountChangeSex":
                         user.Sex = Convert.ToString(message.Text);
 
                         await Command.Destroy(chat_id, message_id);
-                        await Command.Send(chat_id, Reply.Account(user), user.MessageId);
+                        await Command.Send(chat_id, Reply.AccountChange(user), user.MessageId);
 
                         user.LastAction = "";
                         await Command.Update(user);
@@ -189,7 +189,7 @@ namespace Bot.code
                             )
                             .FirstOrDefault();
 
-                        if (observer is not null)
+                        if (observer != null)
                         {
                             user.Observers.Add(observer);
                             await Command.Send(chat_id, Reply.LinkedAccounts(user), user.MessageId);
@@ -217,7 +217,7 @@ namespace Bot.code
                             )
                             .FirstOrDefault();
 
-                        if (observer is not null)
+                        if (observer != null)
                         {
                             user.Observers.Remove(observer);
                             await Command.Send(chat_id, Reply.LinkedAccounts(user), user.MessageId);
@@ -252,7 +252,7 @@ namespace Bot.code
                             .FirstOrDefault();
 
                         if (
-                            last_export is not null
+                            last_export != null
                             && (last_export.CreatedAt - DateTime.Today).TotalDays < 14
                         )
                         {

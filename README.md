@@ -16,7 +16,7 @@ All this is calculated based on the data entered by the user in their diary and 
 It is necessary to obtain a token for the Telegram bot. For detailed instructions, the following link is provided: [How to get Telegram bot API token](https://www.siteguarding.com/en/how-to-get-telegram-bot-api-token). After obtaining your own token you need no create Config.cs file within Configuration namespace and Config class, create token static string and continue the setup.
 
 As this project has dockerfiles it can be starded inside contaner. To do this, if you have alredy installed docker software, open the terminal and enter the following commands in the specified order:
-1. docker build -t healthbot
+1. docker build -t healthbot .
 2. docker-compose build
 3. docker-compose up -d
 
