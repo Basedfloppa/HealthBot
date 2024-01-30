@@ -334,7 +334,7 @@ namespace Bot.scripts
             return (message.ToString(), keyboard);
         }
 
-        public static (string, InlineKeyboardMarkup) DiaryNewFrom(string addition_text = "", Guid entry_uuid = new Guid())
+        public static (string, InlineKeyboardMarkup) DiaryEntryForm(string addition_text = "", Guid entry_uuid = new Guid())
         {
             StringBuilder message = new StringBuilder();
             InlineKeyboardMarkup keyboard;
