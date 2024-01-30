@@ -17,15 +17,15 @@ public partial class Diaryentry : Generic
 
     public string Type { get; set; } = null!;
 
-    public int? CaloryAmount { get; set; }
+    public float? CaloryAmount { get; set; }
 
     public string? State { get; set; }
 
-    public int? Weight { get; set; }
+    public float? Weight { get; set; }
 
-    public int? HeartRate { get; set; }
+    public float? HeartRate { get; set; }
 
-    public int? BloodSaturation { get; set; }
+    public float? BloodSaturation { get; set; }
 
     public string? BloodPreassure { get; set; }
 }
