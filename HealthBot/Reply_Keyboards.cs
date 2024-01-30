@@ -29,6 +29,41 @@ namespace Bot.scripts
             return (message.ToString(), keyboard);
         }
 
+        public static (string, InlineKeyboardMarkup) MenuAdmin(User user, string addition_text = "")
+        {
+            string name = user.Name != null && user.Name != "" ? user.Name : user.Alias;
+
+            StringBuilder message = new StringBuilder();
+            message.AppendLine($"Welcome {name}!");
+            message.AppendLine("What do we do next?");
+            message.AppendLine($"{addition_text}");
+
+            InlineKeyboardMarkup keyboard = new[]
+            {
+                InlineKeyboardButton.WithCallbackData(text: "Diary", callbackData: "To_Diary"),
+                InlineKeyboardButton.WithCallbackData(text: "Stats", callbackData: "To_Stats"),
+                InlineKeyboardButton.WithCallbackData(text: "Accoun data", callbackData: "To_Account"),
+                InlineKeyboardButton.WithCallbackData(text: "Admin", callbackData: "To_Admin")
+            };
+
+            return (message.ToString(), keyboard);
+        }
+
+        public static (string, InlineKeyboardMarkup) Admin(User user, string addition_text = "")
+        {
+            StringBuilder message = new StringBuilder();
+            message.AppendLine($"Welcome sillyman, its time to admin admin");
+
+            InlineKeyboardMarkup keyboard = new[]
+            {
+                InlineKeyboardButton.WithCallbackData(text: "Shutdown", callbackData: "Admin_Shutdown"),
+                InlineKeyboardButton.WithCallbackData(text: "NukeDB", callbackData: "Admin_NukeDb"),
+                InlineKeyboardButton.WithCallbackData(text: "Menu", callbackData: "To_Menu")
+            };
+
+            return (message.ToString(), keyboard);
+        }
+
         public static (string, InlineKeyboardMarkup) Account(User user, string addition_text = "")
         {
             var db = new HealthBotContext();

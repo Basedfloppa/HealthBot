@@ -595,6 +595,9 @@ namespace Bot.code
                     case "Diary":
                         await State_Handlers.Diary_State_Handler(user, callback_data);
                         break;
+                    case "Admin":
+                        await State_Handlers.Admin_State_Handler(user, callback_data);
+                        break;
                 }
             }
             db.Dispose();

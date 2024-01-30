@@ -1,4 +1,7 @@
-﻿using Bot.scripts;
+﻿using System.Data.Common;
+using System.Security.Cryptography.X509Certificates;
+using Bot.scripts;
+using Microsoft.EntityFrameworkCore;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace HealthBot.handlers
@@ -12,7 +15,9 @@ namespace HealthBot.handlers
             switch (callback_data.Split('_')[1])
             {
                 case "Menu":
-                    tuple = Reply.Menu(user);
+                    var db = new HealthBotContext();
+                    if (db.Admins.Where( a => a.User == user.ChatId).Count() > 0)  tuple = Reply.MenuAdmin(user);
+                    else tuple = Reply.Menu(user);
 
                     await Command.Message.Send(user.ChatId, tuple, user.MessageId);
                     break;
@@ -50,6 +55,11 @@ namespace HealthBot.handlers
                     break;
                 case "Stats":
                     tuple = Reply.Stats();
+
+                    await Command.Message.Send(user.ChatId, tuple, user.MessageId);
+                    break;
+                case "Admin":
+                    tuple = Reply.Admin(user);
 
                     await Command.Message.Send(user.ChatId, tuple, user.MessageId);
                     break;
@@ -393,6 +403,52 @@ namespace HealthBot.handlers
                             await Command.Message.Send(user.ChatId, tuple, user.MessageId);
                             break;
                     }
+                    break;
+            }
+        }
+        public static async Task Admin_State_Handler(User user, string callback_data)
+        {
+            (string, InlineKeyboardMarkup) tuple;
+
+            switch(callback_data.Split('_')[1])
+            {
+                case "NukeDb":
+                    HealthBotContext db = new();
+
+                    var bio = db.Biometries.Where(b => true);
+                    foreach(var b in bio)
+                    {
+                        db.Remove(b);
+                    }
+
+                    var dio = db.DiaryEntrys.Where(e => true);
+                    foreach(var e in dio)
+                    {
+                        db.Remove(e);
+                    }
+
+                    var users = db.Users.Where(u => true);
+                    foreach(var u in users)
+                    {
+                        db.Remove(u);
+                    }
+
+                    var exp = db.ExportData.Where(d => true);
+                    foreach(var d in exp)
+                    {
+                        db.Remove(d);
+                    }
+                    
+                    var adm = db.Admins.Where(a => true);
+                    foreach(var a in adm)
+                    {
+                        db.Remove(a);
+                    }
+
+                    db.Dispose();
+                    break;
+                case "Shutdown":
+                    Environment.Exit(0);
                     break;
             }
         }

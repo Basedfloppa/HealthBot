@@ -19,6 +19,8 @@ public partial class HealthBotContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
 
+    public virtual DbSet<Admin> Admins { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) =>
         optionsBuilder.UseNpgsql("Host=db;Database=healthbot;Username=postgres;Password=postgres");
 
@@ -157,6 +159,17 @@ public partial class HealthBotContext : DbContext
                 .WithMany(p => p.ExportData)
                 .HasForeignKey(d => d.Author)
                 .HasConstraintName("Author");
+        });
+
+        modelBuilder.Entity<Admin>(entity =>
+        {
+            entity.HasKey(e => e.Uuid).HasName("Admin_pley");
+
+            entity.ToTable("admin");
+
+            entity.Property(e => e.Uuid).ValueGeneratedNever().HasColumnName("uuid");
+            entity.Property(e => e.User).HasColumnName("user");
+            entity.Property(e => e.Level).HasColumnName("level");
         });
 
         OnModelCreatingPartial(modelBuilder);
