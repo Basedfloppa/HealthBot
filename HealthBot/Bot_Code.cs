@@ -53,16 +53,16 @@ namespace Bot.code
 
                 HealthBot.User user =
                     db.Users.FirstOrDefault(u => u.ChatId == chat_id)
-                    ?? Command.User_create(update, chat_id);
+                    ?? Command.Database.User_create(update, chat_id);
 
                 if (message.Text == "/start")
                 {
                     (string, InlineKeyboardMarkup) tuple = Reply.Menu(user);
                     user.MessageId = message.MessageId;
 
-                    await Command.Update(user);
-                    await Command.Destroy(chat_id, message_id);
-                    await Command.Send(chat_id, tuple);
+                    await Command.Database.Update(user);
+                    await Command.Message.Destroy(chat_id, message_id);
+                    await Command.Message.Send(chat_id, tuple);
                 }
                 
                 Console.BackgroundColor = ConsoleColor.Green;
@@ -88,8 +88,8 @@ namespace Bot.code
 
                             if (date_max.Subtract(date_min).TotalDays < 0) (date_min, date_max) = (date_max, date_min);
 
-                            await Command.Destroy(chat_id, message_id);
-                            await Command.Send(
+                            await Command.Message.Destroy(chat_id, message_id);
+                            await Command.Message.Send(
                                 chat_id,
                                 Reply.Stats(
                                     $"In given time span you consumed average of {Query.average_calories_by_date(date_min, date_max, user)} calories"
@@ -116,8 +116,8 @@ namespace Bot.code
 
                             if (date_max.Subtract(date_min).TotalDays < 0) (date_min, date_max) = (date_max, date_min);
 
-                            await Command.Destroy(chat_id, message_id);
-                            await Command.Send(
+                            await Command.Message.Destroy(chat_id, message_id);
+                            await Command.Message.Send(
                                 chat_id,
                                 Reply.Stats(
                                     $"In given time span you consumed average of {Query.average_water_by_date(date_min, date_max, user)} ml of liquid"
@@ -144,11 +144,11 @@ namespace Bot.code
                             Console.ResetColor();
                         }
 
-                        await Command.Destroy(chat_id, message_id);
-                        await Command.Send(chat_id, Reply.AccountChange(user), user.MessageId);
+                        await Command.Message.Destroy(chat_id, message_id);
+                        await Command.Message.Send(chat_id, Reply.AccountChange(user), user.MessageId);
 
                         user.LastAction = "";
-                        await Command.Update(user);
+                        await Command.Database.Update(user);
                         break;
                     case "AccountChangeWeight":
                         try
@@ -163,7 +163,7 @@ namespace Bot.code
                             if (biometry != null && biometry.UpdatedAt.Date == DateTime.Today.Date)
                             {
                                 biometry.Weight = weight;
-                                await Command.Update(biometry);
+                                await Command.Database.Update(biometry);
                             }
                             else
                             {
@@ -176,9 +176,9 @@ namespace Bot.code
 
                             user.LastAction = "";
 
-                            await Command.Destroy(chat_id, message_id);
-                            await Command.Send(chat_id, Reply.AccountChange(user), user.MessageId);
-                            await Command.Update(user);
+                            await Command.Message.Destroy(chat_id, message_id);
+                            await Command.Message.Send(chat_id, Reply.AccountChange(user), user.MessageId);
+                            await Command.Database.Update(user);
                         }
                         catch (Exception e)
                         {
@@ -200,7 +200,7 @@ namespace Bot.code
                             if (biometry != null && biometry.UpdatedAt.Date == DateTime.Today.Date)
                             {
                                 biometry.Height = height;
-                                await Command.Update(biometry);
+                                await Command.Database.Update(biometry);
                             }
                             else
                             {
@@ -213,9 +213,9 @@ namespace Bot.code
 
                             user.LastAction = "";
 
-                            await Command.Destroy(chat_id, message_id);
-                            await Command.Send(chat_id, Reply.AccountChange(user), user.MessageId);
-                            await Command.Update(user);
+                            await Command.Message.Destroy(chat_id, message_id);
+                            await Command.Message.Send(chat_id, Reply.AccountChange(user), user.MessageId);
+                            await Command.Database.Update(user);
                         }
                         catch (Exception e)
                         {
@@ -227,11 +227,11 @@ namespace Bot.code
                     case "AccountChangeSex":
                         user.Sex = Convert.ToString(message.Text);
 
-                        await Command.Destroy(chat_id, message_id);
-                        await Command.Send(chat_id, Reply.AccountChange(user), user.MessageId);
+                        await Command.Message.Destroy(chat_id, message_id);
+                        await Command.Message.Send(chat_id, Reply.AccountChange(user), user.MessageId);
 
                         user.LastAction = "";
-                        await Command.Update(user);
+                        await Command.Database.Update(user);
                         break;
                     case "AddAccount":
                         observer = db
@@ -243,11 +243,11 @@ namespace Bot.code
                         if (observer != null)
                         {
                             user.Observers.Add(observer);
-                            await Command.Send(chat_id, Reply.LinkedAccounts(user), user.MessageId);
+                            await Command.Message.Send(chat_id, Reply.LinkedAccounts(user), user.MessageId);
                         }
                         else
                         {
-                            await Command.Send(
+                            await Command.Message.Send(
                                 chat_id,
                                 Reply.LinkedAccounts(
                                     user,
@@ -258,8 +258,8 @@ namespace Bot.code
                         }
 
                         user.LastAction = "";
-                        await Command.Update(user);
-                        await Command.Destroy(chat_id, message_id);
+                        await Command.Database.Update(user);
+                        await Command.Message.Destroy(chat_id, message_id);
                         break;
                     case "RemoveAccount":
                         observer = db
@@ -271,11 +271,11 @@ namespace Bot.code
                         if (observer != null)
                         {
                             user.Observers.Remove(observer);
-                            await Command.Send(chat_id, Reply.LinkedAccounts(user), user.MessageId);
+                            await Command.Message.Send(chat_id, Reply.LinkedAccounts(user), user.MessageId);
                         }
                         else
                         {
-                            await Command.Send(
+                            await Command.Message.Send(
                                 chat_id,
                                 Reply.LinkedAccounts(
                                     user,
@@ -286,14 +286,14 @@ namespace Bot.code
                         }
 
                         user.LastAction = "";
-                        await Command.Update(user);
-                        await Command.Destroy(chat_id, message_id);
+                        await Command.Database.Update(user);
+                        await Command.Message.Destroy(chat_id, message_id);
 
                         break;
                     case "AccountExport":
                         if (message.Text.ToLower() != "yes")
                         {
-                            await Command.Destroy(chat_id, message_id);
+                            await Command.Message.Destroy(chat_id, message_id);
                             break;
                         }
 
@@ -307,7 +307,7 @@ namespace Bot.code
                             && (last_export.CreatedAt - DateTime.Today).TotalDays < 14
                         )
                         {
-                            await Command.Send(
+                            await Command.Message.Send(
                                 user.ChatId,
                                 Reply.AccountExport(
                                     "You are not elegible for account export at this time."
@@ -326,10 +326,10 @@ namespace Bot.code
                                 new Exportdatum { Author = user.ChatId, ExportedData = json }
                             );
 
-                            await Command.Destroy(chat_id, message_id);
+                            await Command.Message.Destroy(chat_id, message_id);
                             await db.SaveChangesAsync();
                             db.Dispose();
-                            await Command.Send(
+                            await Command.Message.Send(
                                 user.ChatId,
                                 Reply.AccountExport("Done"),
                                 user.MessageId,
@@ -353,13 +353,13 @@ namespace Bot.code
 
                                 user.LastAction = "";
                                 entry.Name = name;
-                                await Command.Update(entry);
-                                await Command.Update(user);
+                                await Command.Database.Update(entry);
+                                await Command.Database.Update(user);
 
-                                await Command.Destroy(chat_id, message_id);
-                                await Command.Send(
+                                await Command.Message.Destroy(chat_id, message_id);
+                                await Command.Message.Send(
                                     chat_id,
-                                    Reply.DiaryNewFrom(entry_uuid: entry.Uuid),
+                                    Reply.DiaryEntryForm(entry_uuid: entry.Uuid),
                                     user.MessageId
                                 );
                                 break;
@@ -371,13 +371,13 @@ namespace Bot.code
 
                                 user.LastAction = "";
                                 entry.Tags = tags;
-                                await Command.Update(entry);
-                                await Command.Update(user);
+                                await Command.Database.Update(entry);
+                                await Command.Database.Update(user);
 
-                                await Command.Destroy(chat_id, message_id);
-                                await Command.Send(
+                                await Command.Message.Destroy(chat_id, message_id);
+                                await Command.Message.Send(
                                     chat_id,
-                                    Reply.DiaryNewFrom(entry_uuid: entry.Uuid),
+                                    Reply.DiaryEntryForm(entry_uuid: entry.Uuid),
                                     user.MessageId
                                 );
                                 break;
@@ -391,13 +391,13 @@ namespace Bot.code
 
                                     user.LastAction = "";
                                     entry.CreatedAt = date;
-                                    await Command.Update(entry);
-                                    await Command.Update(user);
+                                    await Command.Database.Update(entry);
+                                    await Command.Database.Update(user);
 
-                                    await Command.Destroy(chat_id, message_id);
-                                    await Command.Send(
+                                    await Command.Message.Destroy(chat_id, message_id);
+                                    await Command.Message.Send(
                                         chat_id,
-                                        Reply.DiaryNewFrom(entry_uuid: entry.Uuid),
+                                        Reply.DiaryEntryForm(entry_uuid: entry.Uuid),
                                         user.MessageId
                                     );
                                 }
@@ -417,13 +417,13 @@ namespace Bot.code
 
                                 user.LastAction = "";
                                 entry.BloodPreassure = pressure;
-                                await Command.Update(entry);
-                                await Command.Update(user);
+                                await Command.Database.Update(entry);
+                                await Command.Database.Update(user);
 
-                                await Command.Destroy(chat_id, message_id);
-                                await Command.Send(
+                                await Command.Message.Destroy(chat_id, message_id);
+                                await Command.Message.Send(
                                     chat_id,
-                                    Reply.DiaryNewFrom(entry_uuid: entry.Uuid),
+                                    Reply.DiaryEntryForm(entry_uuid: entry.Uuid),
                                     user.MessageId
                                 );
                                 break;
@@ -437,13 +437,13 @@ namespace Bot.code
 
                                     user.LastAction = "";
                                     entry.BloodSaturation = saturation;
-                                    await Command.Update(entry);
-                                    await Command.Update(user);
+                                    await Command.Database.Update(entry);
+                                    await Command.Database.Update(user);
 
-                                    await Command.Destroy(chat_id, message_id);
-                                    await Command.Send(
+                                    await Command.Message.Destroy(chat_id, message_id);
+                                    await Command.Message.Send(
                                         chat_id,
-                                        Reply.DiaryNewFrom(entry_uuid: entry.Uuid),
+                                        Reply.DiaryEntryForm(entry_uuid: entry.Uuid),
                                         user.MessageId
                                     );
                                 }
@@ -465,13 +465,13 @@ namespace Bot.code
 
                                     user.LastAction = "";
                                     entry.HeartRate = rate;
-                                    await Command.Update(entry);
-                                    await Command.Update(user);
+                                    await Command.Database.Update(entry);
+                                    await Command.Database.Update(user);
 
-                                    await Command.Destroy(chat_id, message_id);
-                                    await Command.Send(
+                                    await Command.Message.Destroy(chat_id, message_id);
+                                    await Command.Message.Send(
                                         chat_id,
-                                        Reply.DiaryNewFrom(entry_uuid: entry.Uuid),
+                                        Reply.DiaryEntryForm(entry_uuid: entry.Uuid),
                                         user.MessageId
                                     );
                                 }
@@ -492,15 +492,15 @@ namespace Bot.code
                                 if (state == "solid" || state == "liquid")
                                 {
                                     entry.State = state;
-                                    await Command.Update(entry);
+                                    await Command.Database.Update(entry);
                                 }
 
                                 user.LastAction = "";
-                                await Command.Update(user);
-                                await Command.Destroy(chat_id, message_id);
-                                await Command.Send(
+                                await Command.Database.Update(user);
+                                await Command.Message.Destroy(chat_id, message_id);
+                                await Command.Message.Send(
                                     chat_id,
-                                    Reply.DiaryNewFrom(entry_uuid: entry.Uuid),
+                                    Reply.DiaryEntryForm(entry_uuid: entry.Uuid),
                                     user.MessageId
                                 );
                                 break;
@@ -514,13 +514,13 @@ namespace Bot.code
 
                                     user.LastAction = "";
                                     entry.Weight = intake_weight;
-                                    await Command.Update(entry);
-                                    await Command.Update(user);
+                                    await Command.Database.Update(entry);
+                                    await Command.Database.Update(user);
 
-                                    await Command.Destroy(chat_id, message_id);
-                                    await Command.Send(
+                                    await Command.Message.Destroy(chat_id, message_id);
+                                    await Command.Message.Send(
                                         chat_id,
-                                        Reply.DiaryNewFrom(entry_uuid: entry.Uuid),
+                                        Reply.DiaryEntryForm(entry_uuid: entry.Uuid),
                                         user.MessageId
                                     );
                                 }
@@ -542,13 +542,13 @@ namespace Bot.code
 
                                     user.LastAction = "";
                                     entry.CaloryAmount = calory;
-                                    await Command.Update(entry);
-                                    await Command.Update(user);
+                                    await Command.Database.Update(entry);
+                                    await Command.Database.Update(user);
 
-                                    await Command.Destroy(chat_id, message_id);
-                                    await Command.Send(
+                                    await Command.Message.Destroy(chat_id, message_id);
+                                    await Command.Message.Send(
                                         chat_id,
-                                        Reply.DiaryNewFrom(entry_uuid: entry.Uuid),
+                                        Reply.DiaryEntryForm(entry_uuid: entry.Uuid),
                                         user.MessageId
                                     );
                                 }
@@ -570,10 +570,10 @@ namespace Bot.code
                 chat_id = update.CallbackQuery.From.Id;
                 var user =
                     db.Users.FirstOrDefault(u => u.ChatId == chat_id)
-                    ?? Command.User_create(update, chat_id);
+                    ?? Command.Database.User_create(update, chat_id);
 
                 user.MessageId = update.CallbackQuery.Message.MessageId;
-                await Command.Update(user);
+                await Command.Database.Update(user);
 
                 string callback_data = update.CallbackQuery.Data ?? "";
 
