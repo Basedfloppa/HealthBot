@@ -18,12 +18,9 @@ namespace Bot.scripts
 
             InlineKeyboardMarkup keyboard = new[]
             {
-                InlineKeyboardButton.WithCallbackData(text: "Diary", callbackData: "To_Diary"),
-                InlineKeyboardButton.WithCallbackData(text: "Stats", callbackData: "To_Stats"),
-                InlineKeyboardButton.WithCallbackData(
-                    text: "Accoun data",
-                    callbackData: "To_Account"
-                ),
+                InlineKeyboardButton.WithCallbackData(text: "📓Diary📓", callbackData: "To_Diary"),
+                InlineKeyboardButton.WithCallbackData(text: "📈Stats📈", callbackData: "To_Stats"),
+                InlineKeyboardButton.WithCallbackData(text: "🧑Accoun🧑", callbackData: "To_Account"),
             };
 
             return (message.ToString(), keyboard);
@@ -40,10 +37,10 @@ namespace Bot.scripts
 
             InlineKeyboardMarkup keyboard = new[]
             {
-                InlineKeyboardButton.WithCallbackData(text: "Diary", callbackData: "To_Diary"),
-                InlineKeyboardButton.WithCallbackData(text: "Stats", callbackData: "To_Stats"),
-                InlineKeyboardButton.WithCallbackData(text: "Accoun data", callbackData: "To_Account"),
-                InlineKeyboardButton.WithCallbackData(text: "Admin", callbackData: "To_Admin")
+                InlineKeyboardButton.WithCallbackData(text: "📓Diary📓", callbackData: "To_Diary"),
+                InlineKeyboardButton.WithCallbackData(text: "📈Stats📈", callbackData: "To_Stats"),
+                InlineKeyboardButton.WithCallbackData(text: "🧑Accoun🧑", callbackData: "To_Account"),
+                InlineKeyboardButton.WithCallbackData(text: "🤖Admin🤖", callbackData: "To_Admin")
             };
 
             return (message.ToString(), keyboard);
@@ -58,7 +55,7 @@ namespace Bot.scripts
             {
                 InlineKeyboardButton.WithCallbackData(text: "Shutdown", callbackData: "Admin_Shutdown"),
                 InlineKeyboardButton.WithCallbackData(text: "NukeDB", callbackData: "Admin_NukeDb"),
-                InlineKeyboardButton.WithCallbackData(text: "Menu", callbackData: "To_Menu")
+                InlineKeyboardButton.WithCallbackData(text: "🧾Menu🧾", callbackData: "To_Menu")
             };
 
             return (message.ToString(), keyboard);
@@ -88,37 +85,22 @@ namespace Bot.scripts
             message.AppendLine($"Weight: {weight?.ToString() ?? "not set"}");
             message.AppendLine($"Height: {height?.ToString() ?? "not set"}");
             message.AppendLine($"Sex: {user.Sex?.ToString() ?? "not set"}");
-            message.AppendLine(
-                $"Subscription {(user.SubscriptionEnd == null ? Convert.ToDateTime(user.SubscriptionEnd - DateTime.Now).ToString("U") : "not started")}"
-            );
-            message.AppendLine(
-                $"Linked accounts: {(linked_accounts > 0 ? linked_accounts : "no linked accounts yet")}"
-            );
+            message.AppendLine($"Subscription {(user.SubscriptionEnd == null ? Convert.ToDateTime(user.SubscriptionEnd - DateTime.Now).ToString("U") : "not started")}");
+            message.AppendLine($"Linked accounts: {(linked_accounts > 0 ? linked_accounts : "no linked accounts yet")}");
             message.AppendLine($"{addition_text}");
 
             InlineKeyboardMarkup keyboard = new[]
             {
                 new[]
                 {
-                    InlineKeyboardButton.WithCallbackData(
-                        text: "Manage linked accounts",
-                        callbackData: "To_LinkedAccounts"
-                    ),
-                    InlineKeyboardButton.WithCallbackData(
-                        text: "Manage subscription",
-                        callbackData: "To_Subscriprion"
-                    )
+                    InlineKeyboardButton.WithCallbackData(text: "🤝Manage linked accounts🤝", callbackData: "To_LinkedAccounts"),
+                    InlineKeyboardButton.WithCallbackData( text: "💰Manage subscription💰", callbackData: "To_Subscriprion")
                 },
                 new[]
                 {
-                    InlineKeyboardButton.WithCallbackData(
-                        text: "Change info",
-                        callbackData: "To_AccountChange"
-                    ),
-                    InlineKeyboardButton.WithCallbackData(text: "Menu", callbackData: "To_Menu"),
-                    InlineKeyboardButton.WithCallbackData(
-                        text: "Export data",
-                        callbackData: "To_AccountExport"
+                    InlineKeyboardButton.WithCallbackData(text: "📝Change info📝", callbackData: "To_AccountChange"),
+                    InlineKeyboardButton.WithCallbackData(text: "🧾Menu🧾", callbackData: "To_Menu"),
+                    InlineKeyboardButton.WithCallbackData( text: "📦Export data📦", callbackData: "To_AccountExport"
                     )
                 }
             };
@@ -151,18 +133,12 @@ namespace Bot.scripts
             {
                 new[]
                 {
-                    InlineKeyboardButton.WithCallbackData(
-                        text: "Add account",
-                        callbackData: "Account_AddAccount"
-                    ),
-                    InlineKeyboardButton.WithCallbackData(
-                        text: "Remove account",
-                        callbackData: "Account_RemoveAccount"
-                    )
+                    InlineKeyboardButton.WithCallbackData(text: "✔️Add account✔️", callbackData: "Account_AddAccount"),
+                    InlineKeyboardButton.WithCallbackData(text: "❌Remove account❌", callbackData: "Account_RemoveAccount")
                 },
                 new[]
                 {
-                    InlineKeyboardButton.WithCallbackData(text: "Back", callbackData: "To_Account")
+                    InlineKeyboardButton.WithCallbackData(text: "🧑Accoun🧑", callbackData: "To_Account"),
                 }
             };
 
@@ -204,26 +180,14 @@ namespace Bot.scripts
             {
                 new[]
                 {
-                    InlineKeyboardButton.WithCallbackData(
-                        text: "Age",
-                        callbackData: "Account_Change_Age"
-                    ),
-                    InlineKeyboardButton.WithCallbackData(
-                        text: "Weight",
-                        callbackData: "Account_Change_Weight"
-                    ),
-                    InlineKeyboardButton.WithCallbackData(
-                        text: "Sex",
-                        callbackData: "Account_Change_Sex"
-                    ),
-                    InlineKeyboardButton.WithCallbackData(
-                        text: "Height",
-                        callbackData: "Account_Change_Height"
-                    )
+                    InlineKeyboardButton.WithCallbackData(text: "👶Age🧓", callbackData: "Account_Change_Age"),
+                    InlineKeyboardButton.WithCallbackData( text: "⚖️Weight⚖️", callbackData: "Account_Change_Weight"),
+                    InlineKeyboardButton.WithCallbackData(text: "♂️Sex♀️", callbackData: "Account_Change_Sex"),
+                    InlineKeyboardButton.WithCallbackData(text: "📏Height📏", callbackData: "Account_Change_Height")
                 },
                 new[]
                 {
-                    InlineKeyboardButton.WithCallbackData(text: "Back", callbackData: "To_Account")
+                   InlineKeyboardButton.WithCallbackData(text: "🧑Accoun🧑", callbackData: "To_Account"),
                 }
             };
 
@@ -241,10 +205,7 @@ namespace Bot.scripts
             {
                 new[]
                 {
-                    InlineKeyboardButton.WithCallbackData(
-                        text: "Cancel",
-                        callbackData: "To_Account"
-                    ),
+                    InlineKeyboardButton.WithCallbackData(text: "🧑Accoun🧑", callbackData: "To_Account"),
                 }
             };
 
@@ -263,10 +224,7 @@ namespace Bot.scripts
             {
                 new[]
                 {
-                    InlineKeyboardButton.WithCallbackData(
-                        text: "Cancel",
-                        callbackData: "To_Account"
-                    )
+                    InlineKeyboardButton.WithCallbackData(text: "🧑Accoun🧑", callbackData: "To_Account"),
                 },
                 new[]
                 {
@@ -293,18 +251,12 @@ namespace Bot.scripts
             {
                 new[]
                 {
-                    InlineKeyboardButton.WithCallbackData(text: "Menu", callbackData: "To_Menu")
+                    InlineKeyboardButton.WithCallbackData(text: "🧾Menu🧾", callbackData: "To_Menu")
                 },
                 new[]
                 {
-                    InlineKeyboardButton.WithCallbackData(
-                        text: "Calories by date",
-                        callbackData: $"Stats_CaloriesByDate{addition_tags}"
-                    ),
-                    InlineKeyboardButton.WithCallbackData(
-                        text: "Liquid by date",
-                        callbackData: $"Stats_LiquidByDate{addition_tags}"
-                    )
+                    InlineKeyboardButton.WithCallbackData(text: "Calories by date", callbackData: $"Stats_CaloriesByDate{addition_tags}"),
+                    InlineKeyboardButton.WithCallbackData(text: "Liquid by date", callbackData: $"Stats_LiquidByDate{addition_tags}")
                 }
             };
 
@@ -319,12 +271,9 @@ namespace Bot.scripts
 
             InlineKeyboardMarkup keyboard = new[]
             {
-                InlineKeyboardButton.WithCallbackData(text: "Menu", callbackData: "To_Menu"),
-                InlineKeyboardButton.WithCallbackData(text: "New entry", callbackData: "Diary_New"),
-                InlineKeyboardButton.WithCallbackData(
-                    text: "Search entrys",
-                    callbackData: "Diary_Search"
-                )
+                InlineKeyboardButton.WithCallbackData(text: "🧾Menu🧾", callbackData: "To_Menu"),
+                InlineKeyboardButton.WithCallbackData(text: "➕New entry➕", callbackData: "Diary_New"),
+                InlineKeyboardButton.WithCallbackData(text: "Search entrys", callbackData: "Diary_Search")
             };
 
             return (message.ToString(), keyboard);
@@ -340,29 +289,17 @@ namespace Bot.scripts
             {
                 new[]
                 {
-                    InlineKeyboardButton.WithCallbackData(
-                        text: "Blood pressure",
-                        callbackData: "Diary_Add_BloodPressure"
-                    ),
-                    InlineKeyboardButton.WithCallbackData(
-                        text: "Blood oxygen saturation",
-                        callbackData: "Diary_Add_BloodSaturation"
-                    )
+                    InlineKeyboardButton.WithCallbackData(text: "Blood pressure", callbackData: "Diary_Add_BloodPressure"),
+                    InlineKeyboardButton.WithCallbackData(text: "Blood oxygen saturation", callbackData: "Diary_Add_BloodSaturation")
                 },
                 new[]
                 {
-                    InlineKeyboardButton.WithCallbackData(
-                        text: "Heart rate",
-                        callbackData: "Diary_Add_HeartRate"
-                    ),
-                    InlineKeyboardButton.WithCallbackData(
-                        text: "Intake item",
-                        callbackData: "Diary_Add_Intake"
-                    )
+                    InlineKeyboardButton.WithCallbackData(text: "Heart rate", callbackData: "Diary_Add_HeartRate"),
+                    InlineKeyboardButton.WithCallbackData(text: "Intake item",callbackData: "Diary_Add_Intake")
                 },
                 new[]
                 {
-                    InlineKeyboardButton.WithCallbackData(text: "Back", callbackData: "To_Diary")
+                InlineKeyboardButton.WithCallbackData(text: "📓Diary📓", callbackData: "To_Diary"),
                 }
             };
 
