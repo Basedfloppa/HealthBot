@@ -47,8 +47,8 @@ namespace HealthBot.Migrations
                 {
                     uuid = table.Column<Guid>(type: "uuid", nullable: false),
                     author = table.Column<long>(type: "bigint", nullable: false),
-                    weight = table.Column<int>(type: "integer", nullable: true),
-                    height = table.Column<int>(type: "integer", nullable: true),
+                    weight = table.Column<float>(type: "real", nullable: true),
+                    height = table.Column<float>(type: "real", nullable: true),
                     created_at = table.Column<DateTime>(
                         type: "timestamp with time zone",
                         nullable: false
@@ -80,11 +80,11 @@ namespace HealthBot.Migrations
                     name = table.Column<string>(type: "text", nullable: true),
                     tags = table.Column<string>(type: "text", nullable: true),
                     type = table.Column<string>(type: "text", nullable: false),
-                    calory_amount = table.Column<int>(type: "integer", nullable: true),
+                    calory_amount = table.Column<float>(type: "real", nullable: true),
                     state = table.Column<string>(type: "text", nullable: true),
-                    weight = table.Column<int>(type: "integer", nullable: true),
-                    heart_rate = table.Column<int>(type: "integer", nullable: true),
-                    blood_saturation = table.Column<int>(type: "integer", nullable: true),
+                    weight = table.Column<float>(type: "real", nullable: true),
+                    heart_rate = table.Column<float>(type: "real", nullable: true),
+                    blood_saturation = table.Column<float>(type: "real", nullable: true),
                     blood_preassure = table.Column<string>(type: "text", nullable: true),
                     created_at = table.Column<DateTime>(
                         type: "timestamp with time zone",

@@ -1,6 +1,4 @@
-﻿using System.Data.Common;
-using Bot.code;
-using Bot.scripts;
+﻿using Bot.scripts;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace HealthBot.handlers

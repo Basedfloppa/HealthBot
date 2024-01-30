@@ -7,11 +7,7 @@ namespace Sql_Queries
 {
     public static class Query
     {
-        internal static double average_calories_by_date(
-            DateTime date_max,
-            DateTime date_min,
-            User user
-        )
+        internal static double average_calories_by_date(DateTime date_max, DateTime date_min, User user)
         {
             var db = new HealthBotContext();
             var calories_summ = 0.0;

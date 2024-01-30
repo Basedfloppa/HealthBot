@@ -9,7 +9,7 @@ namespace Bot.scripts
 {
     class Command
     {
-        public static ITelegramBotClient bot_client;
+        public static ITelegramBotClient? bot_client;
 
         public static void Initialize(ITelegramBotClient _bot_client)
         {
@@ -20,11 +20,11 @@ namespace Bot.scripts
         {
             Telegram.Bot.Types.User user = new Telegram.Bot.Types.User();
 
-            if (upd.Message != null)
+            if (upd != null && upd.Message != null )
             {
-                user = upd.Message.From; // cannot be null so no problem
+                user = upd.Message.From;
             }
-            if (upd.CallbackQuery != null)
+            else if (upd.CallbackQuery != null)
             {
                 user = upd.CallbackQuery.From;
             }
@@ -48,64 +48,111 @@ namespace Bot.scripts
 
         public static async Task Send(long chat_id, (string, InlineKeyboardMarkup) tuple)
         {
-            await bot_client.SendTextMessageAsync(
-                chatId: chat_id,
-                text: tuple.Item1,
-                replyMarkup: tuple.Item2
+            try
+            {
+                await bot_client.SendTextMessageAsync(
+                    chatId: chat_id,
+                    text: tuple.Item1,
+                    replyMarkup: tuple.Item2
             );
+            }
+            catch(Exception e)
+            {
+                Console.BackgroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Command.Send method encountered {e.Message} , chat_id: {chat_id}");
+                Console.ResetColor();
+            }
         }
 
-        public static async Task Send(
-            long chat_id,
-            (string, InlineKeyboardMarkup) tuple,
-            int message_id
-        )
+        public static async Task Send(long chat_id, (string, InlineKeyboardMarkup) tuple, int message_id )
         {
-            await bot_client.EditMessageTextAsync(
-                chatId: chat_id,
-                messageId: message_id,
-                text: tuple.Item1,
-                replyMarkup: tuple.Item2
-            );
+            try
+            {
+                await bot_client.EditMessageTextAsync(
+                    chatId: chat_id,
+                    messageId: message_id,
+                    text: tuple.Item1,
+                    replyMarkup: tuple.Item2
+                );
+            }
+            catch(Exception e)
+            {
+                Console.BackgroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Command.Send method encountered {e.Message} , chat_id: {chat_id} , message_id: {message_id}");
+                Console.ResetColor();
+            }
         }
 
-        public static async Task Send(
-            long chat_id,
-            (string, InlineKeyboardMarkup) tuple,
-            int message_id,
-            string path
-        )
+        public static async Task Send(long chat_id, (string, InlineKeyboardMarkup) tuple, int message_id, string path)
         {
-            await bot_client.EditMessageTextAsync(
-                chatId: chat_id,
-                messageId: message_id,
-                text: tuple.Item1,
-                replyMarkup: tuple.Item2
-            );
+            try
+            {
+                await bot_client.EditMessageTextAsync(
+                    chatId: chat_id,
+                    messageId: message_id,
+                    text: tuple.Item1,
+                    replyMarkup: tuple.Item2
+                );
+            }
+            catch(Exception e)
+            {
+                Console.BackgroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Command.Send method encountered {e.Message} , chat_id: {chat_id} , message_id: {message_id}");
+                Console.ResetColor();
+            }
 
             await using Stream stream = System.IO.File.OpenRead(path);
 
-            await bot_client.SendDocumentAsync(
+            try
+            {
+                await bot_client.SendDocumentAsync(
                 chatId: chat_id,
                 document: InputFile.FromStream(stream: stream, fileName: path.Split("/").Last())
-            );
+                );
+            }
+            catch (Exception ex)
+            {
+                Console.BackgroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Command.Send encountered: {ex.Message} , path: {path}");
+                Console.ResetColor();
+            }
         }
 
         public static async Task Destroy(long chat_id, int message_id)
         {
-            await bot_client.DeleteMessageAsync(chat_id, message_id);
+            try
+            {
+                await bot_client.DeleteMessageAsync(chat_id, message_id);
+            }
+            catch(Exception e)
+            {
+                Console.BackgroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Command.Destroy method encountered {e.Message} , chat_id: {chat_id} , message_id: {message_id}");
+                Console.ResetColor();
+            }
         }
 
-        public static async Task Update<T>(T entry)
-            where T : notnull, Generic
+        public static async Task Update<T>(T entry) where T : notnull, Generic
         {
             var db = new HealthBotContext();
 
             entry.UpdatedAt = DateTime.Now.ToUniversalTime();
 
-            db.Update(entry);
-            db.SaveChanges();
-            db.Dispose();
+            try
+            {
+                db.Update(entry);
+                await db.SaveChangesAsync();
+            }
+            catch(Exception e)
+            {
+                Console.BackgroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Command.Update method encountered {e.Message} , entry: {entry}");
+                Console.ResetColor();
+            }
+            finally
+            {
+                await db.DisposeAsync();
+            }
         }
     }
 }

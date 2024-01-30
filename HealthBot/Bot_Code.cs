@@ -1,4 +1,5 @@
-﻿using Bot.scripts;
+﻿using System.Globalization;
+using Bot.scripts;
 using Configuration;
 using HealthBot;
 using HealthBot.handlers;
@@ -35,11 +36,7 @@ namespace Bot.code
             Console.Read();
         }
 
-        public static async Task HandleUpdateAsync(
-            ITelegramBotClient botclient,
-            Update update,
-            CancellationToken cancellationToken
-        )
+        public static async Task HandleUpdateAsync(ITelegramBotClient botclient, Update update, CancellationToken cancellationToken)
         {
             HealthBotContext db = new();
             long chat_id;
@@ -49,8 +46,7 @@ namespace Bot.code
             {
                 var message = update.Message;
 
-                if (message.Text == null)
-                    return;
+                if (message.Text == null) return;
 
                 chat_id = message.Chat.Id;
                 message_id = message.MessageId;
@@ -68,6 +64,10 @@ namespace Bot.code
                     await Command.Destroy(chat_id, message_id);
                     await Command.Send(chat_id, tuple);
                 }
+                
+                Console.BackgroundColor = ConsoleColor.Green;
+                Console.WriteLine($"User: {user.Alias} , sent: {message.Text} , from: {chat_id}");
+                Console.ResetColor();
 
                 DateTime date_min;
                 DateTime date_max;
@@ -76,108 +76,159 @@ namespace Bot.code
 
                 switch (user.LastAction)
                 {
-                    case "CaloriesByDate": // TODO: add check for which date is earlier + parsing if dates are wrong
-                        date_min = Convert
-                            .ToDateTime(message.Text.Replace(" ", "").Split("-")[0])
-                            .ToUniversalTime();
-                        date_max = Convert
-                            .ToDateTime(message.Text.Replace(" ", "").Split("-")[1])
-                            .ToUniversalTime();
+                    case "CaloriesByDate":
+                        try
+                        {
+                            date_min = Convert
+                                .ToDateTime(message.Text.Replace(" ", "").Split("-")[0])
+                                .ToUniversalTime();
+                            date_max = Convert
+                                .ToDateTime(message.Text.Replace(" ", "").Split("-")[1])
+                                .ToUniversalTime();
 
-                        await Command.Destroy(chat_id, message_id);
-                        await Command.Send(
-                            chat_id,
-                            Reply.Stats(
-                                $"In given time span you consumed average of {Query.average_calories_by_date(date_min, date_max, user)} calories"
-                            ),
-                            user.MessageId
-                        );
+                            if (date_max.Subtract(date_min).TotalDays < 0) (date_min, date_max) = (date_max, date_min);
+
+                            await Command.Destroy(chat_id, message_id);
+                            await Command.Send(
+                                chat_id,
+                                Reply.Stats(
+                                    $"In given time span you consumed average of {Query.average_calories_by_date(date_min, date_max, user)} calories"
+                                ),
+                                user.MessageId
+                            );
+                        }
+                        catch (Exception e)
+                        {
+                            Console.BackgroundColor = ConsoleColor.Red;
+                            Console.WriteLine($"Date conversion method encountered {e.Message}");
+                            Console.ResetColor();
+                        }
                         break;
                     case "LiquidByDate":
-                        date_min = Convert
-                            .ToDateTime(message.Text.Replace(" ", "").Split("-")[0])
-                            .ToUniversalTime();
-                        date_max = Convert
-                            .ToDateTime(message.Text.Replace(" ", "").Split("-")[1])
-                            .ToUniversalTime();
+                        try
+                        {
+                            date_min = Convert
+                                    .ToDateTime(message.Text.Replace(" ", "").Split("-")[0])
+                                    .ToUniversalTime();
+                                date_max = Convert
+                                    .ToDateTime(message.Text.Replace(" ", "").Split("-")[1])
+                                    .ToUniversalTime();
 
-                        await Command.Destroy(chat_id, message_id);
-                        await Command.Send(
-                            chat_id,
-                            Reply.Stats(
-                                $"In given time span you consumed average of {Query.average_water_by_date(date_min, date_max, user)} ml of liquid"
-                            ),
-                            user.MessageId
-                        );
+                            if (date_max.Subtract(date_min).TotalDays < 0) (date_min, date_max) = (date_max, date_min);
+
+                            await Command.Destroy(chat_id, message_id);
+                            await Command.Send(
+                                chat_id,
+                                Reply.Stats(
+                                    $"In given time span you consumed average of {Query.average_water_by_date(date_min, date_max, user)} ml of liquid"
+                                ),
+                                user.MessageId
+                            );
+                        }
+                        catch (Exception e)
+                        {
+                            Console.BackgroundColor = ConsoleColor.Red;
+                            Console.WriteLine($"Date conversion method encountered {e.Message}");
+                            Console.ResetColor();
+                        }
                         break;
                     case "AccountChangeAge":
-                        user.Age = Convert.ToInt32(message.Text);
+                        try
+                        {
+                            user.Age = Convert.ToInt32(message.Text);
+                        }
+                        catch (Exception e)
+                        {
+                            Console.BackgroundColor = ConsoleColor.Red;
+                            Console.WriteLine($"Int conversion method encountered {e.Message} in AccountChangeAge");
+                            Console.ResetColor();
+                        }
 
                         await Command.Destroy(chat_id, message_id);
-                        await Command.Send(chat_id, Reply.Account(user), user.MessageId);
+                        await Command.Send(chat_id, Reply.AccountChange(user), user.MessageId);
 
                         user.LastAction = "";
                         await Command.Update(user);
                         break;
                     case "AccountChangeWeight":
-                        int weight = Convert.ToInt32(message.Text);
-                        biometry = db
+                        try
+                        {
+                            float weight = float.Parse(message.Text.Replace(",","."), CultureInfo.InvariantCulture);
+
+                            biometry = db
                             .Biometries.Where(b => b.Author == user.ChatId)
                             .OrderBy(b => b.CreatedAt)
                             .FirstOrDefault();
 
-                        if (biometry is not null && biometry.UpdatedAt.Date == DateTime.Today.Date)
-                        {
-                            biometry.Weight = weight;
-                            await Command.Update(biometry);
+                            if (biometry != null && biometry.UpdatedAt.Date == DateTime.Today.Date)
+                            {
+                                biometry.Weight = weight;
+                                await Command.Update(biometry);
+                            }
+                            else
+                            {
+                                db.Biometries.Add(
+                                    new Biometry() { Author = user.ChatId, Weight = weight }
+                                );
+                                await db.SaveChangesAsync();
+                                db.Dispose();
+                            }
+
+                            user.LastAction = "";
+
+                            await Command.Destroy(chat_id, message_id);
+                            await Command.Send(chat_id, Reply.AccountChange(user), user.MessageId);
+                            await Command.Update(user);
                         }
-                        else
+                        catch (Exception e)
                         {
-                            db.Biometries.Add(
-                                new Biometry() { Author = user.ChatId, Weight = weight }
-                            );
-                            await db.SaveChangesAsync();
-                            db.Dispose();
+                            Console.BackgroundColor = ConsoleColor.Red;
+                            Console.WriteLine($"Foat conversion method encountered {e.Message} in AccountChangeWeight");
+                            Console.ResetColor();
                         }
 
-                        user.LastAction = "";
-
-                        await Command.Destroy(chat_id, message_id);
-                        await Command.Send(chat_id, Reply.Account(user), user.MessageId);
-                        await Command.Update(user);
                         break;
                     case "AccountChangeHeight":
-                        int height = Convert.ToInt32(message.Text);
-                        biometry = db
-                            .Biometries.Where(b => b.Author == user.ChatId)
-                            .OrderBy(b => b.CreatedAt)
-                            .FirstOrDefault();
-
-                        if (biometry is not null && biometry.UpdatedAt.Date == DateTime.Today.Date)
+                        try
                         {
-                            biometry.Height = height;
-                            await Command.Update(biometry);
+                            float height = float.Parse(message.Text.Replace(",","."), CultureInfo.InvariantCulture);
+                            biometry = db
+                                .Biometries.Where(b => b.Author == user.ChatId)
+                                .OrderBy(b => b.CreatedAt)
+                                .FirstOrDefault();
+
+                            if (biometry != null && biometry.UpdatedAt.Date == DateTime.Today.Date)
+                            {
+                                biometry.Height = height;
+                                await Command.Update(biometry);
+                            }
+                            else
+                            {
+                                db.Biometries.Add(
+                                    new Biometry() { Author = user.ChatId, Height = height }
+                                );
+                                await db.SaveChangesAsync();
+                                db.Dispose();
+                            }
+
+                            user.LastAction = "";
+
+                            await Command.Destroy(chat_id, message_id);
+                            await Command.Send(chat_id, Reply.AccountChange(user), user.MessageId);
+                            await Command.Update(user);
                         }
-                        else
+                        catch (Exception e)
                         {
-                            db.Biometries.Add(
-                                new Biometry() { Author = user.ChatId, Height = height }
-                            );
-                            await db.SaveChangesAsync();
-                            db.Dispose();
+                            Console.BackgroundColor = ConsoleColor.Red;
+                            Console.WriteLine($"Foat conversion method encountered {e.Message} in AccountChangeHeight");
+                            Console.ResetColor();
                         }
-
-                        user.LastAction = "";
-
-                        await Command.Destroy(chat_id, message_id);
-                        await Command.Send(chat_id, Reply.Account(user), user.MessageId);
-                        await Command.Update(user);
                         break;
                     case "AccountChangeSex":
                         user.Sex = Convert.ToString(message.Text);
 
                         await Command.Destroy(chat_id, message_id);
-                        await Command.Send(chat_id, Reply.Account(user), user.MessageId);
+                        await Command.Send(chat_id, Reply.AccountChange(user), user.MessageId);
 
                         user.LastAction = "";
                         await Command.Update(user);
@@ -189,7 +240,7 @@ namespace Bot.code
                             )
                             .FirstOrDefault();
 
-                        if (observer is not null)
+                        if (observer != null)
                         {
                             user.Observers.Add(observer);
                             await Command.Send(chat_id, Reply.LinkedAccounts(user), user.MessageId);
@@ -217,7 +268,7 @@ namespace Bot.code
                             )
                             .FirstOrDefault();
 
-                        if (observer is not null)
+                        if (observer != null)
                         {
                             user.Observers.Remove(observer);
                             await Command.Send(chat_id, Reply.LinkedAccounts(user), user.MessageId);
@@ -252,7 +303,7 @@ namespace Bot.code
                             .FirstOrDefault();
 
                         if (
-                            last_export is not null
+                            last_export != null
                             && (last_export.CreatedAt - DateTime.Today).TotalDays < 14
                         )
                         {
@@ -331,22 +382,32 @@ namespace Bot.code
                                 );
                                 break;
                             case "DiaryFormDate":
-                                var date = Convert.ToDateTime(message.Text).ToUniversalTime();
-                                entry = db.DiaryEntrys.Find(
-                                    Guid.Parse(user.LastAction.Split('_')[1])
-                                );
+                                try
+                                {
+                                    var date = Convert.ToDateTime(message.Text).ToUniversalTime();
+                                    entry = db.DiaryEntrys.Find(
+                                        Guid.Parse(user.LastAction.Split('_')[1])
+                                    );
 
-                                user.LastAction = "";
-                                entry.CreatedAt = date;
-                                await Command.Update(entry);
-                                await Command.Update(user);
+                                    user.LastAction = "";
+                                    entry.CreatedAt = date;
+                                    await Command.Update(entry);
+                                    await Command.Update(user);
 
-                                await Command.Destroy(chat_id, message_id);
-                                await Command.Send(
-                                    chat_id,
-                                    Reply.DiaryNewFrom(entry_uuid: entry.Uuid),
-                                    user.MessageId
-                                );
+                                    await Command.Destroy(chat_id, message_id);
+                                    await Command.Send(
+                                        chat_id,
+                                        Reply.DiaryNewFrom(entry_uuid: entry.Uuid),
+                                        user.MessageId
+                                    );
+                                }
+                                catch (Exception e)
+                                {
+                                    Console.BackgroundColor = ConsoleColor.Red;
+                                    Console.WriteLine($"Date conversion method encountered {e.Message} in DiaryFormDate");
+                                    Console.ResetColor();
+                                }
+
                                 break;
                             case "DiaryFormPressure":
                                 var pressure = Convert.ToString(message.Text);
@@ -367,40 +428,60 @@ namespace Bot.code
                                 );
                                 break;
                             case "DiaryFormSaturation":
-                                var saturation = Convert.ToInt32(message.Text);
-                                entry = db.DiaryEntrys.Find(
-                                    Guid.Parse(user.LastAction.Split('_')[1])
-                                );
+                                try
+                                {
+                                    float saturation = float.Parse(message.Text.Replace(",","."), CultureInfo.InvariantCulture);
+                                    entry = db.DiaryEntrys.Find(
+                                        Guid.Parse(user.LastAction.Split('_')[1])
+                                    );
 
-                                user.LastAction = "";
-                                entry.BloodSaturation = saturation;
-                                await Command.Update(entry);
-                                await Command.Update(user);
+                                    user.LastAction = "";
+                                    entry.BloodSaturation = saturation;
+                                    await Command.Update(entry);
+                                    await Command.Update(user);
 
-                                await Command.Destroy(chat_id, message_id);
-                                await Command.Send(
-                                    chat_id,
-                                    Reply.DiaryNewFrom(entry_uuid: entry.Uuid),
-                                    user.MessageId
-                                );
+                                    await Command.Destroy(chat_id, message_id);
+                                    await Command.Send(
+                                        chat_id,
+                                        Reply.DiaryNewFrom(entry_uuid: entry.Uuid),
+                                        user.MessageId
+                                    );
+                                }
+                                catch (Exception e)
+                                {
+                                    Console.BackgroundColor = ConsoleColor.Red;
+                                    Console.WriteLine($"Float conversion method encountered {e.Message} in DiaryFormSaturation");
+                                    Console.ResetColor();
+                                }
+                                
                                 break;
                             case "DiaryFormRate":
-                                var rate = Convert.ToInt32(message.Text);
-                                entry = db.DiaryEntrys.Find(
-                                    Guid.Parse(user.LastAction.Split('_')[1])
-                                );
+                                try
+                                {
+                                    float rate = float.Parse(message.Text.Replace(",","."), CultureInfo.InvariantCulture);
+                                    entry = db.DiaryEntrys.Find(
+                                        Guid.Parse(user.LastAction.Split('_')[1])
+                                    );
 
-                                user.LastAction = "";
-                                entry.HeartRate = rate;
-                                await Command.Update(entry);
-                                await Command.Update(user);
+                                    user.LastAction = "";
+                                    entry.HeartRate = rate;
+                                    await Command.Update(entry);
+                                    await Command.Update(user);
 
-                                await Command.Destroy(chat_id, message_id);
-                                await Command.Send(
-                                    chat_id,
-                                    Reply.DiaryNewFrom(entry_uuid: entry.Uuid),
-                                    user.MessageId
-                                );
+                                    await Command.Destroy(chat_id, message_id);
+                                    await Command.Send(
+                                        chat_id,
+                                        Reply.DiaryNewFrom(entry_uuid: entry.Uuid),
+                                        user.MessageId
+                                    );
+                                }
+                                catch (Exception e)
+                                {
+                                    Console.BackgroundColor = ConsoleColor.Red;
+                                    Console.WriteLine($"Float conversion method encountered {e.Message} in DiaryFormSaturation");
+                                    Console.ResetColor();
+                                }
+                                
                                 break;
                             case "DiaryFormIntakeState":
                                 var state = Convert.ToString(message.Text);
@@ -424,40 +505,60 @@ namespace Bot.code
                                 );
                                 break;
                             case "DiaryFormIntakeWeight":
-                                var intake_weight = Convert.ToInt32(message.Text);
-                                entry = db.DiaryEntrys.Find(
-                                    Guid.Parse(user.LastAction.Split('_')[1])
-                                );
+                                try
+                                {
+                                    float intake_weight = float.Parse(message.Text.Replace(",","."), CultureInfo.InvariantCulture);
+                                    entry = db.DiaryEntrys.Find(
+                                        Guid.Parse(user.LastAction.Split('_')[1])
+                                    );
 
-                                user.LastAction = "";
-                                entry.Weight = intake_weight;
-                                await Command.Update(entry);
-                                await Command.Update(user);
+                                    user.LastAction = "";
+                                    entry.Weight = intake_weight;
+                                    await Command.Update(entry);
+                                    await Command.Update(user);
 
-                                await Command.Destroy(chat_id, message_id);
-                                await Command.Send(
-                                    chat_id,
-                                    Reply.DiaryNewFrom(entry_uuid: entry.Uuid),
-                                    user.MessageId
-                                );
+                                    await Command.Destroy(chat_id, message_id);
+                                    await Command.Send(
+                                        chat_id,
+                                        Reply.DiaryNewFrom(entry_uuid: entry.Uuid),
+                                        user.MessageId
+                                    );
+                                }
+                                catch (Exception e)
+                                {
+                                    Console.BackgroundColor = ConsoleColor.Red;
+                                    Console.WriteLine($"Float conversion method encountered {e.Message} in DiaryFormIntakeWeight");
+                                    Console.ResetColor();
+                                }
+
                                 break;
                             case "DiaryFormIntakeCalory":
-                                var calory = Convert.ToInt32(message.Text);
-                                entry = db.DiaryEntrys.Find(
-                                    Guid.Parse(user.LastAction.Split('_')[1])
-                                );
+                                try
+                                {
+                                    float calory = float.Parse(message.Text.Replace(",","."), CultureInfo.InvariantCulture);
+                                    entry = db.DiaryEntrys.Find(
+                                        Guid.Parse(user.LastAction.Split('_')[1])
+                                    );
 
-                                user.LastAction = "";
-                                entry.CaloryAmount = calory;
-                                await Command.Update(entry);
-                                await Command.Update(user);
+                                    user.LastAction = "";
+                                    entry.CaloryAmount = calory;
+                                    await Command.Update(entry);
+                                    await Command.Update(user);
 
-                                await Command.Destroy(chat_id, message_id);
-                                await Command.Send(
-                                    chat_id,
-                                    Reply.DiaryNewFrom(entry_uuid: entry.Uuid),
-                                    user.MessageId
-                                );
+                                    await Command.Destroy(chat_id, message_id);
+                                    await Command.Send(
+                                        chat_id,
+                                        Reply.DiaryNewFrom(entry_uuid: entry.Uuid),
+                                        user.MessageId
+                                    );
+                                }
+                                catch (Exception e)
+                                {
+                                    Console.BackgroundColor = ConsoleColor.Red;
+                                    Console.WriteLine($"Float conversion method encountered {e.Message} in DiaryFormIntakeWeight");
+                                    Console.ResetColor();
+                                }
+
                                 break;
                         }
                         break;
@@ -475,6 +576,10 @@ namespace Bot.code
                 await Command.Update(user);
 
                 string callback_data = update.CallbackQuery.Data ?? "";
+
+                Console.BackgroundColor = ConsoleColor.Green;
+                Console.WriteLine($"User: {user.Alias} , pressed button: {callback_data} , from: {chat_id}");
+                Console.ResetColor();
 
                 switch (callback_data.Split('_')[0])
                 {
@@ -495,11 +600,7 @@ namespace Bot.code
             db.Dispose();
         }
 
-        public static async Task HandleErrorAsync(
-            ITelegramBotClient botclient,
-            Exception exception,
-            CancellationToken cancellationToken
-        )
+        public static async Task HandleErrorAsync( ITelegramBotClient botclient, Exception exception, CancellationToken cancellationToken)
         {
             Console.BackgroundColor = ConsoleColor.Red;
             Console.Write("\n\n" + exception.ToString() + "\n\n");

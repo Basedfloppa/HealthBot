@@ -6,9 +6,9 @@ public partial class Biometry : Generic
 
     public long Author { get; set; }
 
-    public int? Weight { get; set; }
+    public float? Weight { get; set; }
 
-    public int? Height { get; set; }
+    public float? Height { get; set; }
 
     public virtual User AuthorNavigation { get; set; } = null!;
 }

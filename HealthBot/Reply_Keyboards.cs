@@ -1,7 +1,5 @@
 ﻿using System.Text;
 using HealthBot;
-using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
-using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 using User = HealthBot.User;
 
@@ -93,10 +91,7 @@ namespace Bot.scripts
             return (message.ToString(), keyboard);
         }
 
-        public static (string, InlineKeyboardMarkup) LinkedAccounts(
-            User user,
-            string addition_text = ""
-        )
+        public static (string, InlineKeyboardMarkup) LinkedAccounts(User user, string addition_text = "")
         {
             var db = new HealthBotContext();
             var observers = db.Users.Find(user.ChatId)?.Observers;
@@ -139,10 +134,7 @@ namespace Bot.scripts
             return (message.ToString(), keyboard);
         }
 
-        public static (string, InlineKeyboardMarkup) AccountChange(
-            User user,
-            string addition_text = ""
-        )
+        public static (string, InlineKeyboardMarkup) AccountChange(User user, string addition_text = "")
         {
             var db = new HealthBotContext();
             var height = db
@@ -224,10 +216,7 @@ namespace Bot.scripts
             return (message.ToString(), keyboard);
         }
 
-        public static (string, InlineKeyboardMarkup) AccountSubsctuption(
-            User user,
-            string addition_text = ""
-        )
+        public static (string, InlineKeyboardMarkup) AccountSubsctuption(User user, string addition_text = "")
         {
             StringBuilder message = new StringBuilder();
             message.AppendLine(
@@ -259,10 +248,7 @@ namespace Bot.scripts
             return (message.ToString(), keyboard);
         }
 
-        public static (string, InlineKeyboardMarkup) Stats(
-            string addition_text = "",
-            string addition_tags = ""
-        )
+        public static (string, InlineKeyboardMarkup) Stats(string addition_text = "", string addition_tags = "")
         {
             StringBuilder message = new StringBuilder();
             message.AppendLine("What statistic info you want to see?");
@@ -348,10 +334,7 @@ namespace Bot.scripts
             return (message.ToString(), keyboard);
         }
 
-        public static (string, InlineKeyboardMarkup) DiaryNewFrom(
-            string addition_text = "",
-            Guid entry_uuid = new Guid()
-        )
+        public static (string, InlineKeyboardMarkup) DiaryNewFrom(string addition_text = "", Guid entry_uuid = new Guid())
         {
             StringBuilder message = new StringBuilder();
             InlineKeyboardMarkup keyboard;
@@ -578,11 +561,7 @@ namespace Bot.scripts
             return (message.ToString(), keyboard);
         }
 
-        public static (string, InlineKeyboardMarkup) DiarySearch(
-            long chat_id,
-            string addition_text = "",
-            int page = 0
-        )
+        public static (string, InlineKeyboardMarkup) DiarySearch(long chat_id, string addition_text = "", int page = 0)
         {
             StringBuilder message = new StringBuilder();
             message.AppendLine($"Entrys:");
