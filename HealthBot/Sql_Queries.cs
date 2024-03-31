@@ -7,10 +7,9 @@ namespace Sql_Queries
 {
     public static class Query
     {
-        internal static double average_calories_by_date(DateTime date_max, DateTime date_min, User user)
+        internal static IEnumerable<Diaryentry> average_calories_by_date(DateTime date_max, DateTime date_min, User user)
         {
             var db = new HealthBotContext();
-            var calories_summ = 0.0;
             var entrys = db.DiaryEntrys.Where(e =>
                 e.Author == user.ChatId
                 && (
@@ -20,20 +19,21 @@ namespace Sql_Queries
                 && e.State == "solid"
             );
 
-            foreach (var entry in entrys)
-                calories_summ += entry.CaloryAmount.GetValueOrDefault(0);
+            return entrys;
 
-            return calories_summ / entrys.Count();
+
+            //  var calories_summ = 0.0;
+            /*
+                foreach (var entry in entrys)
+                    calories_summ += entry.CaloryAmount.GetValueOrDefault(0);
+
+                return calories_summ / entrys.Count();
+            */
         }
 
-        internal static double average_water_by_date(
-            DateTime date_max,
-            DateTime date_min,
-            User user
-        )
+        internal static IEnumerable<Diaryentry> average_water_by_date(DateTime date_max, DateTime date_min, User user)
         {
             var db = new HealthBotContext();
-            var calories_summ = 0.0;
             var entrys = db.DiaryEntrys.Where(e =>
                 e.Author == user.ChatId
                 && (
@@ -43,10 +43,13 @@ namespace Sql_Queries
                 && e.State == "liquid"
             );
 
+            return entrys;
+            // var calories_summ = 0.0;
+            /*
             foreach (var entry in entrys)
                 calories_summ += entry.CaloryAmount.GetValueOrDefault(0);
 
-            return calories_summ / entrys.Count();
+            return calories_summ / entrys.Count(); */
         }
 
         internal static List<Diaryentry> items_by_name(string name, User user)
