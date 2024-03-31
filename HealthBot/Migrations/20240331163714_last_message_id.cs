@@ -1,7 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
 
-#nullable disable
-
 namespace HealthBot.Migrations
 {
     public partial class Last_Message_Id : Migration
