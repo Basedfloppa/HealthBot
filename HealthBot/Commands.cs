@@ -4,6 +4,7 @@ using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 using User = HealthBot.User;
+using ScottPlot;
 
 namespace Bot.scripts
 {
@@ -155,6 +156,39 @@ namespace Bot.scripts
                 finally
                 {
                     await db.DisposeAsync();
+                }
+            }
+
+            public static async Task<string> Graphics(long chat_id, int message_id, List<Diaryentry> entrys)
+            {
+                try
+                {
+                    // Получаем даты и значения из entrys
+                    List<DateTime> dates = entrys.Select(entry => entry.CreatedAt).ToList();
+                    List<double> values = new List<double>(); // Ваш код для получения значений из entrys
+
+                    // Создаем новый график
+                    var plt = new ScottPlot.Plot();
+
+                    // Добавляем данные на график
+                    double[] timestamps = dates.Select(date => date.ToOADate()).ToArray();
+                    plt.PlotScatter(timestamps, values.ToArray());
+
+                    // Устанавливаем метки и формат даты на горизонтальной оси
+                    plt.XTicks(timestamps, dates.Select(date => date.ToString("dd.MM.yyyy")).ToArray());
+                    plt.XAxis.TickLabelStyle(rotation: 45);
+                    plt.XAxis.SetSizeLimit(min: 50);
+
+                    // Сохраняем график как SVG
+                    string filepath = "line.png";
+                    plt.SaveFig(filepath);
+
+                    return filepath;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error during graphic operation: {ex.Message}");
+                    throw;
                 }
             }
         }
