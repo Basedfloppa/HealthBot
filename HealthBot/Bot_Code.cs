@@ -92,7 +92,7 @@ namespace Bot.code
                             await Command.Message.Send(
                                 chat_id,
                                 Reply.Stats(
-                                    $"In given time span you consumed average of {Query.average_calories_by_date(date_min, date_max, user)} calories"
+                                    $"In given time span you consumed average of {Query.calories_by_date(date_min, date_max, user)} calories"
                                 ),
                                 user.MessageId
                             );
@@ -120,7 +120,7 @@ namespace Bot.code
                             await Command.Message.Send(
                                 chat_id,
                                 Reply.Stats(
-                                    $"In given time span you consumed average of {Query.average_water_by_date(date_min, date_max, user)} ml of liquid"
+                                    $"In given time span you consumed average of {Query.water_by_date(date_min, date_max, user)} ml of liquid"
                                 ),
                                 user.MessageId
                             );

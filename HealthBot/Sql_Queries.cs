@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System.ComponentModel;
+using System.Data;
 using System.Text.Json;
 using HealthBot;
 using User = HealthBot.User;
@@ -7,7 +8,7 @@ namespace Sql_Queries
 {
     public static class Query
     {
-        internal static IEnumerable<Diaryentry> average_calories_by_date(DateTime date_max, DateTime date_min, User user)
+        internal static (List<DateTime>, List<Double>) calories_by_date(DateTime date_max, DateTime date_min, User user)
         {
             var db = new HealthBotContext();
             var entrys = db.DiaryEntrys.Where(e =>
@@ -19,19 +20,12 @@ namespace Sql_Queries
                 && e.State == "solid"
             );
 
-            return entrys;
-
-
-            //  var calories_summ = 0.0;
-            /*
-                foreach (var entry in entrys)
-                    calories_summ += entry.CaloryAmount.GetValueOrDefault(0);
-
-                return calories_summ / entrys.Count();
-            */
+            List<DateTime> dates = (from e in entrys select e.UpdatedAt).ToList();
+            List<Double> values = (from e in entrys select Convert.ToDouble(e.CaloryAmount)).ToList();
+            return (dates,values);
         }
 
-        internal static IEnumerable<Diaryentry> average_water_by_date(DateTime date_max, DateTime date_min, User user)
+        internal static (List<DateTime>, List<Double>) water_by_date(DateTime date_max, DateTime date_min, User user)
         {
             var db = new HealthBotContext();
             var entrys = db.DiaryEntrys.Where(e =>
@@ -43,13 +37,9 @@ namespace Sql_Queries
                 && e.State == "liquid"
             );
 
-            return entrys;
-            // var calories_summ = 0.0;
-            /*
-            foreach (var entry in entrys)
-                calories_summ += entry.CaloryAmount.GetValueOrDefault(0);
-
-            return calories_summ / entrys.Count(); */
+            List<DateTime> dates = (from e in entrys select e.UpdatedAt).ToList();
+            List<Double> values = (from e in entrys select Convert.ToDouble(e.CaloryAmount)).ToList();
+            return (dates,values);
         }
 
         internal static List<Diaryentry> items_by_name(string name, User user)
