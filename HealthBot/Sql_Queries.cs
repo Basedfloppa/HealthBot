@@ -7,7 +7,7 @@ namespace Sql_Queries
 {
     public static class Query
     {
-        internal static IEnumerable<Diaryentry> average_calories_by_date(DateTime date_max, DateTime date_min, User user)
+        internal static List<Diaryentry> average_calories_by_date(DateTime date_max, DateTime date_min, User user)
         {
             var db = new HealthBotContext();
             var entrys = db.DiaryEntrys.Where(e =>
@@ -17,9 +17,10 @@ namespace Sql_Queries
                     || DateTime.Compare(e.UpdatedAt, date_max) == 1
                 )
                 && e.State == "solid"
-            );
+            ).ToList();
 
             return entrys;
+        
 
 
             //  var calories_summ = 0.0;
@@ -31,7 +32,7 @@ namespace Sql_Queries
             */
         }
 
-        internal static IEnumerable<Diaryentry> average_water_by_date(DateTime date_max, DateTime date_min, User user)
+        internal static List<Diaryentry> average_water_by_date(DateTime date_max, DateTime date_min, User user)
         {
             var db = new HealthBotContext();
             var entrys = db.DiaryEntrys.Where(e =>
@@ -41,9 +42,11 @@ namespace Sql_Queries
                     || DateTime.Compare(e.UpdatedAt, date_max) == 1
                 )
                 && e.State == "liquid"
-            );
+            ).ToList();
 
             return entrys;
+
+
             // var calories_summ = 0.0;
             /*
             foreach (var entry in entrys)

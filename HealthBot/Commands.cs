@@ -164,8 +164,8 @@ namespace Bot.scripts
                 try
                 {
                     // Получаем даты и значения из entrys
-                    List<DateTime> dates = entrys.Select(entry => entry.CreatedAt).ToList();
-                    List<double> values = new List<double>(); // Ваш код для получения значений из entrys
+                    List<DateTime> dates = entrys.Select(entry => entry.UpdatedAt).ToList();
+                    List<double> values = entrys.Select(entry => (double)entry.CaloryAmount.GetValueOrDefault(0)).ToList();
 
                     // Создаем новый график
                     var plt = new ScottPlot.Plot();
