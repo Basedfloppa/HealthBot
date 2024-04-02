@@ -159,36 +159,31 @@ namespace Bot.scripts
                 }
             }
 
-            public static async Task<string> Graphics(long chat_id, int message_id, List<Diaryentry> entrys)
+            public static async Task<string> Generate_graphics(List<DateTime> dates, List<Double> values, string name)
             {
                 try
                 {
-                    // Получаем даты и значения из entrys
-                    List<DateTime> dates = entrys.Select(entry => entry.UpdatedAt).ToList();
-                    List<double> values = entrys.Select(entry => (double)entry.CaloryAmount.GetValueOrDefault(0)).ToList();
-
-                    // Создаем новый график
                     var plt = new ScottPlot.Plot();
 
-                    // Добавляем данные на график
                     double[] timestamps = dates.Select(date => date.ToOADate()).ToArray();
-                    plt.PlotScatter(timestamps, values.ToArray());
+                    plt.PlotScatter(timestamps, values.ToArray()); // adding data to chart
 
-                    // Устанавливаем метки и формат даты на горизонтальной оси
                     plt.XTicks(timestamps, dates.Select(date => date.ToString("dd.MM.yyyy")).ToArray());
                     plt.XAxis.TickLabelStyle(rotation: 45);
                     plt.XAxis.SetSizeLimit(min: 50);
 
-                    // Сохраняем график как SVG
-                    string filepath = "line.png";
+                    string filepath = "line.svg";
                     plt.SaveFig(filepath);
 
                     return filepath;
                 }
-                catch (Exception ex)
+                catch(Exception e)
                 {
-                    Console.WriteLine($"Error during graphic operation: {ex.Message}");
-                    throw;
+                    Console.BackgroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"Command.Generate_graphics method encountered {e.Message} , values: {values}, dates: {dates}, name: {name}");
+                    Console.ResetColor();
+
+                    return "";
                 }
             }
         }
