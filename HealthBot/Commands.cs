@@ -82,6 +82,20 @@ namespace Bot.scripts
                     chatId: chat_id,
                     document: InputFile.FromStream(stream: stream, fileName: path.Split("/").Last())
                     );
+                    
+                }
+                catch (Exception ex)
+                {
+                    Console.BackgroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"Command.Send encountered: {ex.Message} , path: {path}");
+                    Console.ResetColor();
+                }
+                try
+                {
+                    await bot_client.SendPhotoAsync(
+                    chatId: chat_id,
+                    photo: InputFile.FromStream(stream: stream, fileName: path.Split("/").Last())
+                    );
                 }
                 catch (Exception ex)
                 {
@@ -172,7 +186,7 @@ namespace Bot.scripts
                     plt.XAxis.TickLabelStyle(rotation: 45);
                     plt.XAxis.SetSizeLimit(min: 50);
 
-                    string filepath = "line.svg";
+                    string filepath = "line.png";
                     plt.SaveFig(filepath);
 
                     return filepath;

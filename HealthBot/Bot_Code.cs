@@ -79,30 +79,36 @@ namespace Bot.code
                     case "CaloriesByDate":
                         try
                         {
-                            date_min = Convert
-                                .ToDateTime(message.Text.Replace(" ", "").Split("-")[0])
-                                .ToUniversalTime();
-                            date_max = Convert
-                                .ToDateTime(message.Text.Replace(" ", "").Split("-")[1])
-                                .ToUniversalTime();
+                            date_min = Convert.ToDateTime(message.Text.Replace(" ", "").Split("-")[0]).ToUniversalTime();
+                            date_max = Convert.ToDateTime(message.Text.Replace(" ", "").Split("-")[1]).ToUniversalTime();
 
                             if (date_max.Subtract(date_min).TotalDays < 0) (date_min, date_max) = (date_max, date_min);
 
-                            await Command.Message.Destroy(chat_id, message_id);
-                            await Command.Message.Send(
-                                chat_id,
-                                Reply.Stats(
-                                    $"In given time span you consumed average of {Query.calories_by_date(date_min, date_max, user)} calories"
-                                ),
-                                user.MessageId
-                            );
-                        }
+                            var (dates, values) = Sql_Queries.Query.calories_by_date(date_max, date_min, user);
+
+                            string graphicsFilePath = await Command.Database.Generate_graphics(dates, values, "Calories");
+
+                            if (!string.IsNullOrEmpty(graphicsFilePath))
+                            {
+                                await Command.Message.Destroy(chat_id, message_id);
+                                using (var fileStream = File.OpenRead(graphicsFilePath))
+                                {
+                                    await Command.Message.Send(chat_id, ("Your caption here", null), user.MessageId, graphicsFilePath);
+                                }
+                                File.Delete(graphicsFilePath);
+                            }
+                            else
+                            {
+                                await Command.Message.Send(chat_id, ("Failed to generate graphics.", null), user.MessageId);
+                            }
+                
+                        } 
                         catch (Exception e)
                         {
                             Console.BackgroundColor = ConsoleColor.Red;
                             Console.WriteLine($"Date conversion method encountered {e.Message}");
                             Console.ResetColor();
-                        }
+                        } 
                         break;
                     case "LiquidByDate":
                         try
