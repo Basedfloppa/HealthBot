@@ -76,8 +76,14 @@ namespace Bot.scripts
 
                 await using Stream stream = System.IO.File.OpenRead(path);
 
+                
+
                 try
                 {
+                    if (System.IO.File.Exists(path))
+                    {
+                        System.IO.File.Delete(path);
+                    }
                     await bot_client.SendDocumentAsync(
                     chatId: chat_id,
                     document: InputFile.FromStream(stream: stream, fileName: path.Split("/").Last())
@@ -92,6 +98,10 @@ namespace Bot.scripts
                 }
                 try
                 {
+                    if (System.IO.File.Exists(path))
+                    {
+                        System.IO.File.Delete(path);
+                    }
                     await bot_client.SendPhotoAsync(
                     chatId: chat_id,
                     photo: InputFile.FromStream(stream: stream, fileName: path.Split("/").Last())
