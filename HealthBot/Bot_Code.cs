@@ -93,7 +93,7 @@ namespace Bot.code
                                 await Command.Message.Destroy(chat_id, message_id);
                                 using (var fileStream = System.IO.File.OpenRead(graphicsFilePath))
                                 {
-                                    await Command.Message.Send(chat_id, ("Your caption here", null), user.MessageId, graphicsFilePath);
+                                    await Command.Message.Send(chat_id, Reply.Stats("Your caption here") , user.MessageId, graphicsFilePath);
                                 }
                                 System.IO.File.Delete(graphicsFilePath);
                             }
@@ -131,7 +131,7 @@ namespace Bot.code
                                 await Command.Message.Destroy(chat_id, message_id);
                                 using (var fileStream = System.IO.File.OpenRead(graphicsFilePath))
                                 {
-                                    await Command.Message.Send(chat_id, ("Your caption here", null), user.MessageId, graphicsFilePath);
+                                    await Command.Message.Send(chat_id, Reply.Stats("Your caption here"), user.MessageId, graphicsFilePath);
                                 }
                                 System.IO.File.Delete(graphicsFilePath);
                             }

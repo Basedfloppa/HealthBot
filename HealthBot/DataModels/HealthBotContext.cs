@@ -20,6 +20,7 @@ public partial class HealthBotContext : DbContext
     public virtual DbSet<User> Users { get; set; }
 
     public virtual DbSet<Admin> Admins { get; set; }
+    public virtual DbSet<Graph> Graph { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) =>
         optionsBuilder.UseNpgsql("Host=db;Database=healthbot;Username=postgres;Password=postgres");
@@ -166,6 +167,17 @@ public partial class HealthBotContext : DbContext
             entity.HasKey(e => e.Uuid).HasName("Admin_pkey");
 
             entity.ToTable("admin");
+
+            entity.Property(e => e.Uuid).ValueGeneratedNever().HasColumnName("uuid");
+            entity.Property(e => e.User).HasColumnName("user");
+            entity.Property(e => e.Level).HasColumnName("level");
+        });
+
+        modelBuilder.Entity<Graph>(entity =>
+        {
+            entity.HasKey(e => e.Uuid).HasName("Graph_pkey");
+
+            entity.ToTable("graph");
 
             entity.Property(e => e.Uuid).ValueGeneratedNever().HasColumnName("uuid");
             entity.Property(e => e.User).HasColumnName("user");
