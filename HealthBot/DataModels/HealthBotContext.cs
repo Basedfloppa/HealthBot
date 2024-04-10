@@ -163,7 +163,7 @@ public partial class HealthBotContext : DbContext
 
         modelBuilder.Entity<Admin>(entity =>
         {
-            entity.HasKey(e => e.Uuid).HasName("Admin_pley");
+            entity.HasKey(e => e.Uuid).HasName("Admin_pkey");
 
             entity.ToTable("admin");
 
