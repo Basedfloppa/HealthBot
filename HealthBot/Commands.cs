@@ -57,7 +57,9 @@ namespace Bot.scripts
             }
 
             public static async Task Send(long chat_id, (string, InlineKeyboardMarkup) tuple, int message_id, string path)
-            {
+            {      
+                await using Stream stream = System.IO.File.OpenRead(path);
+
                 try
                 {
                     await bot_client.EditMessageTextAsync(
@@ -74,38 +76,21 @@ namespace Bot.scripts
                     Console.ResetColor();
                 }
 
-                await using Stream stream = System.IO.File.OpenRead(path);
-
-                
-
                 try
                 {
-                    if (System.IO.File.Exists(path))
-                    {
-                        System.IO.File.Delete(path);
-                    }
+                    await bot_client.SendPhotoAsync(
+                    chatId: chat_id,
+                    photo: InputFile.FromStream(stream: stream, fileName: path.Split("/").Last())
+                    );
                     await bot_client.SendDocumentAsync(
                     chatId: chat_id,
                     document: InputFile.FromStream(stream: stream, fileName: path.Split("/").Last())
                     );
                     
-                }
-                catch (Exception ex)
-                {
-                    Console.BackgroundColor = ConsoleColor.Red;
-                    Console.WriteLine($"Command.Send encountered: {ex.Message} , path: {path}");
-                    Console.ResetColor();
-                }
-                try
-                {
                     if (System.IO.File.Exists(path))
                     {
                         System.IO.File.Delete(path);
                     }
-                    await bot_client.SendPhotoAsync(
-                    chatId: chat_id,
-                    photo: InputFile.FromStream(stream: stream, fileName: path.Split("/").Last())
-                    );
                 }
                 catch (Exception ex)
                 {
@@ -182,7 +167,6 @@ namespace Bot.scripts
                     await db.DisposeAsync();
                 }
             }
-
             public static async Task<string> Generate_graphics(List<DateTime> dates, List<Double> values, string name)
             {
                 try
