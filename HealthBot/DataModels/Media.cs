@@ -3,12 +3,12 @@ using System.Collections.Generic;
 
 namespace HealthBot;
 
-public partial class Graph: Generic
+public partial class Media: Generic
 {
     public Guid Uuid { get; set; }
 
-    public long User { get; set; }
+    public long ChatId { get; set; }
 
-    public int Level { get; set; }
+    public int MessageId { get; set; }
 
 }
