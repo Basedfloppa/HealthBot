@@ -14,8 +14,8 @@ namespace Sql_Queries
             var entrys = db.DiaryEntrys.Where(e =>
                 e.Author == user.ChatId
                 && (
-                    DateTime.Compare(e.UpdatedAt, date.min) == 0
-                    || DateTime.Compare(e.UpdatedAt, date.max) == 1
+                    DateTime.Compare(e.UpdatedAt, date.max) <= 0
+                    || DateTime.Compare(e.UpdatedAt, date.min) >= 0
                 )
                 && e.State == "solid"
             ).ToList();
@@ -31,8 +31,8 @@ namespace Sql_Queries
             var entrys = db.DiaryEntrys.Where(e =>
                 e.Author == user.ChatId
                 && (
-                    DateTime.Compare(e.UpdatedAt, date.min) == 0
-                    || DateTime.Compare(e.UpdatedAt, date.max) == 1
+                    DateTime.Compare(e.UpdatedAt, date.max) <= 0
+                    || DateTime.Compare(e.UpdatedAt, date.min) >= 0
                 )
                 && e.State == "liquid"
             ).ToList();

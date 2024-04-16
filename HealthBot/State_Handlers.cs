@@ -402,8 +402,6 @@ namespace HealthBot.handlers
         }
         public static async Task Admin_State_Handler(User user, string callback_data)
         {
-            (string, InlineKeyboardMarkup) tuple;
-
             switch(callback_data.Split('_')[1])
             {
                 case "NukeDb":
@@ -444,6 +442,9 @@ namespace HealthBot.handlers
                 case "Shutdown":
                     Environment.Exit(0);
                     break;
+                case "SeedData":
+                    await Command.Database.Seed();
+                    break;                
             }
         }
     }

@@ -6,6 +6,7 @@ using Telegram.Bot.Types.ReplyMarkups;
 using User = HealthBot.User;
 using ScottPlot;
 using System.Data.Common;
+using Configuration;
 
 namespace Bot.scripts
 {
@@ -84,11 +85,6 @@ namespace Bot.scripts
                         db.Media.Add(media);
                         await db.SaveChangesAsync();
                     }
-
-                    if (System.IO.File.Exists(path))
-                    {
-                        System.IO.File.Delete(path);
-                    }
                 }
                 catch (Exception ex)
                 {
@@ -114,6 +110,9 @@ namespace Bot.scripts
             {
                 var db = new HealthBotContext();
                 var media = db.Media.Where(x => x.ChatId == chat_id);
+                foreach (var entry in media){
+                    Destroy(entry.ChatId, entry.MessageId);
+                }
                 db.RemoveRange(media);
                 await db.SaveChangesAsync();
             }
@@ -201,6 +200,29 @@ namespace Bot.scripts
                     await Help.Warn($"Command.Generate_graphics method encountered {e.Message} , values: {values}, dates: {dates}, name: {name}");
                 }
                 return filepath;
+            }
+            public static async Task Seed()
+            {
+                var db = new HealthBotContext();
+
+                for(int i = 0; i < 10; i++)
+                {
+                    var entry_solid = new Diaryentry{ Uuid = Guid.NewGuid(),
+                                                    Author = Config.admin_alias, 
+                                                    CaloryAmount = Faker.RandomNumber.Next(1, 200), 
+                                                    State = "solid", 
+                                                    Weight = Faker.RandomNumber.Next(1,200), 
+                                                    Type = "IntakeItem"};
+                    db.Add(entry_solid);
+                    var entry_liquid = new Diaryentry{ Uuid = Guid.NewGuid(),
+                                                     Author = Config.admin_alias, 
+                                                     CaloryAmount = Faker.RandomNumber.Next(1, 200), 
+                                                     State = "liquid", 
+                                                     Weight = Faker.RandomNumber.Next(1,200), 
+                                                     Type = "IntakeItem"};
+                    db.Add(entry_solid);
+                }
+                await db.SaveChangesAsync();
             }
         }
         public static class Help

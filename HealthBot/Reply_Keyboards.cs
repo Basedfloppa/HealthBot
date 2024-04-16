@@ -54,6 +54,7 @@ namespace Bot.scripts
             InlineKeyboardMarkup keyboard = new[]
             {
                 InlineKeyboardButton.WithCallbackData(text: "Shutdown", callbackData: "Admin_Shutdown"),
+                InlineKeyboardButton.WithCallbackData(text: "SeedData", callbackData: "Admin_SeedData"),
                 InlineKeyboardButton.WithCallbackData(text: "NukeDB", callbackData: "Admin_NukeDb"),
                 InlineKeyboardButton.WithCallbackData(text: "🧾Menu🧾", callbackData: "To_Menu")
             };

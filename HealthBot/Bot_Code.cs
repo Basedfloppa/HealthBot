@@ -20,7 +20,6 @@ namespace Bot.code
         public static void Main()
         {
             var db = new HealthBotContext();
-            db.Database.EnsureDeleted();
             db.Database.EnsureCreated();
             db.Dispose();
 
