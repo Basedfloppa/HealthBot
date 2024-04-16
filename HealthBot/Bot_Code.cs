@@ -65,12 +65,8 @@ namespace Bot.code
                     await Command.Message.Send(chat_id, tuple);
                 }
                 
-                Console.BackgroundColor = ConsoleColor.Green;
-                Console.WriteLine($"User: {user.Alias} , sent: {message.Text} , from: {chat_id}");
-                Console.ResetColor();
+                await Command.Help.Info($"User: {user.Alias} , sent: {message.Text} , from: {chat_id}");
 
-                DateTime date_min;
-                DateTime date_max;
                 Biometry? biometry;
                 HealthBot.User? observer;
 
@@ -79,12 +75,7 @@ namespace Bot.code
                     case "CaloriesByDate":
                         try
                         {
-                            date_min = Convert.ToDateTime(message.Text.Replace(" ", "").Split("-")[0]).ToUniversalTime();
-                            date_max = Convert.ToDateTime(message.Text.Replace(" ", "").Split("-")[1]).ToUniversalTime();
-
-                            if (date_max.Subtract(date_min).TotalDays < 0) (date_min, date_max) = (date_max, date_min);
-
-                            var (dates, values) = Sql_Queries.Query.calories_by_date(date_max, date_min, user);
+                            var (dates, values) = Sql_Queries.Query.calories_by_date(Command.Help.ParseDates(message.Text), user);
 
                             string graphicsFilePath = await Command.Database.Generate_graphics(dates, values, "Calories");
 
@@ -105,24 +96,13 @@ namespace Bot.code
                         } 
                         catch (Exception e)
                         {
-                            Console.BackgroundColor = ConsoleColor.Red;
-                            Console.WriteLine($"Date conversion method encountered {e.Message}");
-                            Console.ResetColor();
+                            await Command.Help.Warn($"Date conversion method encountered {e.Message}");
                         } 
                         break;
                     case "LiquidByDate":
                         try
                         {
-                            date_min = Convert
-                                    .ToDateTime(message.Text.Replace(" ", "").Split("-")[0])
-                                    .ToUniversalTime();
-                            date_max = Convert
-                                    .ToDateTime(message.Text.Replace(" ", "").Split("-")[1])
-                                    .ToUniversalTime();
-
-                            if (date_max.Subtract(date_min).TotalDays < 0) (date_min, date_max) = (date_max, date_min);
-
-                            var (dates, values) = Sql_Queries.Query.water_by_date(date_min, date_max, user);
+                            var (dates, values) = Sql_Queries.Query.calories_by_date(Command.Help.ParseDates(message.Text), user);
 
                             string graphicsFilePath = await Command.Database.Generate_graphics(dates, values, "Liquid");
 
@@ -142,9 +122,7 @@ namespace Bot.code
                         }
                         catch (Exception e)
                         {
-                            Console.BackgroundColor = ConsoleColor.Red;
-                            Console.WriteLine($"Date conversion method encountered {e.Message}");
-                            Console.ResetColor();
+                            await Command.Help.Warn($"Date conversion method encountered {e.Message}");
                         }
                         break;
                     case "AccountChangeAge":
@@ -154,9 +132,7 @@ namespace Bot.code
                         }
                         catch (Exception e)
                         {
-                            Console.BackgroundColor = ConsoleColor.Red;
-                            Console.WriteLine($"Int conversion method encountered {e.Message} in AccountChangeAge");
-                            Console.ResetColor();
+                            await Command.Help.Warn($"Int conversion method encountered {e.Message} in AccountChangeAge");
                         }
 
                         await Command.Message.Destroy(chat_id, message_id);
@@ -197,9 +173,7 @@ namespace Bot.code
                         }
                         catch (Exception e)
                         {
-                            Console.BackgroundColor = ConsoleColor.Red;
-                            Console.WriteLine($"Foat conversion method encountered {e.Message} in AccountChangeWeight");
-                            Console.ResetColor();
+                            await Command.Help.Warn($"Foat conversion method encountered {e.Message} in AccountChangeWeight");
                         }
 
                         break;
@@ -234,9 +208,7 @@ namespace Bot.code
                         }
                         catch (Exception e)
                         {
-                            Console.BackgroundColor = ConsoleColor.Red;
-                            Console.WriteLine($"Foat conversion method encountered {e.Message} in AccountChangeHeight");
-                            Console.ResetColor();
+                            await Command.Help.Warn($"Foat conversion method encountered {e.Message} in AccountChangeHeight");
                         }
                         break;
                     case "AccountChangeSex":
@@ -418,9 +390,7 @@ namespace Bot.code
                                 }
                                 catch (Exception e)
                                 {
-                                    Console.BackgroundColor = ConsoleColor.Red;
-                                    Console.WriteLine($"Date conversion method encountered {e.Message} in DiaryFormDate");
-                                    Console.ResetColor();
+                                    await Command.Help.Warn($"Date conversion method encountered {e.Message} in DiaryFormDate");
                                 }
 
                                 break;
@@ -464,9 +434,7 @@ namespace Bot.code
                                 }
                                 catch (Exception e)
                                 {
-                                    Console.BackgroundColor = ConsoleColor.Red;
-                                    Console.WriteLine($"Float conversion method encountered {e.Message} in DiaryFormSaturation");
-                                    Console.ResetColor();
+                                    await Command.Help.Warn($"Float conversion method encountered {e.Message} in DiaryFormSaturation");
                                 }
                                 
                                 break;
@@ -492,9 +460,7 @@ namespace Bot.code
                                 }
                                 catch (Exception e)
                                 {
-                                    Console.BackgroundColor = ConsoleColor.Red;
-                                    Console.WriteLine($"Float conversion method encountered {e.Message} in DiaryFormSaturation");
-                                    Console.ResetColor();
+                                    await Command.Help.Warn($"Float conversion method encountered {e.Message} in DiaryFormSaturation");
                                 }
                                 
                                 break;
@@ -541,9 +507,7 @@ namespace Bot.code
                                 }
                                 catch (Exception e)
                                 {
-                                    Console.BackgroundColor = ConsoleColor.Red;
-                                    Console.WriteLine($"Float conversion method encountered {e.Message} in DiaryFormIntakeWeight");
-                                    Console.ResetColor();
+                                    await Command.Help.Warn($"Float conversion method encountered {e.Message} in DiaryFormIntakeWeight");
                                 }
 
                                 break;
@@ -569,9 +533,7 @@ namespace Bot.code
                                 }
                                 catch (Exception e)
                                 {
-                                    Console.BackgroundColor = ConsoleColor.Red;
-                                    Console.WriteLine($"Float conversion method encountered {e.Message} in DiaryFormIntakeWeight");
-                                    Console.ResetColor();
+                                    await Command.Help.Warn($"Float conversion method encountered {e.Message} in DiaryFormIntakeWeight");
                                 }
 
                                 break;
@@ -600,12 +562,14 @@ namespace Bot.code
                 {
                     case "To":
                         await State_Handlers.To_State_Handler(user, callback_data);
+                        await Command.Message.ClearMedia(user.ChatId);
                         break;
                     case "Account":
                         await State_Handlers.Account_State_Handler(user, callback_data);
                         break;
                     case "Stats":
                         await State_Handlers.Stats_State_Handler(user, callback_data);
+                        await Command.Message.ClearMedia(user.ChatId);
                         break;
                     case "Diary":
                         await State_Handlers.Diary_State_Handler(user, callback_data);
@@ -620,9 +584,7 @@ namespace Bot.code
 
         public static async Task HandleErrorAsync( ITelegramBotClient botclient, Exception exception, CancellationToken cancellationToken)
         {
-            Console.BackgroundColor = ConsoleColor.Red;
-            Console.Write("\n\n" + exception.ToString() + "\n\n");
-            Console.ResetColor();
-        } // exeption handling
+            await Command.Help.Warn(exception.ToString());
+        }
     }
 }

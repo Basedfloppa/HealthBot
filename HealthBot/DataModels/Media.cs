@@ -5,7 +5,7 @@ namespace HealthBot;
 
 public partial class Media: Generic
 {
-    public Guid Uuid { get; set; }
+    public Guid Uuid { get; set; } = new Guid();
 
     public long ChatId { get; set; }
 

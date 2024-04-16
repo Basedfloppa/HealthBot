@@ -8,14 +8,14 @@ namespace Sql_Queries
 {
     public static class Query
     {
-        internal static (List<DateTime>, List<Double>) calories_by_date(DateTime date_max, DateTime date_min, User user)
+        internal static (List<DateTime>, List<Double>) calories_by_date((DateTime max, DateTime min) date,  User user)
         {
             var db = new HealthBotContext();
             var entrys = db.DiaryEntrys.Where(e =>
                 e.Author == user.ChatId
                 && (
-                    DateTime.Compare(e.UpdatedAt, date_min) == 0
-                    || DateTime.Compare(e.UpdatedAt, date_max) == 1
+                    DateTime.Compare(e.UpdatedAt, date.min) == 0
+                    || DateTime.Compare(e.UpdatedAt, date.max) == 1
                 )
                 && e.State == "solid"
             ).ToList();
@@ -25,14 +25,14 @@ namespace Sql_Queries
             return (dates,values);
         }
 
-        internal static (List<DateTime>, List<Double>) water_by_date(DateTime date_max, DateTime date_min, User user)
+        internal static (List<DateTime>, List<Double>) water_by_date((DateTime max, DateTime min) date, User user)
         {
             var db = new HealthBotContext();
             var entrys = db.DiaryEntrys.Where(e =>
                 e.Author == user.ChatId
                 && (
-                    DateTime.Compare(e.UpdatedAt, date_min) == 0
-                    || DateTime.Compare(e.UpdatedAt, date_max) == 1
+                    DateTime.Compare(e.UpdatedAt, date.min) == 0
+                    || DateTime.Compare(e.UpdatedAt, date.max) == 1
                 )
                 && e.State == "liquid"
             ).ToList();

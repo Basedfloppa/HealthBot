@@ -20,7 +20,7 @@ namespace Bot.scripts
             {
                 InlineKeyboardButton.WithCallbackData(text: "📓Diary📓", callbackData: "To_Diary"),
                 InlineKeyboardButton.WithCallbackData(text: "📈Stats📈", callbackData: "To_Stats"),
-                InlineKeyboardButton.WithCallbackData(text: "🧑Accoun🧑", callbackData: "To_Account"),
+                InlineKeyboardButton.WithCallbackData(text: "🧑Account🧑", callbackData: "To_Account"),
             };
 
             return (message.ToString(), keyboard);
@@ -39,7 +39,7 @@ namespace Bot.scripts
             {
                 InlineKeyboardButton.WithCallbackData(text: "📓Diary📓", callbackData: "To_Diary"),
                 InlineKeyboardButton.WithCallbackData(text: "📈Stats📈", callbackData: "To_Stats"),
-                InlineKeyboardButton.WithCallbackData(text: "🧑Accoun🧑", callbackData: "To_Account"),
+                InlineKeyboardButton.WithCallbackData(text: "🧑Account🧑", callbackData: "To_Account"),
                 InlineKeyboardButton.WithCallbackData(text: "🤖Admin🤖", callbackData: "To_Admin")
             };
 
