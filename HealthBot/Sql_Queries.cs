@@ -18,7 +18,7 @@ namespace Sql_Queries
                     || DateTime.Compare(e.UpdatedAt, date.min) >= 0
                 )
                 && e.State == "solid"
-            ).ToList();
+            ).OrderBy(x => x.UpdatedAt).ToList();
 
             List<DateTime> dates = (from e in entrys select e.UpdatedAt).ToList();
             List<Double> values = (from e in entrys select Convert.ToDouble(e.CaloryAmount)).ToList();

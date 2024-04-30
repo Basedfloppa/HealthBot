@@ -212,15 +212,19 @@ namespace Bot.scripts
                                                     CaloryAmount = Faker.RandomNumber.Next(1, 200), 
                                                     State = "solid", 
                                                     Weight = Faker.RandomNumber.Next(1,200), 
-                                                    Type = "IntakeItem"};
+                                                    Type = "IntakeItem",
+                                                    CreatedAt = DateTime.Now.AddDays(-i).ToUniversalTime(),
+                                                    UpdatedAt = DateTime.Now.AddDays(-i).ToUniversalTime()};
                     db.Add(entry_solid);
                     var entry_liquid = new Diaryentry{ Uuid = Guid.NewGuid(),
                                                      Author = Config.admin_alias, 
                                                      CaloryAmount = Faker.RandomNumber.Next(1, 200), 
                                                      State = "liquid", 
                                                      Weight = Faker.RandomNumber.Next(1,200), 
-                                                     Type = "IntakeItem"};
-                    db.Add(entry_solid);
+                                                     Type = "IntakeItem",
+                                                     CreatedAt = DateTime.Now.AddDays(-i).ToUniversalTime(),
+                                                     UpdatedAt = DateTime.Now.AddDays(-i).ToUniversalTime()};
+                    db.Add(entry_liquid);
                 }
                 await db.SaveChangesAsync();
             }
