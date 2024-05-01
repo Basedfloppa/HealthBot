@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System.ComponentModel;
+using System.Data;
 using System.Text.Json;
 using HealthBot;
 using User = HealthBot.User;
@@ -7,46 +8,38 @@ namespace Sql_Queries
 {
     public static class Query
     {
-        internal static double average_calories_by_date(DateTime date_max, DateTime date_min, User user)
+        internal static (List<DateTime>, List<Double>) calories_by_date((DateTime max, DateTime min) date,  User user)
         {
             var db = new HealthBotContext();
-            var calories_summ = 0.0;
             var entrys = db.DiaryEntrys.Where(e =>
                 e.Author == user.ChatId
                 && (
-                    DateTime.Compare(e.UpdatedAt, date_min) == 0
-                    || DateTime.Compare(e.UpdatedAt, date_max) == 1
+                    DateTime.Compare(e.UpdatedAt, date.max) <= 0
+                    || DateTime.Compare(e.UpdatedAt, date.min) >= 0
                 )
                 && e.State == "solid"
-            );
+            ).OrderBy(x => x.UpdatedAt).ToList();
 
-            foreach (var entry in entrys)
-                calories_summ += entry.CaloryAmount.GetValueOrDefault(0);
-
-            return calories_summ / entrys.Count();
+            List<DateTime> dates = (from e in entrys select e.UpdatedAt).ToList();
+            List<Double> values = (from e in entrys select Convert.ToDouble(e.CaloryAmount)).ToList();
+            return (dates,values);
         }
 
-        internal static double average_water_by_date(
-            DateTime date_max,
-            DateTime date_min,
-            User user
-        )
+        internal static (List<DateTime>, List<Double>) water_by_date((DateTime max, DateTime min) date, User user)
         {
             var db = new HealthBotContext();
-            var calories_summ = 0.0;
             var entrys = db.DiaryEntrys.Where(e =>
                 e.Author == user.ChatId
                 && (
-                    DateTime.Compare(e.UpdatedAt, date_min) == 0
-                    || DateTime.Compare(e.UpdatedAt, date_max) == 1
+                    DateTime.Compare(e.UpdatedAt, date.max) <= 0
+                    || DateTime.Compare(e.UpdatedAt, date.min) >= 0
                 )
                 && e.State == "liquid"
-            );
+            ).ToList();
 
-            foreach (var entry in entrys)
-                calories_summ += entry.CaloryAmount.GetValueOrDefault(0);
-
-            return calories_summ / entrys.Count();
+            List<DateTime> dates = (from e in entrys select e.UpdatedAt).ToList();
+            List<Double> values = (from e in entrys select Convert.ToDouble(e.CaloryAmount)).ToList();
+            return (dates,values);
         }
 
         internal static List<Diaryentry> items_by_name(string name, User user)

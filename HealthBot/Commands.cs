@@ -4,6 +4,9 @@ using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 using User = HealthBot.User;
+using ScottPlot;
+using System.Data.Common;
+using Configuration;
 
 namespace Bot.scripts
 {
@@ -30,9 +33,7 @@ namespace Bot.scripts
                 }
                 catch(Exception e)
                 {
-                    Console.BackgroundColor = ConsoleColor.Red;
-                    Console.WriteLine($"Command.Send method encountered {e.Message} , chat_id: {chat_id}");
-                    Console.ResetColor();
+                    await Help.Warn($"Command.Send method encountered {e.Message} , chat_id: {chat_id}");
                 }
             }
 
@@ -49,14 +50,47 @@ namespace Bot.scripts
                 }
                 catch(Exception e)
                 {
-                    Console.BackgroundColor = ConsoleColor.Red;
-                    Console.WriteLine($"Command.Send method encountered {e.Message} , chat_id: {chat_id} , message_id: {message_id}");
-                    Console.ResetColor();
+                    await Help.Warn($"Command.Send method encountered {e.Message} , chat_id: {chat_id} , message_id: {message_id}");
                 }
             }
 
             public static async Task Send(long chat_id, (string, InlineKeyboardMarkup) tuple, int message_id, string path)
-            {
+            {      
+                await using Stream stream = System.IO.File.OpenRead(path);
+
+                try
+                {
+                    var type = path.Split('.').Last();
+                    Telegram.Bot.Types.Message msg = new();
+                    var db = new HealthBotContext();
+                    var media = new Media();
+
+                    if ( type == "png" ) {
+                        msg = await bot_client.SendPhotoAsync(
+                        chatId: chat_id,
+                        photo: InputFile.FromStream(stream: stream, fileName: path.Split("/").Last())
+                        );
+                        media.MessageId = msg.MessageId;
+                        media.ChatId = chat_id;
+                        db.Media.Add(media);
+                        await db.SaveChangesAsync();
+                    }
+                    else if ( type == "json" ) {
+                        msg = await bot_client.SendDocumentAsync(
+                        chatId: chat_id,
+                        document: InputFile.FromStream(stream: stream, fileName: path.Split("/").Last())
+                        );
+                        media.MessageId = msg.MessageId;
+                        media.ChatId = chat_id;
+                        db.Media.Add(media);
+                        await db.SaveChangesAsync();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    await Help.Warn($"Command.Send encountered: {ex.Message} , path: {path}");
+                }
+
                 try
                 {
                     await bot_client.EditMessageTextAsync(
@@ -68,26 +102,19 @@ namespace Bot.scripts
                 }
                 catch(Exception e)
                 {
-                    Console.BackgroundColor = ConsoleColor.Red;
-                    Console.WriteLine($"Command.Send method encountered {e.Message} , chat_id: {chat_id} , message_id: {message_id}");
-                    Console.ResetColor();
+                    await Help.Warn($"Command.Send method encountered {e.Message} , chat_id: {chat_id} , message_id: {message_id}");
                 }
+            }
 
-                await using Stream stream = System.IO.File.OpenRead(path);
-
-                try
-                {
-                    await bot_client.SendDocumentAsync(
-                    chatId: chat_id,
-                    document: InputFile.FromStream(stream: stream, fileName: path.Split("/").Last())
-                    );
+            public static async Task ClearMedia(long chat_id)
+            {
+                var db = new HealthBotContext();
+                var media = db.Media.Where(x => x.ChatId == chat_id);
+                foreach (var entry in media){
+                    Destroy(entry.ChatId, entry.MessageId);
                 }
-                catch (Exception ex)
-                {
-                    Console.BackgroundColor = ConsoleColor.Red;
-                    Console.WriteLine($"Command.Send encountered: {ex.Message} , path: {path}");
-                    Console.ResetColor();
-                }
+                db.RemoveRange(media);
+                await db.SaveChangesAsync();
             }
 
             public static async Task Destroy(long chat_id, int message_id)
@@ -98,9 +125,7 @@ namespace Bot.scripts
                 }
                 catch(Exception e)
                 {
-                    Console.BackgroundColor = ConsoleColor.Red;
-                    Console.WriteLine($"Command.Destroy method encountered {e.Message} , chat_id: {chat_id} , message_id: {message_id}");
-                    Console.ResetColor();
+                    await Help.Warn($"Command.Destroy method encountered {e.Message} , chat_id: {chat_id} , message_id: {message_id}");
                 }
             }
         }
@@ -148,14 +173,102 @@ namespace Bot.scripts
                 }
                 catch(Exception e)
                 {
-                    Console.BackgroundColor = ConsoleColor.Red;
-                    Console.WriteLine($"Command.Update method encountered {e.Message} , entry: {entry}");
-                    Console.ResetColor();
+                    await Help.Warn($"Command.Update method encountered {e.Message} , entry: {entry}");
                 }
-                finally
+            }
+            public static async Task<string> Generate_graphics(List<DateTime> dates, List<Double> values, string name)
+            {
+                string filepath = string.Empty;
+                try
                 {
-                    await db.DisposeAsync();
+                    var plt = new ScottPlot.Plot();
+
+                    double[] timestamps = dates.Select(date => date.ToOADate()).ToArray();
+                    plt.PlotScatter(timestamps, values.ToArray()); // adding data to chart
+
+                    plt.XTicks(timestamps, dates.Select(date => date.ToString("dd.MM.yyyy")).ToArray());
+                    plt.XAxis.TickLabelStyle(rotation: 45);
+                    plt.XAxis.SetSizeLimit(min: 50);
+
+                    filepath = "line.png";
+                    plt.SaveFig(filepath);
+
+                    
                 }
+                catch(Exception e)
+                {
+                    await Help.Warn($"Command.Generate_graphics method encountered {e.Message} , values: {values}, dates: {dates}, name: {name}");
+                }
+                return filepath;
+            }
+            public static async Task Seed()
+            {
+                var db = new HealthBotContext();
+
+                for(int i = 0; i < 10; i++)
+                {
+                    var entry_solid = new Diaryentry{ Uuid = Guid.NewGuid(),
+                                                    Author = Config.admin_alias, 
+                                                    CaloryAmount = Faker.RandomNumber.Next(1, 200), 
+                                                    State = "solid", 
+                                                    Weight = Faker.RandomNumber.Next(1,200), 
+                                                    Type = "IntakeItem",
+                                                    CreatedAt = DateTime.Now.AddDays(-i).ToUniversalTime(),
+                                                    UpdatedAt = DateTime.Now.AddDays(-i).ToUniversalTime()};
+                    db.Add(entry_solid);
+                    var entry_liquid = new Diaryentry{ Uuid = Guid.NewGuid(),
+                                                     Author = Config.admin_alias, 
+                                                     CaloryAmount = Faker.RandomNumber.Next(1, 200), 
+                                                     State = "liquid", 
+                                                     Weight = Faker.RandomNumber.Next(1,200), 
+                                                     Type = "IntakeItem",
+                                                     CreatedAt = DateTime.Now.AddDays(-i).ToUniversalTime(),
+                                                     UpdatedAt = DateTime.Now.AddDays(-i).ToUniversalTime()};
+                    db.Add(entry_liquid);
+                }
+                await db.SaveChangesAsync();
+            }
+        }
+        public static class Help
+        {
+            public static Task Warn(string message)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.Write(message);
+                Console.ResetColor();
+                Console.Write("\n");
+
+                return Task.CompletedTask;
+            }
+
+            public static Task Info(string message)
+            {
+                Console.ForegroundColor = ConsoleColor.Blue;
+                Console.Write(message);
+                Console.ResetColor();
+                Console.Write("\n");
+
+                return Task.CompletedTask;
+            }
+
+            public static Task Success(string message)
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.Write(message);
+                Console.ResetColor();
+                Console.Write("\n");
+
+                return Task.CompletedTask;
+            }
+
+            public static (DateTime max, DateTime min) ParseDates(string input)
+            {
+                var date_min = Convert.ToDateTime(input.Replace(" ", "").Split("-")[0]).ToUniversalTime();
+                var date_max = Convert.ToDateTime(input.Replace(" ", "").Split("-")[1]).ToUniversalTime();
+
+                if (date_max.Subtract(date_min).TotalDays < 0) (date_min, date_max) = (date_max, date_min);
+
+                return (date_max, date_min);
             }
         }
     }

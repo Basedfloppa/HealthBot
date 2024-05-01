@@ -20,6 +20,7 @@ public partial class HealthBotContext : DbContext
     public virtual DbSet<User> Users { get; set; }
 
     public virtual DbSet<Admin> Admins { get; set; }
+    public virtual DbSet<Media> Media { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) =>
         optionsBuilder.UseNpgsql("Host=db;Database=healthbot;Username=postgres;Password=postgres");
@@ -163,13 +164,24 @@ public partial class HealthBotContext : DbContext
 
         modelBuilder.Entity<Admin>(entity =>
         {
-            entity.HasKey(e => e.Uuid).HasName("Admin_pley");
+            entity.HasKey(e => e.Uuid).HasName("Admin_pkey");
 
             entity.ToTable("admin");
 
             entity.Property(e => e.Uuid).ValueGeneratedNever().HasColumnName("uuid");
             entity.Property(e => e.User).HasColumnName("user");
             entity.Property(e => e.Level).HasColumnName("level");
+        });
+
+        modelBuilder.Entity<Media>(entity =>
+        {
+            entity.HasKey(e => e.Uuid).HasName("Media_pkey");
+
+            entity.ToTable("media");
+
+            entity.Property(e => e.Uuid).ValueGeneratedNever().HasColumnName("uuid");
+            entity.Property(e => e.ChatId).HasColumnName("chat_id");
+            entity.Property(e => e.MessageId).HasColumnName("message_id");
         });
 
         OnModelCreatingPartial(modelBuilder);

@@ -65,7 +65,6 @@ namespace HealthBot.handlers
                     break;
             }
         }
-
         public static async Task Account_State_Handler(User user, string callback_data)
         {
             (string, InlineKeyboardMarkup) tuple;
@@ -94,7 +93,6 @@ namespace HealthBot.handlers
                     break;
             }
         }
-
         public static async Task Account_Change_State_Handler(User user, string callback_data)
         {
             (string, InlineKeyboardMarkup) tuple;
@@ -135,7 +133,6 @@ namespace HealthBot.handlers
                     break;
             }
         }
-
         public static async Task Stats_State_Handler(User user, string callback_data)
         {
             (string, InlineKeyboardMarkup) tuple;
@@ -164,7 +161,6 @@ namespace HealthBot.handlers
                     break;
             }
         }
-
         public static async Task Diary_State_Handler(User user, string callback_data)
         {
             (string, InlineKeyboardMarkup) tuple;
@@ -199,7 +195,6 @@ namespace HealthBot.handlers
                     break;
             }
         }
-
         public static async Task Diary_Add_State_Handler(User user, string callback_data)
         {
             HealthBotContext db = new HealthBotContext();
@@ -287,7 +282,6 @@ namespace HealthBot.handlers
                     break;
             }
         }
-
         public static async Task Diary_Form_State_Handler(User user, string callback_data)
         {
             (string, InlineKeyboardMarkup) tuple;
@@ -408,8 +402,6 @@ namespace HealthBot.handlers
         }
         public static async Task Admin_State_Handler(User user, string callback_data)
         {
-            (string, InlineKeyboardMarkup) tuple;
-
             switch(callback_data.Split('_')[1])
             {
                 case "NukeDb":
@@ -450,6 +442,9 @@ namespace HealthBot.handlers
                 case "Shutdown":
                     Environment.Exit(0);
                     break;
+                case "SeedData":
+                    await Command.Database.Seed();
+                    break;                
             }
         }
     }

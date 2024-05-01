@@ -20,7 +20,7 @@ namespace Bot.scripts
             {
                 InlineKeyboardButton.WithCallbackData(text: "📓Diary📓", callbackData: "To_Diary"),
                 InlineKeyboardButton.WithCallbackData(text: "📈Stats📈", callbackData: "To_Stats"),
-                InlineKeyboardButton.WithCallbackData(text: "🧑Accoun🧑", callbackData: "To_Account"),
+                InlineKeyboardButton.WithCallbackData(text: "🧑Account🧑", callbackData: "To_Account"),
             };
 
             return (message.ToString(), keyboard);
@@ -39,7 +39,7 @@ namespace Bot.scripts
             {
                 InlineKeyboardButton.WithCallbackData(text: "📓Diary📓", callbackData: "To_Diary"),
                 InlineKeyboardButton.WithCallbackData(text: "📈Stats📈", callbackData: "To_Stats"),
-                InlineKeyboardButton.WithCallbackData(text: "🧑Accoun🧑", callbackData: "To_Account"),
+                InlineKeyboardButton.WithCallbackData(text: "🧑Account🧑", callbackData: "To_Account"),
                 InlineKeyboardButton.WithCallbackData(text: "🤖Admin🤖", callbackData: "To_Admin")
             };
 
@@ -54,6 +54,7 @@ namespace Bot.scripts
             InlineKeyboardMarkup keyboard = new[]
             {
                 InlineKeyboardButton.WithCallbackData(text: "Shutdown", callbackData: "Admin_Shutdown"),
+                InlineKeyboardButton.WithCallbackData(text: "SeedData", callbackData: "Admin_SeedData"),
                 InlineKeyboardButton.WithCallbackData(text: "NukeDB", callbackData: "Admin_NukeDb"),
                 InlineKeyboardButton.WithCallbackData(text: "🧾Menu🧾", callbackData: "To_Menu")
             };
