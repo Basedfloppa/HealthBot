@@ -256,8 +256,29 @@ namespace Bot.scripts
                 },
                 new[]
                 {
+                    InlineKeyboardButton.WithCallbackData(text: "Analytics", callbackData: "To_Analytics")
+                },
+                new[]
+                {
                     InlineKeyboardButton.WithCallbackData(text: "Calories by date", callbackData: $"Stats_CaloriesByDate{addition_tags}"),
                     InlineKeyboardButton.WithCallbackData(text: "Liquid by date", callbackData: $"Stats_LiquidByDate{addition_tags}")
+                }
+            };
+
+            return (message.ToString(), keyboard);
+        }
+
+        public static (string, InlineKeyboardMarkup) Analytics(string addition_text = "")
+        {
+            StringBuilder message = new StringBuilder();
+            message.AppendLine("Analytic info:");
+            message.AppendLine($"{addition_text}");
+
+            InlineKeyboardMarkup keyboard = new[]
+            {
+                new[]
+                {
+                    InlineKeyboardButton.WithCallbackData(text: "📈Stats📈", callbackData: "To_Stats")
                 }
             };
 
