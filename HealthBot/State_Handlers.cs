@@ -59,7 +59,7 @@ namespace HealthBot.handlers
                     await Command.Message.Send(user.ChatId, tuple, user.MessageId);
                     break;
                 case "Analytics":
-                    tuple = Reply.Analytics();
+                    tuple = Reply.Analytics(Command.Database.Analytics(user.ChatId));
 
                     await Command.Message.Send(user.ChatId, tuple, user.MessageId);
                     break;
