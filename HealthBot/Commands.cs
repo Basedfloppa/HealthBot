@@ -235,34 +235,37 @@ namespace Bot.scripts
                 var db = new HealthBotContext();
                 StringBuilder message = new StringBuilder();
 
-                var height = db.Biometries.Where(b => b.Author == chat_id && b.Height != null).OrderBy(x=>x.UpdatedAt).First().Height;
-                var weight = db.Biometries.Where(b => b.Author == chat_id && b.Weight != null).OrderBy(x=>x.UpdatedAt).First().Weight;
-                var bmi = (double)(height/weight);
-                switch(bmi)
+                var height = db.Biometries.Where(b => b.Author == chat_id && b.Height != null).OrderBy(x=>x.UpdatedAt);
+                var weight = db.Biometries.Where(b => b.Author == chat_id && b.Weight != null).OrderBy(x=>x.UpdatedAt);
+                if ( height.Count() > 0 && weight.Count() > 0 )
                 {
-                    case < 16:
-                        message.AppendLine("According to latest biometry data you are severly thinn");
-                        break;
-                    case >= 16 and <= 17:
-                        message.AppendLine("According to latest biometry data you are moderatly thinn");
-                        break;
-                    case > 17 and <= 18.5:
-                        message.AppendLine("According to latest biometry data you are mildly thinn");
-                        break;
-                    case > 25 and <= 30:
-                        message.AppendLine("According to latest biometry data you are overweight");
-                        break;
-                    case > 30 and <= 35:
-                        message.AppendLine("According to latest biometry data you are obese class I");
-                        break;
-                    case > 35 and <= 40:
-                        message.AppendLine("According to latest biometry data you are Obese class II");
-                        break;
-                    case > 40:
-                        message.AppendLine("According to latest biometry data you are obese class III");
-                        break;
+                    var bmi = (double)(height.First().Height/weight.First().Weight);
+                    switch(bmi)
+                    {
+                        case < 16:
+                            message.AppendLine("According to latest biometry data you are severly thinn");
+                            break;
+                        case >= 16 and <= 17:
+                            message.AppendLine("According to latest biometry data you are moderatly thinn");
+                            break;
+                        case > 17 and <= 18.5:
+                            message.AppendLine("According to latest biometry data you are mildly thinn");
+                            break;
+                        case > 25 and <= 30:
+                            message.AppendLine("According to latest biometry data you are overweight");
+                            break;
+                        case > 30 and <= 35:
+                            message.AppendLine("According to latest biometry data you are obese class I");
+                            break;
+                        case > 35 and <= 40:
+                            message.AppendLine("According to latest biometry data you are Obese class II");
+                            break;
+                        case > 40:
+                            message.AppendLine("According to latest biometry data you are obese class III");
+                            break;
+                    }
                 }
-
+                
                 return message.ToString();
             } 
         }
