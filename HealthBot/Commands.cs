@@ -12,7 +12,7 @@ using System.Text;
 
 namespace Bot.scripts
 {
-    static class Command
+    public static class Command
     {
         public static ITelegramBotClient? bot_client;
 

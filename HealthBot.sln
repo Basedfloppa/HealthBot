@@ -5,6 +5,8 @@ VisualStudioVersion = 17.7.34031.279
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HealthBot", "HealthBot\HealthBot.csproj", "{FB832F45-2C95-467D-BBA1-E6B722C7AE39}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Healthbot_tests", "Healthbot_tests\Healthbot_tests.csproj", "{FE0B1ACC-D59D-4C9D-AA5E-BC7B9CF1DF5C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,10 +17,10 @@ Global
 		{FB832F45-2C95-467D-BBA1-E6B722C7AE39}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FB832F45-2C95-467D-BBA1-E6B722C7AE39}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FB832F45-2C95-467D-BBA1-E6B722C7AE39}.Release|Any CPU.Build.0 = Release|Any CPU
-		{86BC1077-E294-495D-A1F3-B0784DF185AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{86BC1077-E294-495D-A1F3-B0784DF185AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{86BC1077-E294-495D-A1F3-B0784DF185AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{86BC1077-E294-495D-A1F3-B0784DF185AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE0B1ACC-D59D-4C9D-AA5E-BC7B9CF1DF5C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE0B1ACC-D59D-4C9D-AA5E-BC7B9CF1DF5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE0B1ACC-D59D-4C9D-AA5E-BC7B9CF1DF5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE0B1ACC-D59D-4C9D-AA5E-BC7B9CF1DF5C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
